@@ -1,0 +1,112 @@
+---
+globs: *.py
+alwaysApply: false
+---
+# Python, SQL Rules
+
+Follow these patterns for `Python` and `SQL` code.
+
+## Database Interactions
+
+### Batch Operations
+
+- Strive for **single db operations** (eg batching) whenever possible
+- Avoid looping over a single db call for lists, arrays, dicts, or tuples
+- Use `from psycopg2.extras import execute_values` for batch insertions
+- Use `UPDATE ... SET ...` for many updates at once
+- Calculate insertions values or update values before single db call
+
+### Connection Pool
+
+- Use the shared connection pooler `from core.db import DatabaseConnectionPool`
+- Simple fetches (no `CTEs` or window functions) should use `db_pool.execute_query(query)`
+- Beyond simple operations, use `db_pool.get_cursor() as cursor`
+- Insertions should use `execute_values(cursor, query, insertValues, template, page_size)`
+- Truly specialized or complex queries can use `conn = db_pool.get_conn()`
+
+### Query Structure
+
+- Use `sql.SQL` from `psycopg2` to format `f-strings` in queries
+- Protect every query against an **SQL INJECTION** attack
+- Check all queries for database security and vulnerability exposure
+- Every query should be safe on re-run with `ON CONFLICT`, `upsert`, etc
+- Operations with databases should be **idempotent** and type safe
+
+## Code Quality
+
+### Syntax Guidelines
+
+- Follow these custom `Rowan` coding standards:
+- `camelCase` for `variable` names
+- `snake_case` for `function` names
+- `PascalCase` for `class` objects
+- `UPPER_SNAKE_CASE` for `CONSTANTS`
+
+### Function Reusability
+
+- Before attempting to create a new function, check for an existing function
+- If an existing function closely mirrors your desired functionality, use that
+- Design every individual function in such a way it can be reused across your project
+- Design helper functions where possible for **modularity**
+
+### Function Definitions
+
+- Provide `type hints` using `typing` for all variables
+- Always declare the input(s) and their `type(s)`
+- Always declare the expected return object and its `type(s)`
+- Include a doc string for a one line description of the function
+- If not self obvious, include expected `inputs` and `outputs`
+- Always guard functions against null or invalid inputs
+
+### Constants
+
+- If a variable or name is reused, at all, define it as a constant
+- Define all table names specific to your project as constants
+- This keeps table names bound to a single source of truth
+- Ex: `QUICKBOOKS_ONLINE_CUSTOMER_TABLE` points to table name `quickbooks_online_customer`
+- Ex: `QuickBooksCustomerService` imports `QUICKBOOKS_ONLINE_CUSTOMER_TABLE` for all db functions
+- Ex: `QUICKBOOKS_ONLINE_PAGE_SIZE` is assigned a value in only `_constants.py`
+
+### Logging
+
+- Always use `from core import logging` never print statements
+- Log API error points in your project as `level: error` (route app-breaking errors)
+- Log potential error points in your project as `level: warning` (not app-breaking errors)
+- Log when you queue a background job from each `route` in your `routes/[projectroutes.py]`
+- Log database operations using `db_pool` wrapped in `try/except` statements
+- Log when you fail to execute any outbound webhooks or API calls
+- Log at boundaries (`job` start or end, `db` writes, `server` calls)
+- Do not log routine or expected outputs for the sake of checkpoints
+- Do not log debugging other than explicitly during local testing
+- Do not log `secrets` or **sensitive fields** in production code
+
+### Environment Variables
+
+- Store them as apart of `from core import config`
+- Access them top level using `MY_KEY = config.get("MY_KEY")`
+
+### Redis Secrets
+
+- Can use `import secrets` for tokens stored by `secrets.token_urlsafe(32|64)`
+- Create and delete keys for `OAuth` processes scoped by some `ID` field
+- Store secrets using `redis_connection.queue_manage.get_connection()` and `.setex`
+- Include standardized `MY_TOKEN_EXPIRATION_TIME` as a `_constants.py` variable
+
+### Strong Types
+
+- Use supported libraries like `from datetime import datetime` for dates
+- Use enums as defined in `packages/db/schema/*` and in `_enums.py` files
+- Define enums strongly with `from enum import Enum`
+
+### Doc Strings
+
+- Every Python file should have simple headers for traceability
+- Include `Author`, `Contact`, `Date`, `Documentation`, and a one line description
+- No verbose or lengthy descriptions; no AI slop
+
+### Documentation
+
+- Every `.md` file should be **handwritten by the human developer**
+- Documentation is written **by humans, for humans**
+- One doc per service group (eg your project) found in `worker/docs`
+- Every service file should point back to the relevant documentation in doc strings
