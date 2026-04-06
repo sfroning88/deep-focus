@@ -1,0 +1,42 @@
+name: React Doctor
+
+on:
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  react-doctor:
+    name: React Doctor
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run React Doctor
+        id: doctor
+        uses: millionco/react-doctor@main
+        with:
+          directory: apps/dashboard
+          verbose: "true"
+          node-version: "20"
+
+      - name: Print score
+        run: echo "Health score ${{ steps.doctor.outputs.score }}"

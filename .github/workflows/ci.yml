@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  # Merge into main = push to main
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_REMOTE_CACHE_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_REMOTE_SLUG }}
+      NODE_OPTIONS: "--max-old-space-size=4096"
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm --filter @focus/db run db:generate
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: bash scripts/ci-turbo-build.sh
+        env:
+          CI_EVENT_NAME: ${{ github.event_name }}
+          CI_BASE_REF: ${{ github.base_ref }}
+          CI_EVENT_BEFORE: ${{ github.event.before }}
+          CI: true
+          NEXT_PUBLIC_SUPABASE_URL: ${{ (github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.base_ref == 'main')) && secrets.NEXT_PUBLIC_SUPABASE_URL || '' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ (github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.base_ref == 'main')) && secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ (github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.base_ref == 'main')) && secrets.SUPABASE_SERVICE_ROLE_KEY || '' }}

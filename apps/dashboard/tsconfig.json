@@ -1,0 +1,19 @@
+{
+  "extends": "@focus/tsconfig/nextjs.json",
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@app/*": ["./app/*"],
+      "@lib/*": ["./lib/*"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.d.ts",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}

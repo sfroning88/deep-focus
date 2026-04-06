@@ -1,0 +1,63 @@
+{
+  "name": "focus-platform",
+  "version": "0.0.1",
+  "private": true,
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --filter=@focus/dashboard --log-order=stream",
+    "build": "turbo run build --filter=@focus/dashboard --log-order=stream",
+    "lint": "turbo run lint --filter=@focus/dashboard --log-order=stream",
+    "build:app": "pnpm --filter @focus/dashboard run build",
+    "type-check": "pnpm --filter @focus/config --filter @focus/types --filter @focus/db --filter @focus/services --filter @focus/utils --filter @focus/auth --filter @focus/dashboard run type-check",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "db:generate": "pnpm --filter @focus/db db:generate",
+    "db:migrate": "pnpm --filter @focus/db db:migrate",
+    "db:migrate:create": "pnpm --filter @focus/db db:migrate:create --",
+    "db:deploy:dev": "pnpm --filter @focus/db db:deploy",
+    "db:studio": "pnpm --filter @focus/db db:studio",
+    "use:local": "node scripts/env-setup.js local",
+    "use:dev": "node scripts/env-setup.js dev",
+    "use:prod": "node scripts/env-setup.js prod",
+    "postinstall": "pnpm db:generate",
+    "check:migration-safety": "./scripts/check-migration-safety.sh",
+    "git:pre-commit": "sh scripts/husky/pre-commit.sh",
+    "git:pre-push": "sh scripts/husky/pre-push.sh",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@next/eslint-plugin-next": "^15.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "dotenv-cli": "^8.0.0",
+    "eslint": "^9.0.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^16.0.0",
+    "prettier": "^3.8.0",
+    "prettier-plugin-tailwindcss": "^0.7.0",
+    "turbo": "^2.8.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.57.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write",
+      "eslint --max-warnings=0 --no-ignore"
+    ],
+    "*.{json,md,css}": [
+      "prettier --write"
+    ]
+  },
+  "prisma": {
+    "schema": "packages/db/prisma/schema"
+  }
+}
