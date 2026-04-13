@@ -35,7 +35,7 @@ export default async function Home() {
             {supabaseUser ? (
               <>
                 <Link
-                  href="/dashboard"
+                  href="/home"
                   className="rounded-full bg-zinc-900 px-4 py-2 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
                 >
                   Dashboard
