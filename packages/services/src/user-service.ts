@@ -1,33 +1,28 @@
 import "server-only";
 
 import { db } from "@focus/db";
+import type { User } from "@focus/db";
 import type { User as SupabaseAuthUser } from "@supabase/supabase-js";
+
+export class AppUserProfileNotFoundError extends Error {
+  constructor(readonly supabaseUserId: string) {
+    super(
+      `No iam.users profile for Supabase user ${supabaseUserId}; expected DB trigger handle_new_user to create it.`,
+    );
+    this.name = "AppUserProfileNotFoundError";
+  }
+}
 
 export const UserService = {
   async ensureAppUserFromSupabaseAuth(
     authUser: SupabaseAuthUser,
-  ): Promise<void> {
-    const email = authUser.email ?? `${authUser.id}@users.local`;
-    const name =
-      (typeof authUser.user_metadata?.full_name === "string" &&
-        authUser.user_metadata.full_name) ||
-      (typeof authUser.user_metadata?.name === "string" &&
-        authUser.user_metadata.name) ||
-      email.split("@")[0] ||
-      "User";
-    const phonePlaceholder = `+${authUser.id.replace(/-/g, "")}`;
-    await db.user.upsert({
+  ): Promise<User> {
+    const appUser = await db.user.findUnique({
       where: { id: authUser.id },
-      create: {
-        id: authUser.id,
-        email,
-        name,
-        phone: phonePlaceholder,
-      },
-      update: {
-        email,
-        name,
-      },
     });
+    if (!appUser) {
+      throw new AppUserProfileNotFoundError(authUser.id);
+    }
+    return appUser;
   },
 };

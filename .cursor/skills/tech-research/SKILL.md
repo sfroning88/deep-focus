@@ -152,7 +152,7 @@ Infrastructure:
 - IAM: Shared @rowan/iam package for org/user/profile management (providers, components,
   hooks, server actions). Apps extend with app-specific routes.
 - Background jobs: Redis + RQ (Python workers); Redis rate limiting (collect-tool).
-- Env: root .env files, pnpm use:[local|dev|prod] scripts.
+- Env: single repo-root `.env` (see `.env.example`); symlink into `apps/dashboard` and `packages/db` as in README.
 - Deployments: Vercel (Next.js apps), Render (FastAPI + Express always-on services).
 - Key integrations: QuickBooks Online, ElevenLabs, PostHog, Gmail (platform-express).
 - AI surface: receivables-worker (FastAPI/Python) is primary agent/LLM execution layer. pgvector for vector storage, embedding + reranking pipelines.

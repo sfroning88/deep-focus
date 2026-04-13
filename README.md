@@ -15,9 +15,16 @@ This application uses lightweight and free `libraries`:
 
 ## Database
 
-[`@focus/db`](packages/db) — Prisma 7 + PostgreSQL. Config and migrations live under [`packages/db`](packages/db): [`prisma.config.ts`](packages/db/prisma.config.ts) points at the `prisma/` schema folder and `prisma/migrations/`. CLI uses **`DIRECT_URL`** (direct Postgres; pooled `DATABASE_URL` is for the app client — see [`.env.example`](.env.example)). Put a **`packages/db/.env`** with at least `DIRECT_URL` when running Prisma commands locally.
+[`@focus/db`](packages/db) — Prisma 7 + PostgreSQL. Config and migrations live under [`packages/db`](packages/db): [`prisma.config.ts`](packages/db/prisma.config.ts) points at the `prisma/` schema folder and `prisma/migrations/`. CLI uses **`DIRECT_URL`** (direct Postgres; pooled `DATABASE_URL` is for the app client — see [`.env.example`](.env.example)). Use one **repo-root `.env`** and symlink it into `packages/db` (see [Environment](#environment)) so Prisma picks up `DIRECT_URL`.
 
-**From repo root:** `pnpm db:generate` · `pnpm db:migrate` (`prisma migrate dev`) · `pnpm db:migrate:create -- <name>` (writes `prisma/migrations/<name>/migration.sql` from a schema diff; prints `yes`/`no`) · `pnpm db:deploy:dev` · `pnpm db:studio` · `pnpm --filter @focus/db db:push`
+Supabase **Auth** lives in `auth.users`; app profiles are **`iam.users`** with the same UUID. A trigger (`on_auth_user_created`) is defined in [`20260414000000_on_auth_user_created/migration.sql`](packages/db/prisma/migrations/20260414000000_on_auth_user_created/migration.sql) so it ships with `migrate deploy`; if that migration cannot run against `auth` from your CLI role, apply the same SQL in the Supabase SQL Editor, then mark the migration resolved (see comments in that file).
+
+**From repo root:**
+
+- `pnpm db:generate` — regenerate the Prisma client after schema changes.
+- `pnpm db:migrate <migration_name>` — creates `prisma/migrations/` via [`create-migration.sh`](packages/db/prisma/scripts/create-migration.sh) (`prisma migrate dev --create-only --name …`; **does not apply** to any database). Example: `pnpm db:migrate init`. Extra Prisma flags after `--`: `pnpm db:migrate init -- --skip-generate`. Production applies on merge to `main` via [`deploy-db-with-prisma`](.github/workflows/deploy-db-with-prisma.yml) (`migrate deploy`).
+- `pnpm db:deploy` — apply pending migrations (`prisma migrate deploy`) using whatever database URLs are in your current `.env` (e.g. local testing against your Supabase project).
+- `pnpm db:studio` · `pnpm --filter @focus/db db:push`
 
 ```ts
 import { db } from "@focus/db";
@@ -33,10 +40,13 @@ npx prisma migrate diff --from-empty --to-schema-datamodel ./prisma --script -o 
 
 ## Environment
 
-Create symbolic links to each app:
+There is a **single** environment file at the repo root: copy [`.env.example`](.env.example) to `.env` and fill in values. No separate dev/prod env switching in `package.json`—Vercel and GitHub Actions inject their own secrets in deploy.
+
+Point apps and Prisma at that file with symlinks:
 
 ```sh
 ln -sf ../../.env apps/dashboard/.env
+ln -sf ../../.env packages/db/.env
 ```
 
 ## Analytics

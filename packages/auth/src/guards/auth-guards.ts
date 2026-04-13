@@ -1,7 +1,6 @@
 import { cache } from "react";
 import { redirect } from "next/navigation";
-import { db } from "@focus/db";
-import { UserService } from "@focus/services";
+import { AppUserProfileNotFoundError, UserService } from "@focus/services";
 import { getSession } from "./session";
 import { authRoutes } from "../routes";
 
@@ -9,11 +8,15 @@ export const requirePlatformAdmin = cache(
   async function requirePlatformAdmin() {
     const { supabaseUser } = await getSession();
     if (!supabaseUser) redirect(authRoutes.auth.login);
-    await UserService.ensureAppUserFromSupabaseAuth(supabaseUser);
-    const appUser = await db.user.findUnique({
-      where: { id: supabaseUser.id },
-    });
-    if (!appUser) redirect(authRoutes.auth.login);
+    let appUser;
+    try {
+      appUser = await UserService.ensureAppUserFromSupabaseAuth(supabaseUser);
+    } catch (error) {
+      if (error instanceof AppUserProfileNotFoundError) {
+        redirect(authRoutes.noAccess);
+      }
+      throw error;
+    }
     if (!appUser.isPlatformAdmin) {
       redirect(authRoutes.noAccess);
     }
@@ -27,8 +30,17 @@ export const requirePlatformAdmin = cache(
 export const requireUser = cache(async function requireUser() {
   const { supabaseUser } = await getSession();
   if (!supabaseUser) redirect(authRoutes.auth.login);
-  await UserService.ensureAppUserFromSupabaseAuth(supabaseUser);
+  let appUser;
+  try {
+    appUser = await UserService.ensureAppUserFromSupabaseAuth(supabaseUser);
+  } catch (error) {
+    if (error instanceof AppUserProfileNotFoundError) {
+      redirect(authRoutes.noAccess);
+    }
+    throw error;
+  }
   return {
     supabaseUser,
+    appUser,
   };
 });
