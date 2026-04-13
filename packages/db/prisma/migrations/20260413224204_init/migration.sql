@@ -1,3 +1,6 @@
+-- gen_random_uuid() requires pgcrypto
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
 -- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "iam";
 
@@ -7,10 +10,10 @@ CREATE TABLE IF NOT EXISTS "iam"."users" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
-    "is_active" BOOLEAN DEFAULT false,
-    "is_platform_admin" BOOLEAN DEFAULT false,
-    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    "is_active" BOOLEAN NOT NULL DEFAULT false,
+    "is_platform_admin" BOOLEAN NOT NULL DEFAULT false,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );

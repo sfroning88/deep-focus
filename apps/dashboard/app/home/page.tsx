@@ -1,14 +1,9 @@
 import Link from "next/link";
-import { db } from "@focus/db";
 import { requireUser } from "@focus/auth/server";
 import { routes } from "@lib/routes";
 
 export default async function HomePage() {
-  const { supabaseUser } = await requireUser();
-  const appUser = await db.user.findUnique({
-    where: { id: supabaseUser.id },
-    select: { email: true, name: true, isPlatformAdmin: true },
-  });
+  const { appUser } = await requireUser();
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -27,23 +22,23 @@ export default async function HomePage() {
         <div>
           <dt className="text-zinc-500">Name</dt>
           <dd className="font-medium text-zinc-900 dark:text-zinc-100">
-            {appUser?.name}
+            {appUser.name}
           </dd>
         </div>
         <div>
           <dt className="text-zinc-500">Email</dt>
           <dd className="font-medium text-zinc-900 dark:text-zinc-100">
-            {appUser?.email}
+            {appUser.email}
           </dd>
         </div>
         <div>
           <dt className="text-zinc-500">Platform admin</dt>
           <dd className="font-medium text-zinc-900 dark:text-zinc-100">
-            {appUser?.isPlatformAdmin ? "Yes" : "No"}
+            {appUser.isPlatformAdmin ? "Yes" : "No"}
           </dd>
         </div>
       </dl>
-      {appUser?.isPlatformAdmin ? (
+      {appUser.isPlatformAdmin ? (
         <Link
           href={routes.admin.root}
           className="inline-flex w-fit text-sm font-medium text-zinc-900 underline underline-offset-4 dark:text-zinc-100"
