@@ -5,6 +5,18 @@
 -- If this fails on hosted Supabase (rare permission edge cases on `auth`), run the same statements in the SQL Editor,
 -- then: `pnpm exec prisma migrate resolve --applied 20260414000000_on_auth_user_created` from `packages/db`.
 
+-- Prisma `migrate dev` replays migrations against an empty shadow database with no Supabase `auth` schema.
+-- This block is idempotent: on Supabase, `auth.users` already exists so CREATE TABLE is skipped; on shadow/local Postgres, a minimal stub is created.
+CREATE SCHEMA IF NOT EXISTS auth;
+
+CREATE TABLE IF NOT EXISTS auth.users (
+  id uuid NOT NULL,
+  email text,
+  phone text,
+  raw_user_meta_data jsonb DEFAULT '{}'::jsonb,
+  CONSTRAINT auth_users_pkey PRIMARY KEY (id)
+);
+
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
