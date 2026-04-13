@@ -24,6 +24,7 @@ Supabase **Auth** lives in `auth.users`; app profiles are **`iam.users`** with t
 - `pnpm db:generate` — regenerate the Prisma client after schema changes.
 - `pnpm db:migrate <migration_name>` — creates `prisma/migrations/` via [`create-migration.sh`](packages/db/prisma/scripts/create-migration.sh) (`prisma migrate dev --create-only --name …`; **does not apply** to any database). Example: `pnpm db:migrate init`. Extra Prisma flags after `--`: `pnpm db:migrate init -- --skip-generate`. Production applies on merge to `main` via [`deploy-db-with-prisma`](.github/workflows/deploy-db-with-prisma.yml) (`migrate deploy`).
 - `pnpm db:deploy` — apply pending migrations (`prisma migrate deploy`) using whatever database URLs are in your current `.env` (e.g. local testing against your Supabase project).
+- `pnpm run db:prisma <prisma-args>` — run the Prisma CLI from `@focus/db` (e.g. `pnpm run db:prisma migrate resolve --rolled-back 20260414000000_on_auth_user_created`). Do not run bare `pnpm prisma` at the repo root; the binary lives only in that workspace package.
 - `pnpm db:studio` · `pnpm --filter @focus/db db:push`
 
 ```ts
