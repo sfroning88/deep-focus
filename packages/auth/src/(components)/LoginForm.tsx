@@ -7,11 +7,9 @@ import { supabaseClient } from "../client/browser";
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") ?? "/dashboard";
+  const nextPath = searchParams.get("next") ?? "/home";
   const safeNext =
-    nextPath.startsWith("/") && !nextPath.startsWith("//")
-      ? nextPath
-      : "/dashboard";
+    nextPath.startsWith("/") && !nextPath.startsWith("//") ? nextPath : "/home";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);

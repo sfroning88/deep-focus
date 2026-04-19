@@ -10,7 +10,7 @@ export default async function Home() {
       <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between gap-10 py-24 px-8 sm:items-start">
         <Image
           className="dark:invert"
-          src="/next.svg"
+          src="/default/next.svg"
           alt="Next.js logo"
           width={100}
           height={20}
