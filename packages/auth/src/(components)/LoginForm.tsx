@@ -3,15 +3,16 @@
 import { useState, type ChangeEvent, type SubmitEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabaseClient } from "../client/browser";
+import { authRoutes } from "../routes";
 
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") ?? "/dashboard";
+  const nextPath = searchParams.get("next") ?? authRoutes.home;
   const safeNext =
     nextPath.startsWith("/") && !nextPath.startsWith("//")
       ? nextPath
-      : "/dashboard";
+      : authRoutes.home;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);

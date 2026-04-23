@@ -10,7 +10,7 @@ export default async function Home() {
       <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between gap-10 py-24 px-8 sm:items-start">
         <Image
           className="dark:invert"
-          src="/next.svg"
+          src="/default/next.svg"
           alt="Next.js logo"
           width={100}
           height={20}
@@ -35,7 +35,7 @@ export default async function Home() {
             {supabaseUser ? (
               <>
                 <Link
-                  href="/home"
+                  href={routes.home}
                   className="rounded-full bg-zinc-900 px-4 py-2 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
                 >
                   Dashboard
