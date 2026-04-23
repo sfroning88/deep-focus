@@ -34,7 +34,7 @@ model Property {
 
 model PropertySnapshot {
     reportedAt              DateTime @map("reported_at") @db.Date
-    occupancy               Decimal @default(0) @db.Decimal(5,4)
+    occupancy               Decimal @default(0) @db.Decimal(5,2)
     totalRevenues           Decimal @map("total_revenues") @default(0) @db.Decimal(14,2)
     repairsMaintenance      Decimal @map("repairs_maintenance") @default(0) @db.Decimal(14,2)
     payroll                 Decimal @default(0) @db.Decimal(14,2)

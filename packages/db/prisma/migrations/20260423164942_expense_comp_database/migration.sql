@@ -12,7 +12,7 @@ ALTER COLUMN "is_platform_admin" DROP NOT NULL;
 CREATE TABLE IF NOT EXISTS "property"."nic_msa" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "name" TEXT NOT NULL,
-    "population" DECIMAL(65,30) NOT NULL DEFAULT 0,
+    "population" INTEGER NOT NULL DEFAULT 0,
     "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS "property"."property" (
 -- CreateTable
 CREATE TABLE IF NOT EXISTS "property"."property_snapshot" (
     "reported_at" DATE NOT NULL,
-    "occupancy" DECIMAL(5,4) NOT NULL DEFAULT 0,
+    "occupancy" DECIMAL(5,2) NOT NULL DEFAULT 0,
     "total_revenues" DECIMAL(14,2) NOT NULL DEFAULT 0,
     "repairs_maintenance" DECIMAL(14,2) NOT NULL DEFAULT 0,
     "payroll" DECIMAL(14,2) NOT NULL DEFAULT 0,
