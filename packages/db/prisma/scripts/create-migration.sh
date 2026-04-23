@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Runs `prisma migrate dev --create-only` with --name (does not apply to the DB).
-# From repo root: pnpm db:migrate <name> [-- extra prisma args]
-# Example: pnpm db:migrate init
+# Generates a new migration SQL file using `prisma migrate diff` (no shadow DB).
+# `migrate dev --create-only` needs a shadow database which cannot replay
+# Supabase-managed schemas (auth.*), so we diff schema files directly instead.
+#
+# From repo root: pnpm db:migrate <name>
+# Example: pnpm db:migrate add_expense_tables
 
 NAME="${1:-}"
 if [[ -z "$NAME" || "$NAME" == *"/"* || "$NAME" == *".."* ]]; then
@@ -14,4 +17,24 @@ if [[ -z "$NAME" || "$NAME" == *"/"* || "$NAME" == *".."* ]]; then
 fi
 shift
 
-exec prisma migrate dev --create-only --name "$NAME" "$@"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PRISMA_DIR="$(dirname "$SCRIPT_DIR")"
+MIGRATIONS_DIR="$PRISMA_DIR/migrations"
+
+TIMESTAMP="$(date -u '+%Y%m%d%H%M%S')"
+MIGRATION_DIR="$MIGRATIONS_DIR/${TIMESTAMP}_${NAME}"
+
+sql="$(prisma migrate diff \
+  --from-config-datasource \
+  --to-schema "$PRISMA_DIR/schema" \
+  --script)"
+
+if [[ -z "$sql" || "$sql" == "-- This is an empty migration." ]]; then
+  echo "No schema changes detected — nothing to migrate."
+  exit 0
+fi
+
+mkdir -p "$MIGRATION_DIR"
+printf '%s\n' "$sql" > "$MIGRATION_DIR/migration.sql"
+echo "Created migration: ${TIMESTAMP}_${NAME}"
+echo "  → $MIGRATION_DIR/migration.sql"
