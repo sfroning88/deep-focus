@@ -1,1 +1,1 @@
-export * from "./supabase-utils";
+export * from "./number-utils";

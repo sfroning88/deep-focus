@@ -1,0 +1,8 @@
+{
+  "eslint.workingDirectories": [
+    {
+      "directory": "apps/dashboard",
+      "changeProcessCwd": true
+    }
+  ]
+}
