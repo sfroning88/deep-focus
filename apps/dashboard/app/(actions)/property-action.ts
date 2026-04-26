@@ -3,13 +3,13 @@
 import { z } from "zod";
 import { selfUserAction } from "@focus/auth/server";
 import { PropertyService } from "@lib/services/src/property/server/property-service";
-import { Property, PropertyCard } from "@focus/types";
+import { PropertyCard, PropertyListEntry } from "@focus/types";
 
 const fetchPropertiesSchema = z.object({});
 
 export const fetchPropertiesAction = selfUserAction(
   fetchPropertiesSchema,
-  async (): Promise<Property[]> => {
+  async (): Promise<PropertyListEntry[]> => {
     return await PropertyService.fetchProperties();
   },
 );

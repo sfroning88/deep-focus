@@ -1,21 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition, useMemo } from "react";
 import { useMediaQuery } from "@/app/(hooks)/use-media-query";
 import { useFetchProperties } from "@/app/(hooks)/use-fetch-properties";
 import { useUserId } from "@/app/(hooks)/use-user-id";
 import { PropertyCard } from "@/app/(components)/(properties)/PropertyCard";
+import { PropertySearchBar } from "./(propertyList)/PropertySearchBar";
+import { PropertyListItem } from "./(propertyList)/PropertyListItem";
 import { MOBILE_BREAKPOINT } from "@/lib/constants";
-import type { Property } from "@focus/types";
+import { toNum } from "@focus/utils";
+import type { SortField, SortDir } from "@focus/utils";
+import type { PropertyListEntry } from "@focus/types";
 
 type PropertyListProps = {
-  initialData?: Property[];
+  initialData?: PropertyListEntry[];
 };
 
 export function PropertyList({ initialData }: PropertyListProps) {
   const userId = useUserId();
   const isMobile = !useMediaQuery(`(min-width: ${MOBILE_BREAKPOINT}px)`, true);
   const [detailId, setDetailId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [sortField, setSortField] = useState<SortField>("name");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [, startTransition] = useTransition();
 
   const {
     data: properties,
@@ -24,56 +32,99 @@ export function PropertyList({ initialData }: PropertyListProps) {
     error: listErrorObj,
   } = useFetchProperties(userId, initialData);
 
-  const padding = isMobile ? "0.75rem" : "1.25rem";
+  const handleQueryChange = (q: string) => {
+    startTransition(() => setQuery(q));
+  };
+
+  const handleToggleSort = (field: SortField) => {
+    if (field === sortField) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortDir("asc");
+    }
+  };
+
+  const filtered = useMemo(() => {
+    if (!properties) return [];
+    const q = query.toLowerCase().trim();
+
+    const list = q
+      ? properties.filter(
+          (p) =>
+            p.name.toLowerCase().includes(q) ||
+            p.city.toLowerCase().includes(q) ||
+            p.state.toLowerCase().includes(q),
+        )
+      : [...properties];
+
+    list.sort((a, b) => {
+      if (sortField === "name") {
+        const cmp = a.name.localeCompare(b.name);
+        return sortDir === "asc" ? cmp : -cmp;
+      }
+      if (sortField === "msa") {
+        const aMsa = a.msa?.name ?? "";
+        const bMsa = b.msa?.name ?? "";
+        const cmp = aMsa.localeCompare(bMsa);
+        return sortDir === "asc" ? cmp : -cmp;
+      }
+      const aOcc = toNum(a.snapshots?.[0]?.occupancy ?? 0);
+      const bOcc = toNum(b.snapshots?.[0]?.occupancy ?? 0);
+      return sortDir === "asc" ? aOcc - bOcc : bOcc - aOcc;
+    });
+
+    return list;
+  }, [properties, query, sortField, sortDir]);
 
   return (
-    <div
-      className={`space-y-4 ${isMobile ? "text-xs" : "text-sm"}`}
-      style={{ padding }}
-    >
+    <div className="space-y-4 font-data">
       <h1
-        className={`font-semibold text-slate-900 ${isMobile ? "text-lg" : "text-2xl"}`}
+        className={`font-semibold text-fhp-blue-400 ${isMobile ? "text-lg" : "text-2xl"}`}
       >
         Properties
       </h1>
 
+      <PropertySearchBar
+        query={query}
+        onQueryChange={handleQueryChange}
+        sortField={sortField}
+        sortDir={sortDir}
+        onToggleSort={handleToggleSort}
+        isMobile={isMobile}
+      />
+
       {listLoading ? (
-        <p className="text-slate-600">Loading properties…</p>
+        <p className="text-white/50 text-sm">Loading properties…</p>
       ) : listError ? (
-        <p className="text-red-700">
+        <p className="text-red-400 text-sm">
           {listErrorObj instanceof Error
             ? listErrorObj.message
             : "Could not load properties."}
         </p>
-      ) : !properties?.length ? (
-        <p className="text-slate-600">No properties to show.</p>
+      ) : !filtered.length ? (
+        <p className="text-white/40 text-sm">
+          {query
+            ? "No properties match your search."
+            : "No properties to show."}
+        </p>
       ) : (
-        <ul className="divide-y divide-slate-200 border border-slate-200 rounded-lg overflow-hidden bg-white">
-          {properties.map((p) => (
-            <li
-              key={p.id}
-              className="flex items-center justify-between gap-3 px-4 py-3"
-            >
-              <div className="min-w-0">
-                <p
-                  className={`font-medium text-slate-900 truncate ${isMobile ? "text-sm" : "text-base"}`}
-                >
-                  {p.name}
-                </p>
-                <p className="text-slate-600 truncate">
-                  {p.city}, {p.state}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setDetailId(p.id)}
-                className="shrink-0 px-3 py-1.5 border-2 border-slate-400 bg-white hover:bg-slate-50 font-medium text-slate-800 rounded"
-              >
-                View
-              </button>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="border border-white/10 rounded-md overflow-hidden bg-surface-dark">
+            {filtered.map((p) => (
+              <PropertyListItem
+                key={p.id}
+                property={p}
+                isMobile={isMobile}
+                onSelect={setDetailId}
+              />
+            ))}
+          </ul>
+          <p className="text-[11px] text-white/30 font-data-mono">
+            {filtered.length}{" "}
+            {filtered.length === 1 ? "property" : "properties"}
+          </p>
+        </>
       )}
 
       <PropertyCard

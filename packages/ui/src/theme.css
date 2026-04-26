@@ -27,6 +27,8 @@
   --color-foreground: var(--color-fhp-navy-900);
   --color-card: var(--color-fhp-white);
   --color-card-foreground: var(--color-fhp-navy-900);
+  --color-surface-dark: #111827;
+  --color-surface-dark-foreground: #ffffff;
   --color-primary: var(--color-fhp-navy-800);
   --color-primary-foreground: var(--color-fhp-white);
   --color-secondary: var(--color-fhp-blue-100);
@@ -65,6 +67,13 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono:
     var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* —— Type: data UI pairing (DM Sans / DM Mono via next/font CSS vars) —— */
+  --font-data:
+    var(--font-dm-sans), "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-data-mono:
+    var(--font-dm-mono), "DM Mono", ui-monospace, SFMono-Regular, Menlo,
+    monospace;
 
   /* —— Radii —— */
   --radius-sm: 0.25rem;

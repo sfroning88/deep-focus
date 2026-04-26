@@ -1,0 +1,79 @@
+"use client";
+
+import { formatPercent, getOccupancyTier, toNum } from "@focus/utils";
+import { occupancyColors } from "@focus/ui";
+import type { PropertyListEntry } from "@focus/types";
+
+type PropertyListItemProps = {
+  property: PropertyListEntry;
+  isMobile: boolean;
+  onSelect: (id: string) => void;
+};
+
+function Dot() {
+  return <span className="text-white/20 select-none">·</span>;
+}
+
+export function PropertyListItem({
+  property,
+  isMobile,
+  onSelect,
+}: PropertyListItemProps) {
+  const latestOcc = property.snapshots?.[0]?.occupancy;
+  const occValue = latestOcc != null ? toNum(latestOcc) : null;
+  const tier = occValue != null ? getOccupancyTier(occValue) : null;
+
+  return (
+    <li className="flex items-center justify-between gap-3 border-b border-white/5 last:border-0 px-3 md:px-5 py-3 md:py-4 transition-colors hover:bg-white/[0.02]">
+      <div className="min-w-0">
+        <p
+          className={`font-semibold text-white truncate ${isMobile ? "text-sm" : "text-base"}`}
+        >
+          {property.name}
+        </p>
+        <div
+          className={`mt-0.5 flex flex-wrap items-center gap-x-1.5 text-white/50 ${isMobile ? "text-[11px]" : "text-xs"}`}
+        >
+          <span>
+            {property.city}, {property.state}
+          </span>
+          {property.msa?.name && (
+            <>
+              <Dot />
+              <span>{property.msa.name}</span>
+            </>
+          )}
+          <Dot />
+          <span>{property.totalUnits} units</span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 md:gap-3 shrink-0">
+        {tier && occValue != null && (
+          <span
+            className={`
+              inline-flex items-center rounded-sm border px-2 py-0.5
+              font-data-mono font-semibold
+              ${isMobile ? "text-xs" : "text-sm"}
+              ${occupancyColors[tier]}
+            `}
+          >
+            {formatPercent(occValue)}
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={() => onSelect(property.id)}
+          className={`
+            rounded-md border border-white/15 bg-white/[0.04]
+            font-data font-medium text-white/70
+            hover:bg-white/[0.08] hover:text-white transition-colors
+            ${isMobile ? "px-2.5 py-1.5 text-xs" : "px-4 py-2 text-sm"}
+          `}
+        >
+          View →
+        </button>
+      </div>
+    </li>
+  );
+}

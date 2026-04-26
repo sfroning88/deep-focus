@@ -307,6 +307,9 @@ importers:
       '@focus/db':
         specifier: workspace:*
         version: link:../db
+      '@focus/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@supabase/supabase-js':
         specifier: ^2.49.1
         version: 2.100.1

@@ -1,1 +1,1 @@
-export {};
+export { occupancyColors } from "./tokens";

@@ -1,11 +1,11 @@
 import { unstable_cache } from "next/cache";
 import { CACHE_STALE_TIME, QUERY_KEYS } from "@/lib/constants";
-import type { Property } from "@focus/types";
+import type { PropertyListEntry } from "@focus/types";
 import { PropertyService } from "@lib/services";
 
 export async function fetchPropertiesCached(
   userId: string,
-): Promise<Property[]> {
+): Promise<PropertyListEntry[]> {
   return unstable_cache(
     async () => {
       return await PropertyService.fetchProperties();

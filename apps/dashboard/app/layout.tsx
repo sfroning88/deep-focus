@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Cinzel, Geist, Geist_Mono } from "next/font/google";
+import { Cinzel, DM_Sans, DM_Mono, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { QueryProvider, SupabaseProvider } from "./providers";
 
@@ -21,6 +21,18 @@ const focusDisplay = Cinzel({
   weight: ["400", "500", "600", "700"],
 });
 
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const dmMono = DM_Mono({
+  variable: "--font-dm-mono",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+});
+
 export const metadata: Metadata = {
   title: "Deep Focus",
   description: "Focus Healthcare Partners dashboard",
@@ -34,7 +46,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${focusDisplay.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${focusDisplay.variable} ${dmSans.variable} ${dmMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <QueryProvider>
