@@ -3,17 +3,40 @@ name: React Doctor
 on:
   pull_request:
     branches: [main, master]
+    paths:
+      - "apps/dashboard/**"
+      - "packages/**"
 
 jobs:
-  react-doctor:
-    name: React Doctor
+  changes:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pull-requests: read
+    outputs:
+      dashboard: ${{ steps.filter.outputs.dashboard }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            dashboard:
+              - 'apps/dashboard/**'
+              - 'packages/**'
 
+  react-doctor:
+    needs: changes
+    if: needs.changes.outputs.dashboard == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -21,20 +44,80 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate Prisma Client
+        run: pnpm --filter @focus/db run db:generate
+
+      - name: Build project list
+        id: projects
+        run: |
+          list=""
+          [ "${{ needs.changes.outputs.dashboard }}" == "true" ] && list="${list}@focus/dashboard,"
+          echo "projects=${list%,}" >> "$GITHUB_OUTPUT"
+
+      # react-doctor embeds jsx-a11y/no-noninteractive-element-interactions; oxlint does not
+      # implement that rule yet. oxlint 1.58+ rejects unknown plugin rules when parsing config
+      # (oxc-project/oxc#20464), so ^1.47.0 resolves to a broken combo. Pin oxlint to 1.57.0.
+      - name: Install React Doctor with pinned oxlint
+        run: |
+          mkdir -p /tmp/react-doctor-runner
+          cd /tmp/react-doctor-runner
+          npm init -y
+          npm pkg set overrides.oxlint=1.57.0
+          npm install react-doctor@0.0.29
+
       - name: Run React Doctor
         id: doctor
-        uses: millionco/react-doctor@main
+        run: |
+          FLAGS="--fail-on error --verbose"
+          FLAGS="$FLAGS --project ${{ steps.projects.outputs.projects }}"
+          FLAGS="$FLAGS --diff ${{ github.base_ref }}"
+          RD="/tmp/react-doctor-runner/node_modules/.bin/react-doctor"
+          "$RD" . $FLAGS 2>&1 | tee /tmp/react-doctor-output.txt
+          SCORE=$("$RD" . --score 2>/dev/null | tail -1 | tr -d '[:space:]')
+          echo "score=${SCORE:-0}" >> "$GITHUB_OUTPUT"
+
+      - name: Post filtered comment
+        uses: actions/github-script@v7
+        if: always() && github.event_name == 'pull_request'
         with:
-          directory: apps/dashboard
-          verbose: "true"
-          node-version: "20"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require("fs");
+            const { execSync } = require("child_process");
+            const path = "/tmp/react-doctor-output.txt";
+            if (!fs.existsSync(path)) return;
+            const raw = fs.readFileSync(path, "utf8").trim();
+            if (!raw) return;
+            const filtered = execSync(
+              `sh scripts/filter-react-doctor-output.sh "${path}"`,
+              { encoding: "utf8", maxBuffer: 10 * 1024 * 1024 }
+            ).trim();
+            if (!filtered) return;
+            const marker = "<!-- react-doctor -->";
+            const body = `${marker}\n## 🩺 React Doctor\n\n\`\`\`\n${filtered}\n\`\`\``;
+            const { data: comments } = await github.rest.issues.listComments({
+              ...context.repo,
+              issue_number: context.issue.number,
+            });
+            const prev = comments.find((c) => c.body?.startsWith(marker));
+            if (prev) {
+              await github.rest.issues.deleteComment({
+                ...context.repo,
+                comment_id: prev.id,
+              });
+            }
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body,
+            });
 
       - name: Print score
         run: echo "Health score ${{ steps.doctor.outputs.score }}"
