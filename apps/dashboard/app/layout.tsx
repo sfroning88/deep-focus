@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Cinzel, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { QueryProvider, SupabaseProvider } from "./providers";
 
@@ -13,6 +13,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const focusDisplay = Cinzel({
+  variable: "--font-focus-display",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -28,7 +34,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${focusDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <QueryProvider>

@@ -71,6 +71,9 @@ importers:
       '@focus/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@focus/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@focus/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -284,6 +287,22 @@ importers:
   packages/tsconfig: {}
 
   packages/types:
+    dependencies:
+      '@focus/db':
+        specifier: workspace:*
+        version: link:../db
+      '@supabase/supabase-js':
+        specifier: ^2.49.1
+        version: 2.100.1
+    devDependencies:
+      '@focus/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  packages/ui:
     dependencies:
       '@focus/db':
         specifier: workspace:*

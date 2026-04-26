@@ -15,6 +15,7 @@
     "@focus/db": "workspace:*",
     "@focus/services": "workspace:*",
     "@focus/types": "workspace:*",
+    "@focus/ui": "workspace:*",
     "@focus/utils": "workspace:*",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.1",
