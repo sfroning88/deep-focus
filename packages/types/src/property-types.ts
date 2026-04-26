@@ -17,5 +17,31 @@ export type PropertyListEntry = Prisma.PropertyGetPayload<{
     snapshots: {
       select: { occupancy: true };
     };
+    _count: { select: { snapshots: true } };
   };
 }>;
+
+export type CreateSnapshotArgs = {
+  propertyId: string;
+  reportedAt: string;
+  occupancy: number;
+  totalRevenues: number;
+  repairsMaintenance: number;
+  payroll: number;
+  utilities: number;
+  contractServices: number;
+  rawFood: number;
+  culinarySupplies: number;
+  administrative: number;
+  marketingPromotions: number;
+  activities: number;
+  otherExpenses: number;
+  controllableExpenses: number;
+  managementFee: number;
+  realEstateTaxes: number;
+  insurance: number;
+  nonControllableExpenses: number;
+  totalExpenses: number;
+  operatingMargin: number;
+  controllablePRD: number;
+};

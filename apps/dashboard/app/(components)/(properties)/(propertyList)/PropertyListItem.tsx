@@ -19,6 +19,8 @@ export function PropertyListItem({
   isMobile,
   onSelect,
 }: PropertyListItemProps) {
+  const snapshotCount = property._count.snapshots;
+  const hasNoSnapshots = snapshotCount === 0;
   const latestOcc = property.snapshots?.[0]?.occupancy;
   const occValue = latestOcc != null ? toNum(latestOcc) : null;
   const tier = occValue != null ? getOccupancyTier(occValue) : null;
@@ -49,6 +51,18 @@ export function PropertyListItem({
       </div>
 
       <div className="flex items-center gap-2 md:gap-3 shrink-0">
+        {hasNoSnapshots && (
+          <span
+            className={`
+              inline-flex items-center rounded-sm border border-amber-600/50
+              bg-amber-950/50 px-2 py-0.5 font-data font-medium text-amber-100/90
+              ${isMobile ? "text-[10px]" : "text-xs"}
+            `}
+            title="No expense comp snapshots on file"
+          >
+            No snapshots
+          </span>
+        )}
         {tier && occValue != null && (
           <span
             className={`

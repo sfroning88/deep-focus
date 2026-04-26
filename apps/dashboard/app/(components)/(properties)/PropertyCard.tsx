@@ -3,6 +3,7 @@
 import { createPortal } from "react-dom";
 import { useFetchPropertyCard } from "@/app/(hooks)/use-fetch-property-card";
 import { CardHeader } from "./(propertyCard)/CardHeader";
+import { CreateSnapshotModal } from "./(propertyCard)/CreateSnapshotModal";
 import { KpiStrip } from "./(propertyCard)/KpiStrip";
 import { UnitMixCard } from "./(propertyCard)/UnitMixCard";
 import { ExpenseBreakdownCard } from "./(propertyCard)/ExpenseBreakdownCard";
@@ -73,7 +74,13 @@ export function PropertyCard({
 
         {card && latestSnapshot && (
           <div className="overflow-y-auto flex-1 min-h-0 flex flex-col gap-4 md:gap-5 p-4 md:p-6">
-            <CardHeader card={card} onClose={onClose} />
+            <CardHeader
+              card={card}
+              onClose={onClose}
+              actions={
+                <CreateSnapshotModal userId={userId} propertyId={card.id} />
+              }
+            />
             <KpiStrip card={card} latestSnapshot={latestSnapshot} />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
@@ -88,7 +95,13 @@ export function PropertyCard({
 
         {card && !latestSnapshot && (
           <div className="flex flex-col gap-4 md:gap-5 p-4 md:p-6">
-            <CardHeader card={card} onClose={onClose} />
+            <CardHeader
+              card={card}
+              onClose={onClose}
+              actions={
+                <CreateSnapshotModal userId={userId} propertyId={card.id} />
+              }
+            />
             <p className="text-xs md:text-sm text-white/40">
               No snapshots on file for this property.
             </p>

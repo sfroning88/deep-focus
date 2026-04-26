@@ -1,12 +1,26 @@
+import type { ReactNode } from "react";
 import { X } from "lucide-react";
 import type { PropertyCard } from "@focus/types";
 
 type CardHeaderProps = {
   card: PropertyCard;
   onClose: () => void;
+  actions?: ReactNode;
 };
 
-export function CardHeader({ card, onClose }: CardHeaderProps) {
+function Dot() {
+  return <span className="text-white/30 select-none">·</span>;
+}
+
+function Badge({ children }: { children: ReactNode }) {
+  return (
+    <span className="inline-flex items-center rounded-sm border border-white/15 px-1.5 md:px-2 py-0.5 text-[10px] md:text-xs text-white/50 font-data-mono whitespace-nowrap">
+      {children}
+    </span>
+  );
+}
+
+export function CardHeader({ card, onClose, actions }: CardHeaderProps) {
   return (
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
@@ -24,26 +38,17 @@ export function CardHeader({ card, onClose }: CardHeaderProps) {
           <Badge>{card.totalUnits} units</Badge>
         </div>
       </div>
-      <button
-        type="button"
-        onClick={onClose}
-        className="shrink-0 p-1.5 -mr-1.5 -mt-1 text-white/40 hover:text-white/80 transition-colors"
-        aria-label="Close"
-      >
-        <X className="h-4 w-4 md:h-[18px] md:w-[18px]" />
-      </button>
+      <div className="flex items-center gap-2 shrink-0 -mt-1">
+        {actions}
+        <button
+          type="button"
+          onClick={onClose}
+          className="p-1.5 -mr-1.5 text-white/40 hover:text-white/80 transition-colors"
+          aria-label="Close"
+        >
+          <X className="h-4 w-4 md:h-[18px] md:w-[18px]" />
+        </button>
+      </div>
     </div>
-  );
-}
-
-function Dot() {
-  return <span className="text-white/30 select-none">·</span>;
-}
-
-function Badge({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-sm border border-white/15 px-1.5 md:px-2 py-0.5 text-[10px] md:text-xs text-white/50 font-data-mono whitespace-nowrap">
-      {children}
-    </span>
   );
 }

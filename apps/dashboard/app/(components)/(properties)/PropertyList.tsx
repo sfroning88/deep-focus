@@ -69,6 +69,11 @@ export function PropertyList({ initialData }: PropertyListProps) {
         const cmp = aMsa.localeCompare(bMsa);
         return sortDir === "asc" ? cmp : -cmp;
       }
+      if (sortField === "snapshots") {
+        const aN = a._count.snapshots;
+        const bN = b._count.snapshots;
+        return sortDir === "asc" ? aN - bN : bN - aN;
+      }
       const aOcc = toNum(a.snapshots?.[0]?.occupancy ?? 0);
       const bOcc = toNum(b.snapshots?.[0]?.occupancy ?? 0);
       return sortDir === "asc" ? aOcc - bOcc : bOcc - aOcc;

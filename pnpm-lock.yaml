@@ -326,6 +326,9 @@ importers:
       '@focus/config':
         specifier: workspace:*
         version: link:../config
+      '@focus/types':
+        specifier: workspace:*
+        version: link:../types
       '@supabase/supabase-js':
         specifier: ^2.49.1
         version: 2.100.1

@@ -57,5 +57,5 @@ export function formatDate(date: Date | string): string {
   });
 }
 
-export type SortField = "name" | "msa" | "occupancy";
+export type SortField = "name" | "msa" | "occupancy" | "snapshots";
 export type SortDir = "asc" | "desc";

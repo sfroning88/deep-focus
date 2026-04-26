@@ -66,6 +66,13 @@ export function PropertySearchBar({
           onClick={() => onToggleSort("occupancy")}
           isMobile={isMobile}
         />
+        <SortButton
+          label="SNAPS"
+          active={sortField === "snapshots"}
+          dir={sortField === "snapshots" ? sortDir : undefined}
+          onClick={() => onToggleSort("snapshots")}
+          isMobile={isMobile}
+        />
       </div>
     </div>
   );
