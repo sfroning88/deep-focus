@@ -60,6 +60,19 @@ export function formatDate(date: Date | string): string {
   });
 }
 
+const CALENDAR_DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+export function parseCalendarDate(raw: string): Date {
+  const match = CALENDAR_DATE_RE.exec(raw);
+  if (!match) {
+    throw new Error(
+      `Invalid calendar date "${raw}" — expected YYYY-MM-DD with no time component`,
+    );
+  }
+  const [, year, month, day] = match;
+  return new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+}
+
 export enum SortField {
   name = "name",
   msa = "msa",

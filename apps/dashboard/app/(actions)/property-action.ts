@@ -15,7 +15,7 @@ export const fetchPropertiesAction = selfUserAction(
 );
 
 const fetchPropertyCardSchema = z.object({
-  id: z.string(),
+  id: z.string().uuid(),
 });
 
 export const fetchPropertyCardAction = selfUserAction(

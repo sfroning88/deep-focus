@@ -1,7 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import type { PropertyCard } from "@focus/types";
+import { SectionLabel } from "@focus/ui";
 import { formatCurrency, formatDate, formatPercent } from "@focus/utils";
-import { SectionLabel } from "./KpiStrip";
 
 type SnapshotHistoryTableProps = {
   snapshots: PropertyCard["snapshots"];

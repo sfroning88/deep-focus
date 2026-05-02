@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useId, useState } from "react";
+import {
+  useCallback,
+  useId,
+  useState,
+  type ChangeEvent,
+  type SubmitEvent,
+} from "react";
 import { createPortal } from "react-dom";
 import { Plus, X } from "lucide-react";
 import { occupancyColors } from "@focus/ui";
@@ -19,7 +25,7 @@ import {
   toNum,
 } from "@focus/utils";
 import { useCreateSnapshot } from "@/app/(hooks)/use-create-snapshot";
-import { SectionLabel } from "./KpiStrip";
+import { SectionLabel } from "@focus/ui";
 
 type CreateSnapshotModalProps = {
   userId: string;
@@ -37,12 +43,6 @@ export function CreateSnapshotModal({
   const formId = useId();
   const createSnapshot = useCreateSnapshot(userId);
 
-  useEffect(() => {
-    if (open) {
-      setForm(getDefaultSnapshotFormState());
-    }
-  }, [open]);
-
   const setField = useCallback(
     <K extends keyof SnapshotFormState>(
       key: K,
@@ -54,12 +54,11 @@ export function CreateSnapshotModal({
   );
 
   const onNumber =
-    (key: SnapshotFormNumericKey) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (key: SnapshotFormNumericKey) => (e: ChangeEvent<HTMLInputElement>) => {
       setField(key, readNumberInputString(e.target.value));
     };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     createSnapshot.mutate(
       { propertyId, ...form },
@@ -225,7 +224,10 @@ export function CreateSnapshotModal({
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setForm(getDefaultSnapshotFormState());
+          setOpen(true);
+        }}
         className="inline-flex items-center gap-1.5 rounded-sm border border-white/15 px-2.5 py-1.5 text-xs font-medium text-white/80 hover:bg-white/5 hover:text-white transition-colors"
       >
         <Plus className="h-3.5 w-3.5" aria-hidden />

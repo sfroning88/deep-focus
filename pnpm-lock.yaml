@@ -313,10 +313,16 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.49.1
         version: 2.100.1
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
     devDependencies:
       '@focus/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.14
       typescript:
         specifier: ^5.0.0
         version: 5.9.3

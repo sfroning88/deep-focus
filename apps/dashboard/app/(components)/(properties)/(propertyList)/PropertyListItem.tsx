@@ -6,7 +6,7 @@ import {
   getOccupancyTier,
   toNum,
 } from "@focus/utils";
-import { occupancyColors } from "@focus/ui";
+import { Dot, occupancyColors } from "@focus/ui";
 import type { PropertyListEntry } from "@focus/types";
 
 type PropertyListItemProps = {
@@ -14,10 +14,6 @@ type PropertyListItemProps = {
   isMobile: boolean;
   onSelect: (id: string) => void;
 };
-
-function Dot() {
-  return <span className="text-white/20 select-none">·</span>;
-}
 
 export function PropertyListItem({
   property,
@@ -84,6 +80,7 @@ export function PropertyListItem({
         <button
           type="button"
           onClick={() => onSelect(property.id)}
+          aria-label={`View ${property.name}`}
           className={`
             rounded-md border border-white/15 bg-white/[0.04]
             font-data font-medium text-white/70

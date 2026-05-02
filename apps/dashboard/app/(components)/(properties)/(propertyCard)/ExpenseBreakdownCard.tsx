@@ -1,6 +1,6 @@
 import type { PropertyCard } from "@focus/types";
+import { SectionLabel } from "@focus/ui";
 import { formatCurrency, toNum } from "@focus/utils";
-import { SectionLabel } from "./KpiStrip";
 
 type ExpenseBreakdownCardProps = {
   snapshot: PropertyCard["snapshots"][number];

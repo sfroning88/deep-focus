@@ -1,24 +1,13 @@
 import type { ReactNode } from "react";
 import { X } from "lucide-react";
 import type { PropertyCard } from "@focus/types";
+import { Badge, Dot } from "@focus/ui";
 
 type CardHeaderProps = {
   card: PropertyCard;
   onClose: () => void;
   actions?: ReactNode;
 };
-
-function Dot() {
-  return <span className="text-white/30 select-none">·</span>;
-}
-
-function Badge({ children }: { children: ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-sm border border-white/15 px-1.5 md:px-2 py-0.5 text-[10px] md:text-xs text-white/50 font-data-mono whitespace-nowrap">
-      {children}
-    </span>
-  );
-}
 
 export function CardHeader({ card, onClose, actions }: CardHeaderProps) {
   return (

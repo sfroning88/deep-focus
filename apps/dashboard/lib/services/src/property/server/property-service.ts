@@ -7,6 +7,7 @@ import {
   type PropertyListEntry,
   type PropertySnapshot,
 } from "@focus/types";
+import { parseCalendarDate } from "@focus/utils";
 
 export const PropertyService = {
   async fetchProperties(): Promise<PropertyListEntry[]> {
@@ -42,10 +43,7 @@ export const PropertyService = {
       throw new Error("Property does not exist");
     }
     const { propertyId, reportedAt: reportedAtRaw, ...metrics } = args;
-    const reportedAt = new Date(reportedAtRaw);
-    if (Number.isNaN(reportedAt.getTime())) {
-      throw new Error("Invalid reportedAt date");
-    }
+    const reportedAt = parseCalendarDate(reportedAtRaw);
     return db.propertySnapshot.upsert({
       where: {
         propertyId_reportedAt: { propertyId, reportedAt },

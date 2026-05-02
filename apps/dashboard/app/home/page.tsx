@@ -5,6 +5,7 @@ import type { PropertyListEntry } from "@focus/types";
 import { fetchPropertiesCached } from "@lib/api/cache/property-cache";
 import { PropertyListAsync } from "@/app/(components)/(properties)/PropertyListAsync";
 import { PropertyListSkeleton } from "@/app/(components)/(properties)/PropertyListSkeleton";
+import { MyProfileButton } from "@/app/(components)/(privacy)/MyProfileButton";
 import { routes } from "@lib/routes";
 
 export default async function HomePage() {
@@ -20,9 +21,12 @@ export default async function HomePage() {
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
             Dashboard
           </h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            {appUser.name} · {appUser.email}
-          </p>
+          <div className="mt-1 flex items-center gap-3">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              {appUser.name} · {appUser.email}
+            </p>
+            <MyProfileButton userId={supabaseUser.id} />
+          </div>
         </div>
         {appUser.isPlatformAdmin ? (
           <Link
