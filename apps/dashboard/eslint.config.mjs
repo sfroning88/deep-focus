@@ -1,8 +1,19 @@
 import { createRequire } from "node:module";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import eslint from "@eslint/js";
 import { defineConfig, globalIgnores } from "eslint/config";
+import tseslint from "typescript-eslint";
+
+/** Directory containing this config (`apps/dashboard`). Required in monorepos when multiple tsconfigs exist. */
+const tsconfigRootDir = path.dirname(fileURLToPath(import.meta.url));
 
 const require = createRequire(import.meta.url);
 const { flatConfig } = require("@next/eslint-plugin-next");
+
+const nextCoreWebVitalsBlocks = Array.isArray(flatConfig.coreWebVitals)
+    ? flatConfig.coreWebVitals
+    : [flatConfig.coreWebVitals];
 
 /**
  * Load CJS plugin with `createRequire` so `flatConfig` is available in ESLint flat config.
@@ -10,7 +21,7 @@ const { flatConfig } = require("@next/eslint-plugin-next");
  */
 const actionGuardNames =
     "createPublicAction|selfUserAction|platformAdminAction";
-const routeAuthNames = 
+const routeAuthNames =
     "requireUser|requirePlatformAdmin";
 
 /** Server actions: must be guard-wrapped const exports, not raw async exports. */
@@ -47,13 +58,18 @@ const apiRouteRules = {
 };
 
 const eslintConfig = defineConfig([
-    flatConfig.coreWebVitals,
     globalIgnores([
         ".next/**",
         "out/**",
         "build/**",
         "next-env.d.ts",
     ]),
+    eslint.configs.recommended,
+    ...tseslint.configs.recommended,
+    ...nextCoreWebVitalsBlocks.map((block) => ({
+        ...block,
+        files: block.files ?? ["**/*.{js,jsx,mjs,cjs,ts,tsx}"],
+    })),
     {
         files: [
             "app/**/actions.ts",
@@ -70,6 +86,16 @@ const eslintConfig = defineConfig([
     {
         files: ["app/api/**/route.ts"],
         rules: apiRouteRules,
+    },
+    // After typescript-eslint configs so parserOptions win; pin monorepo tsconfig.
+    {
+        files: ["**/*.{ts,tsx}"],
+        languageOptions: {
+            parserOptions: {
+                tsconfigRootDir,
+                project: "./tsconfig.json",
+            },
+        },
     },
 ]);
 

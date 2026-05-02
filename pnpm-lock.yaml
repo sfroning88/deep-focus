@@ -71,6 +71,12 @@ importers:
       '@focus/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@focus/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@focus/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       '@supabase/ssr':
         specifier: ^0.6.1
         version: 0.6.1(@supabase/supabase-js@2.100.1)
@@ -117,6 +123,9 @@ importers:
         specifier: ^3.24.0
         version: 3.25.76
     devDependencies:
+      '@eslint/js':
+        specifier: ^9.39.4
+        version: 9.39.4
       '@focus/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -141,6 +150,9 @@ importers:
       tailwindcss:
         specifier: ^4.0.0
         version: 4.2.2
+      typescript-eslint:
+        specifier: ^8.58.0
+        version: 8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
 
   packages/auth:
     dependencies:
@@ -290,11 +302,39 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
+  packages/ui:
+    dependencies:
+      '@focus/db':
+        specifier: workspace:*
+        version: link:../db
+      '@focus/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@supabase/supabase-js':
+        specifier: ^2.49.1
+        version: 2.100.1
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@focus/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.14
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
   packages/utils:
     dependencies:
       '@focus/config':
         specifier: workspace:*
         version: link:../config
+      '@focus/types':
+        specifier: workspace:*
+        version: link:../types
       '@supabase/supabase-js':
         specifier: ^2.49.1
         version: 2.100.1

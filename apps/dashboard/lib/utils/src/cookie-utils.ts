@@ -1,7 +1,6 @@
-import { cookies } from "next/headers";
 import { COOKIE_MAX_AGE, USER_ID_COOKIE_NAME } from "@lib/constants";
 
-export function generateUserId(): string {
+function generateUserId(): string {
   const array = new Uint8Array(16);
   crypto.getRandomValues(array);
   return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join(
@@ -37,11 +36,6 @@ export function getOrCreateUserId(): string | null {
   const newUserId = generateUserId();
   setCookie(USER_ID_COOKIE_NAME, newUserId, COOKIE_MAX_AGE);
   return newUserId;
-}
-
-export async function getUserIdFromCookies(): Promise<string | null> {
-  const cookieStore = await cookies();
-  return cookieStore.get(USER_ID_COOKIE_NAME)?.value || null;
 }
 
 export function createUserIdCookie(userId: string, maxAge: number): string {
