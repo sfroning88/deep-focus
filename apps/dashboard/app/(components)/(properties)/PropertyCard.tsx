@@ -46,6 +46,9 @@ export function PropertyCard({
       />
 
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="property-card-title"
         className="
           fixed inset-3 md:inset-auto
           md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2

@@ -10,11 +10,12 @@ type PrdDetailCardProps = {
 export function PrdDetailCard({ card, snapshot }: PrdDetailCardProps) {
   const occupancy = toNum(snapshot.occupancy) / 100;
   const occupiedUnits = card.totalUnits * occupancy;
-  const days = occupiedUnits > 0 ? occupiedUnits * 365 : 1;
+  const days = occupiedUnits * 365;
 
   const controllablePrd = toNum(snapshot.controllablePRD);
-  const revenuePrd = toNum(snapshot.totalRevenues) / days;
-  const expensePrd = toNum(snapshot.controllableExpenses) / days;
+  const revenuePrd = days > 0 ? toNum(snapshot.totalRevenues) / days : null;
+  const expensePrd =
+    days > 0 ? toNum(snapshot.controllableExpenses) / days : null;
 
   return (
     <div className="border border-white/10 rounded-sm p-3 md:p-4">
@@ -34,7 +35,7 @@ function PrdBox({
   highlight,
 }: {
   label: string;
-  value: number;
+  value: number | null;
   highlight?: boolean;
 }) {
   return (
@@ -45,9 +46,18 @@ function PrdBox({
           : "bg-white/[0.03] border border-white/10"
       }`}
     >
-      <p className="text-base md:text-xl font-semibold font-data-mono text-white">
-        {formatCurrency(value)}
-      </p>
+      {value === null ? (
+        <p
+          className="min-h-[1.5rem] md:min-h-8 flex items-center justify-center"
+          aria-label="Not available"
+        >
+          <span className="block w-9 md:w-11 max-w-[60%] h-px bg-white/35 rounded-full" />
+        </p>
+      ) : (
+        <p className="text-base md:text-xl font-semibold font-data-mono text-white">
+          {formatCurrency(value)}
+        </p>
+      )}
       <p className="mt-0.5 text-[9px] md:text-[11px] text-white/40">{label}</p>
     </div>
   );

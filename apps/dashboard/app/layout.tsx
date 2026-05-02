@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Cinzel, DM_Sans, DM_Mono, Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "sonner";
+import { CookieBanner } from "@/app/(components)/(privacy)/CookieBanner";
+import { PrivacyNotice } from "@/app/(components)/(privacy)/PrivacyNotice";
 import "./globals.css";
 import { QueryProvider, SupabaseProvider } from "./providers";
 
@@ -52,6 +55,9 @@ export default function RootLayout({
         <QueryProvider>
           <SupabaseProvider>{children}</SupabaseProvider>
         </QueryProvider>
+        <CookieBanner />
+        <PrivacyNotice />
+        <Toaster richColors closeButton position="top-center" />
         <Analytics />
         <SpeedInsights />
       </body>

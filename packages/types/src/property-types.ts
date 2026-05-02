@@ -15,7 +15,7 @@ export type PropertyListEntry = Prisma.PropertyGetPayload<{
   include: {
     msa: { select: { name: true } };
     snapshots: {
-      select: { occupancy: true };
+      select: { occupancy: true; reportedAt: true; createdAt: true };
     };
     _count: { select: { snapshots: true } };
   };

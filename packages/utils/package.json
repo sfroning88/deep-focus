@@ -7,7 +7,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./number-utils": "./src/number-utils.ts",
-    "./server": "./src/supabase-utils.ts"
+    "./server": "./src/server/supabase-utils.ts"
   },
   "scripts": {
     "type-check": "tsc --noEmit"

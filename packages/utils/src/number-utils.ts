@@ -25,12 +25,10 @@ export function formatCurrency(value: unknown): string {
 
 export function formatCompactCurrency(value: unknown): string {
   const n = toNum(value);
-  if (Math.abs(n) >= 1_000_000) {
-    return `$${(n / 1_000_000).toFixed(2)}M`;
-  }
-  if (Math.abs(n) >= 1_000) {
-    return `$${(n / 1_000).toFixed(0)}K`;
-  }
+  const sign = n < 0 ? "-" : "";
+  const abs = Math.abs(n);
+  if (abs >= 1_000_000) return `${sign}$${(abs / 1_000_000).toFixed(2)}M`;
+  if (abs >= 1_000) return `${sign}$${(abs / 1_000).toFixed(0)}K`;
   return formatCurrency(value);
 }
 
@@ -39,13 +37,17 @@ export function formatPercent(value: unknown): string {
   return `${n.toFixed(2)}%`;
 }
 
-export type OccupancyTier = "high" | "mid" | "low";
+export enum OccupancyTier {
+  high = "high",
+  mid = "mid",
+  low = "low",
+}
 
 export function getOccupancyTier(occ: unknown): OccupancyTier {
   const n = toNum(occ);
-  if (n >= 80) return "high";
-  if (n >= 65) return "mid";
-  return "low";
+  if (n >= 80) return OccupancyTier.high;
+  if (n >= 65) return OccupancyTier.mid;
+  return OccupancyTier.low;
 }
 
 export function formatDate(date: Date | string): string {
@@ -54,8 +56,54 @@ export function formatDate(date: Date | string): string {
     month: "2-digit",
     day: "2-digit",
     year: "numeric",
+    timeZone: "UTC",
   });
 }
 
-export type SortField = "name" | "msa" | "occupancy" | "snapshots";
-export type SortDir = "asc" | "desc";
+export enum SortField {
+  name = "name",
+  msa = "msa",
+  occupancy = "occupancy",
+  snapshots = "snapshots",
+}
+
+export enum SortDir {
+  asc = "asc",
+  desc = "desc",
+}
+
+export type RecencySortable = {
+  timestamp?: unknown;
+  reportedAt?: unknown;
+  createdAt?: unknown;
+};
+
+export function dateLikeToMs(value: unknown): number {
+  if (value == null) return 0;
+  if (value instanceof Date) {
+    const t = value.getTime();
+    return Number.isNaN(t) ? 0 : t;
+  }
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const t = Date.parse(value);
+    return Number.isNaN(t) ? 0 : t;
+  }
+  return 0;
+}
+
+export function getRecencySortKey(item: RecencySortable): number {
+  return dateLikeToMs(item.timestamp ?? item.reportedAt ?? item.createdAt);
+}
+
+export function sortByRecencyDesc<T extends RecencySortable>(
+  items: readonly T[],
+): T[] {
+  return [...items].sort((a, b) => getRecencySortKey(b) - getRecencySortKey(a));
+}
+
+export function getLatestByRecency<T extends RecencySortable>(
+  items: readonly T[] | null | undefined,
+): T | undefined {
+  return sortByRecencyDesc(items ?? [])[0];
+}

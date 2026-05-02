@@ -2,7 +2,7 @@
 
 Last updated: **March 2026**
 
-This is a personal portfolio site with no user accounts, no forms, and minimal anonymous tracking for analytics purposes only.
+This is a proof-of-concept dashboard with minimal Supabase user accounts, no forms, and minimal anonymous tracking for analytics purposes only.
 
 ## What Data Is Collected
 
@@ -18,7 +18,7 @@ See [Vercel's Privacy Policy](https://vercel.com/legal/privacy-policy) for detai
 
 This site uses one first-party cookie:
 
-- **`house-of-froning-id`**: An anonymous identifier used for visit analytics and IP rate limiting. This cookie:
+- **`deep-focus-id`**: An anonymous identifier used for visit analytics and IP rate limiting. This cookie:
   - Is set automatically when you visit the site
   - Expires after 30 days
   - Cannot be used to identify you personally
@@ -33,16 +33,13 @@ This site uses the following third-party services:
 
 - **Vercel** — Hosting and deployment
 - **PostHog** — Anonymous analytics (page visits, basic events). See [PostHog's Privacy Policy](https://posthog.com/privacy)
-- **YouTube** — Background music via the [YouTube IFrame API](https://developers.google.com/youtube/iframe_api_reference). Video content and any related data collection are governed by [YouTube's Privacy Policy](https://policies.google.com/privacy)
-- **Spotify** — Displays my currently playing or last-played song. Requests are made server-side; no Spotify data is stored by this site
-- **Google** — Books list from Google Sheets, book metadata and cover images from the Google Books API. See [Google's Privacy Policy](https://policies.google.com/privacy)
-- **Open Library** — Fallback source for book cover images when not available from Google Books. See [Open Library's Privacy Policy](https://openlibrary.org/privacypolicy)
+- **Supabase** — User authentication (accounts, sign-in) and database connection. See [Supabase's Privacy Policy](https://supabase.com/privacy)
 
 No data is shared with advertisers. I do not control how these services collect or use data when you interact with content they provide.
 
 ## Your Rights
 
-You can delete the `house-of-froning-id` cookie at any time through your browser settings. Deleting this cookie will not affect your ability to use the site, but a new anonymous identifier will be generated on your next visit.
+You can delete the `deep-focus-id` cookie at any time through your browser settings. Deleting this cookie will not affect your ability to use the site, but a new anonymous identifier will be generated on your next visit.
 
 For data held by Vercel, refer to their privacy policy linked above.
 

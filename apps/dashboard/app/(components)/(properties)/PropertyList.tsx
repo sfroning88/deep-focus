@@ -8,8 +8,7 @@ import { PropertyCard } from "@/app/(components)/(properties)/PropertyCard";
 import { PropertySearchBar } from "./(propertyList)/PropertySearchBar";
 import { PropertyListItem } from "./(propertyList)/PropertyListItem";
 import { MOBILE_BREAKPOINT } from "@/lib/constants";
-import { toNum } from "@focus/utils";
-import type { SortField, SortDir } from "@focus/utils";
+import { getLatestByRecency, SortDir, SortField, toNum } from "@focus/utils";
 import type { PropertyListEntry } from "@focus/types";
 
 type PropertyListProps = {
@@ -21,8 +20,8 @@ export function PropertyList({ initialData }: PropertyListProps) {
   const isMobile = !useMediaQuery(`(min-width: ${MOBILE_BREAKPOINT}px)`, true);
   const [detailId, setDetailId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
-  const [sortField, setSortField] = useState<SortField>("name");
-  const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [sortField, setSortField] = useState<SortField>(SortField.name);
+  const [sortDir, setSortDir] = useState<SortDir>(SortDir.asc);
   const [, startTransition] = useTransition();
 
   const {
@@ -38,10 +37,10 @@ export function PropertyList({ initialData }: PropertyListProps) {
 
   const handleToggleSort = (field: SortField) => {
     if (field === sortField) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+      setSortDir((d) => (d === SortDir.asc ? SortDir.desc : SortDir.asc));
     } else {
       setSortField(field);
-      setSortDir("asc");
+      setSortDir(SortDir.asc);
     }
   };
 
@@ -59,24 +58,24 @@ export function PropertyList({ initialData }: PropertyListProps) {
       : [...properties];
 
     list.sort((a, b) => {
-      if (sortField === "name") {
+      if (sortField === SortField.name) {
         const cmp = a.name.localeCompare(b.name);
-        return sortDir === "asc" ? cmp : -cmp;
+        return sortDir === SortDir.asc ? cmp : -cmp;
       }
-      if (sortField === "msa") {
+      if (sortField === SortField.msa) {
         const aMsa = a.msa?.name ?? "";
         const bMsa = b.msa?.name ?? "";
         const cmp = aMsa.localeCompare(bMsa);
-        return sortDir === "asc" ? cmp : -cmp;
+        return sortDir === SortDir.asc ? cmp : -cmp;
       }
-      if (sortField === "snapshots") {
+      if (sortField === SortField.snapshots) {
         const aN = a._count.snapshots;
         const bN = b._count.snapshots;
-        return sortDir === "asc" ? aN - bN : bN - aN;
+        return sortDir === SortDir.asc ? aN - bN : bN - aN;
       }
-      const aOcc = toNum(a.snapshots?.[0]?.occupancy ?? 0);
-      const bOcc = toNum(b.snapshots?.[0]?.occupancy ?? 0);
-      return sortDir === "asc" ? aOcc - bOcc : bOcc - aOcc;
+      const aOcc = toNum(getLatestByRecency(a.snapshots)?.occupancy ?? 0);
+      const bOcc = toNum(getLatestByRecency(b.snapshots)?.occupancy ?? 0);
+      return sortDir === SortDir.asc ? aOcc - bOcc : bOcc - aOcc;
     });
 
     return list;

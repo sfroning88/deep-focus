@@ -1,10 +1,5 @@
 import type { PropertyCard } from "@focus/types";
-import {
-  formatCompactCurrency,
-  formatDate,
-  formatPercent,
-  toNum,
-} from "@focus/utils";
+import { formatCompactCurrency, formatDate, formatPercent } from "@focus/utils";
 
 type KpiStripProps = {
   card: PropertyCard;
@@ -12,7 +7,7 @@ type KpiStripProps = {
 };
 
 export function KpiStrip({ card, latestSnapshot }: KpiStripProps) {
-  const occupancy = toNum(latestSnapshot.occupancy);
+  const occupancy = latestSnapshot.occupancy;
   const reportedLabel = formatDate(latestSnapshot.reportedAt);
 
   return (

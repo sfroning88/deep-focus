@@ -15,16 +15,11 @@ export const PropertyService = {
       include: {
         msa: { select: { name: true } },
         snapshots: {
-          orderBy: { reportedAt: "desc" },
-          take: 1,
-          select: { occupancy: true },
+          select: { occupancy: true, reportedAt: true, createdAt: true },
         },
         _count: { select: { snapshots: true } },
       },
     });
-    if (!properties || properties.length === 0) {
-      throw new Error("No properties were found");
-    }
     return properties;
   },
 

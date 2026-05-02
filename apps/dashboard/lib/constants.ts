@@ -6,6 +6,8 @@ export const USER_ID_COOKIE_NAME = "deep-focus-id";
 
 export const COOKIE_BANNER_DISMISSED_KEY = "deep-focus-cookie-banner-dismissed";
 
+export const COOKIE_BANNER_SYNC_EVENT = `${COOKIE_BANNER_DISMISSED_KEY}:sync`;
+
 export const COOKIE_BANNER_MESSAGE =
   "This site uses one first-party cookie for anonymous analytics. No third-party tracking.";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
-import type { SortField, SortDir } from "@focus/utils";
+import { SortDir, SortField } from "@focus/utils";
 
 type PropertySearchBarProps = {
   query: string;
@@ -33,7 +33,7 @@ export function PropertySearchBar({
           type="text"
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
-          placeholder="Search by name, city, state…"
+          aria-label="Search properties"
           className={`
             w-full rounded-md border border-white/10 bg-white/[0.04]
             text-white placeholder:text-white/30
@@ -46,31 +46,31 @@ export function PropertySearchBar({
 
       <div className="flex gap-1.5 shrink-0">
         <SortButton
-          label="STATE"
-          active={sortField === "name"}
-          dir={sortField === "name" ? sortDir : undefined}
-          onClick={() => onToggleSort("name")}
+          label="NAME"
+          active={sortField === SortField.name}
+          dir={sortField === SortField.name ? sortDir : undefined}
+          onClick={() => onToggleSort(SortField.name)}
           isMobile={isMobile}
         />
         <SortButton
           label="MSA"
-          active={sortField === "msa"}
-          dir={sortField === "msa" ? sortDir : undefined}
-          onClick={() => onToggleSort("msa")}
+          active={sortField === SortField.msa}
+          dir={sortField === SortField.msa ? sortDir : undefined}
+          onClick={() => onToggleSort(SortField.msa)}
           isMobile={isMobile}
         />
         <SortButton
           label="OCC"
-          active={sortField === "occupancy"}
-          dir={sortField === "occupancy" ? sortDir : undefined}
-          onClick={() => onToggleSort("occupancy")}
+          active={sortField === SortField.occupancy}
+          dir={sortField === SortField.occupancy ? sortDir : undefined}
+          onClick={() => onToggleSort(SortField.occupancy)}
           isMobile={isMobile}
         />
         <SortButton
           label="SNAPS"
-          active={sortField === "snapshots"}
-          dir={sortField === "snapshots" ? sortDir : undefined}
-          onClick={() => onToggleSort("snapshots")}
+          active={sortField === SortField.snapshots}
+          dir={sortField === SortField.snapshots ? sortDir : undefined}
+          onClick={() => onToggleSort(SortField.snapshots)}
           isMobile={isMobile}
         />
       </div>
@@ -91,7 +91,7 @@ function SortButton({
   onClick: () => void;
   isMobile: boolean;
 }) {
-  const arrow = dir === "asc" ? "↑" : dir === "desc" ? "↓" : "↕";
+  const arrow = dir === SortDir.asc ? "↑" : dir === SortDir.desc ? "↓" : "↕";
 
   return (
     <button

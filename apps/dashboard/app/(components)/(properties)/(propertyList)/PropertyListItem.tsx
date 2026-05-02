@@ -1,6 +1,11 @@
 "use client";
 
-import { formatPercent, getOccupancyTier, toNum } from "@focus/utils";
+import {
+  formatPercent,
+  getLatestByRecency,
+  getOccupancyTier,
+  toNum,
+} from "@focus/utils";
 import { occupancyColors } from "@focus/ui";
 import type { PropertyListEntry } from "@focus/types";
 
@@ -21,7 +26,8 @@ export function PropertyListItem({
 }: PropertyListItemProps) {
   const snapshotCount = property._count.snapshots;
   const hasNoSnapshots = snapshotCount === 0;
-  const latestOcc = property.snapshots?.[0]?.occupancy;
+  const latestSnapshot = getLatestByRecency(property.snapshots);
+  const latestOcc = latestSnapshot?.occupancy;
   const occValue = latestOcc != null ? toNum(latestOcc) : null;
   const tier = occValue != null ? getOccupancyTier(occValue) : null;
 

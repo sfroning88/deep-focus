@@ -1,14 +1,17 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { requireUser } from "@focus/auth/server";
+import type { PropertyListEntry } from "@focus/types";
 import { fetchPropertiesCached } from "@lib/api/cache/property-cache";
-import { PropertyList } from "@/app/(components)/(properties)/PropertyList";
+import { PropertyListAsync } from "@/app/(components)/(properties)/PropertyListAsync";
 import { PropertyListSkeleton } from "@/app/(components)/(properties)/PropertyListSkeleton";
 import { routes } from "@lib/routes";
 
 export default async function HomePage() {
   const { appUser, supabaseUser } = await requireUser();
-  const properties = await fetchPropertiesCached(supabaseUser.id);
+  const propertiesPromise = fetchPropertiesCached(supabaseUser.id).catch(
+    (): PropertyListEntry[] => [],
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -31,7 +34,7 @@ export default async function HomePage() {
         ) : null}
       </div>
       <Suspense fallback={<PropertyListSkeleton />}>
-        <PropertyList initialData={properties} />
+        <PropertyListAsync initialDataPromise={propertiesPromise} />
       </Suspense>
     </div>
   );
