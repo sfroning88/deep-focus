@@ -1,0 +1,132 @@
+---
+globs: apps/backend/**
+alwaysApply: false
+---
+# apps/backend Rules
+
+Follow these patterns for `apps/backend` development.
+
+## Python version
+
+- Target **Python 3.13** locally (`python3`) and in Docker (**`python:3.13-slim`**). **`packages/python`** declares **`requires-python >= 3.13`**.
+
+## Shared package (`focus_python`)
+
+- Install **`packages/python`** as **`focus_python`** (editable **`-e ../../packages/python`** in **`requirements.in`**, resolved from **`apps/backend`**).
+- Put **reusable** worker infrastructure there: **`config`**, **`db_pool`**, **`logging`**, **`queue`**, FastAPI **`dependency`**, **`error`**, **`exception`**, **`middleware`**, shared **`enums`**, **`FrequencyServices`**, **`SchemaUtils`**.
+- Do **not** duplicate that logic under **`apps/backend/src/core/`**; keep **`src/core/`** for **app-only** wiring (**`health`**, **`lifespan`**, etc.).
+- Import shared pieces from **`focus_python`** (for example **`from focus_python import db_pool, logging, queue`**) or submodule paths under **`focus_python.*`** when appropriate.
+
+## File Structure
+
+```text
+apps/backend/
+├── src/
+│   ├── main.py                  # Application entry point (FastAPI + focus_python)
+│   ├── core/                    # App-only: health, lifespan (not db/config/queue)
+│   ├── integrations/            # Integration modules (QuickBooks, Receivables, etc.)
+│   │   └── [integration]/       # Per-integration module
+│   │       ├── router.py        # API route handlers
+│   │       ├── background.py    # Background job queueing
+│   │       ├── models/          # Domain/object models (Pydantic)
+│   │       ├── schemas/         # Request/response models
+│   │       │   ├── requests.py
+│   │       │   └── responses.py
+│   │       ├── services/        # Business logic layer
+│   │       │   ├── __init__.py
+│   │       │   └── [entity]_services.py
+│   │       ├── _constants.py
+│   │       ├── _enums.py
+│   │       └── [client.py]      # External API client (when needed)
+│   ├── jobs/                    # CRON job dispatchers (hit agent endpoints)
+│   │   └── dispatch_[name].py
+│   ├── utils/                   # Shared utility functions
+│   └── worker_runner.py         # RQ worker entry point
+├── docs/                        # Project documentation (one doc per integration)
+├── scripts/                     # Utility scripts
+├── tests/                       # Test files
+├── requirements.in              # includes -e ../../packages/python for focus_python
+├── requirements.txt             # pip-compile lockfile
+├── Dockerfile                   # build context = monorepo root; copies packages/python
+└── render.yaml                  # Render config and CRON jobs
+```
+
+```text
+packages/python/                 # Shared installable package (pyproject.toml at root)
+└── src/focus_python/           # config, core db/logging/queue, fastapi, enums, services, utils
+```
+
+## Agent Pattern
+
+### Cron Jobs
+
+- Add to `render.yaml` the desired CRON service
+- CRON jobs run `python -m src.jobs.dispatch_[name]` and hit agent endpoints
+- Cron jobs should return immediately with minimal complexity
+- Achieve this by queuing up background jobs instantly via the endpoint
+- The CRON job returns and frees up the server upon confirming job queue
+- Ex: `dispatch_job_example` hits `{WORKER_API_URL}/api/example/endpoint`
+
+### Routes
+
+- Routes live in `integrations/[integration]/router.py`
+- Every route has a schema definition from `integrations/[integration]/schemas/*`
+- Every integration `schemas/` should include `requests.py` and `responses.py`
+- Routes should return immediately with minimal complexity
+- Achieve this by queuing up background jobs instantly
+
+### Service Functions
+
+- The majority of execution logic lives in `integrations/[integration]/services/*`
+- Each service function group is a logical grouping of purpose in **one file**
+- For all class objects, have a corresponding `[entity]_services.py`
+- Every service function is an `@staticmethod` for runtime declaration of `classes`
+- Do not use `@staticmethod` if not working directly with `class` objects
+- When at all possible, service function groups can pertain to one `database table`
+
+### Class Objects
+
+- Every standardized object to be handled define as a `class`
+- Use `pydantic` to define as `BaseModel` with full `type hints`
+- Store domain/object models in `integrations/[integration]/models/`
+- Include any `super().__init__(**data)` functions for creation
+
+### Background Jobs
+
+- Every integration contains `background.py` (not `background_services.py`)
+- Barring special `IAM` or `OAuth` workflows, all `queue_manager` live here
+- Background services should each track their job success
+- Background jobs should not strictly depend on any other background job
+
+### Worker Usage
+
+- Use the existing patterns for **retries, backoff, and graceful shutdowns**
+- All worker jobs should be recoverable and **non blocking**
+- Use the existing `worker_runner` for handling states like `SIGTERM`
+- Modifying shared worker files is only an **absolute last resort**
+
+## Database Interactions
+
+### Batch Operations
+
+- Strive for **single db operations** (eg batching) whenever possible
+- Avoid looping over a single db call for lists, arrays, dicts, or tuples
+- Use `from psycopg2.extras import execute_values` for batch insertions
+- Use `UPDATE ... SET ...` for many updates at once
+- Calculate insertions values or update values before single db call
+
+### Connection Pool
+
+- Use the shared connection pooler `from focus_python import db_pool`
+- Simple fetches (no `CTEs` or window functions) should use `db_pool.execute_query(query)`
+- Beyond simple operations, use `db_pool.get_cursor() as cursor`
+- Insertions should use `execute_values(cursor, query, insertValues, template, page_size)`
+- Truly specialized or complex queries can use `conn = db_pool.get_conn()`
+
+### Query Structure
+
+- Use `sql.SQL` from `psycopg2` to format `f-strings` in queries
+- Protect every query against an **SQL INJECTION** attack
+- Check all queries for database security and vulnerability exposure
+- Every query should be safe on re-run with `ON CONFLICT`, `upsert`, etc
+- Operations with databases should be **idempotent** and type safe

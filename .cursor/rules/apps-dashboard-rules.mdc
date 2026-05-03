@@ -1,5 +1,5 @@
 ---
-globs: apps/dashboard/*
+globs: apps/dashboard/**
 alwaysApply: false
 ---
 # Dashboard Rules
