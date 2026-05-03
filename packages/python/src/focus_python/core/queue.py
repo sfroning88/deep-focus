@@ -49,7 +49,9 @@ class _Queue:
 
     def _get_rq_queue(self) -> Queue:
         if self._rq_queue is None:
-            self._rq_queue = Queue(QUEUE_NAME, connection=self._get_connection())
+            with self._init_lock:
+                if self._rq_queue is None:
+                    self._rq_queue = Queue(QUEUE_NAME, connection=self._get_connection())
         return self._rq_queue
 
     def enqueue_jobs(self, jobs: List[Dict[str, Any]]) -> List[Job]:

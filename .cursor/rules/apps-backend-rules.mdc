@@ -48,8 +48,7 @@ apps/backend/
 ├── requirements.in              # includes -e ../../packages/python for focus_python
 ├── requirements.txt             # pip-compile lockfile
 ├── Dockerfile                   # build context = monorepo root; copies packages/python
-├── render.production.yaml       # Render config and CRON jobs
-└── render.staging.yaml
+└── render.yaml                  # Render config and CRON jobs
 ```
 
 ```text
