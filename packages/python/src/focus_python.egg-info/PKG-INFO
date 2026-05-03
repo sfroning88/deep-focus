@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: focus_python
+Version: 0.0.1
+Summary: Shared core, FastAPI helpers, enums, services, and utils for Focus Python apps
+Requires-Python: >=3.13
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: psycopg2-binary>=2.9.0
+Requires-Dist: structlog>=24.0.0
+Requires-Dist: redis>=5.0.0
+Requires-Dist: rq>=2.0.0
+Requires-Dist: fastapi>=0.100.0

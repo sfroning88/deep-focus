@@ -1,0 +1,22 @@
+# Python package
+-e ../../packages/python
+
+# Core web framework
+fastapi>=0.100.0
+uvicorn>=0.20.0
+pydantic>=2.10.0
+
+# Database and caching
+redis
+rq
+psycopg2-binary
+
+# Environment
+python-dotenv
+
+# Logging
+structlog>=24.0.0
+
+# HTTP clients
+httpx
+requests

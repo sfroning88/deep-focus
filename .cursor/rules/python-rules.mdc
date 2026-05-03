@@ -36,8 +36,8 @@ Follow these patterns for `Python` and `SQL` code.
 
 ### Syntax Guidelines
 
-- Follow these custom `Rowan` coding standards:
-- `camelCase` for `variable` names
+- Follow these custom `Focus` coding standards:
+- `snake_case` for `variable` names
 - `snake_case` for `function` names
 - `PascalCase` for `class` objects
 - `UPPER_SNAKE_CASE` for `CONSTANTS`
@@ -63,9 +63,7 @@ Follow these patterns for `Python` and `SQL` code.
 - If a variable or name is reused, at all, define it as a constant
 - Define all table names specific to your project as constants
 - This keeps table names bound to a single source of truth
-- Ex: `QUICKBOOKS_ONLINE_CUSTOMER_TABLE` points to table name `quickbooks_online_customer`
-- Ex: `QuickBooksCustomerService` imports `QUICKBOOKS_ONLINE_CUSTOMER_TABLE` for all db functions
-- Ex: `QUICKBOOKS_ONLINE_PAGE_SIZE` is assigned a value in only `_constants.py`
+- Ex: `PROPERTY_TABLE` points to table name `property.property`
 
 ### Logging
 
@@ -101,7 +99,7 @@ Follow these patterns for `Python` and `SQL` code.
 ### Doc Strings
 
 - Every Python file should have simple headers for traceability
-- Include `Author`, `Contact`, `Date`, `Documentation`, and a one line description
+- Include `Author`, `Date`, and a one line description
 - No verbose or lengthy descriptions; no AI slop
 
 ### Documentation

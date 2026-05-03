@@ -51,6 +51,7 @@ supabase/.temp
 
 # FastAPI / Python
 .venv/
+venv/
 *.pyc
 __pycache__/
 

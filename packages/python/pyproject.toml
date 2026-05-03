@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "focus_python"
+version = "0.0.1"
+description = "Shared core, FastAPI helpers, enums, services, and utils for Focus Python apps"
+requires-python = ">=3.13"
+dependencies = [
+  "python-dotenv>=1.0.0",
+  "psycopg2-binary>=2.9.0",
+  "structlog>=24.0.0",
+  "redis>=5.0.0",
+  "rq>=2.0.0",
+  "fastapi>=0.100.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

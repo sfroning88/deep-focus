@@ -1,0 +1,23 @@
+previews:
+  generation: automatic
+services:
+- type: web
+  runtime: docker
+  name: focus-backend-api
+  plan: starter
+  previews:
+    plan: starter
+  numInstances: 1
+  dockerfilePath: apps/backend/Dockerfile
+  buildFilter:
+    paths:
+      - apps/backend/**
+      - packages/python/**
+  envVars:
+    - fromGroup: Focus-Environment
+    - key: SERVICE_TYPE
+      value: api
+    - key: API_URL
+      value: https://focus-backend-api.onrender.com
+    - key: JOB_DOMAIN
+      value: predictions

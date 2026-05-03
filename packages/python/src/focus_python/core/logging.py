@@ -1,0 +1,79 @@
+"""
+Author: Sean Froning
+Created Date: 5.3.2026
+Centralized logging with structlog
+"""
+import sys
+import structlog  # pyright: ignore[reportMissingImports]
+from structlog import DropEvent  # pyright: ignore[reportMissingImports]
+from typing import Optional
+from .config import config
+
+LOG_FORMAT = config.get_log_format()
+
+class _Logging:
+    """Centralized logging configuration with structlog"""
+
+    def drop_health_logs(self, logger, method_name, event_dict):
+        path = event_dict.get("path") or event_dict.get("request_path")
+        if path in ("/health", "/ready"): raise DropEvent
+        return event_dict
+
+    def configure_structlog(self, ):
+        shared_processors = [
+            structlog.stdlib.filter_by_level,
+            structlog.contextvars.merge_contextvars,
+            structlog.stdlib.add_log_level,
+            structlog.stdlib.add_logger_name,
+            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.processors.UnicodeDecoder(),
+            self.drop_health_logs,
+        ]
+        if LOG_FORMAT == "json":
+            renderer = structlog.processors.JSONRenderer()
+        else:
+            renderer = structlog.dev.ConsoleRenderer(colors=True)
+        structlog.configure(
+            processors=shared_processors + [renderer],
+            wrapper_class=structlog.stdlib.BoundLogger,
+            logger_factory=structlog.stdlib.LoggerFactory(),
+            cache_logger_on_first_use=True,
+        )
+
+    def setup_structured_logging(self):
+        import logging
+        logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.INFO)
+        self.configure_structlog()
+
+    def get_logger(self, name: str):
+        return structlog.get_logger(name)
+
+    def bind_context(self, correlation_id: str, client_id: Optional[str] = None, path: Optional[str] = None):
+        ctx = {"correlation_id": correlation_id}
+        if client_id is not None:
+            ctx["client_id"] = client_id
+        if path is not None:
+            ctx["path"] = path
+        structlog.contextvars.bind_contextvars(**ctx)
+
+    def bind_job_context(
+        self, 
+        property_id: Optional[str] = None, 
+    ):
+        ctx = {}
+        if property_id is not None:
+            ctx["property_id"] = property_id
+        if ctx:
+            structlog.contextvars.bind_contextvars(**ctx)
+
+    def clear_context(self):
+        structlog.contextvars.clear_contextvars()
+
+    def unbind_job_context(self) -> None:
+        structlog.contextvars.unbind_contextvars(
+            "property_id"
+        )
+
+logging = _Logging()
