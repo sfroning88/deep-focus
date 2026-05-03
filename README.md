@@ -47,6 +47,8 @@ Point apps and Prisma at that file with symlinks:
 
 ```sh
 ln -sf ../../.env apps/dashboard/.env
+ln -sf ../../.env apps/backend/.env
+ln -sf ../../.env apps/ai/.env
 ln -sf ../../.env packages/db/.env
 ```
 

@@ -18,6 +18,10 @@
     "build:app": "pnpm --filter @focus/dashboard run build",
     "type-check": "pnpm --filter @focus/config --filter @focus/types --filter @focus/db --filter @focus/services --filter @focus/utils --filter @focus/auth --filter @focus/dashboard run type-check",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "use:local": "node scripts/env-setup.js local",
+    "use:prod": "node scripts/env-setup.js prod",
+    "db:setup": "./scripts/local-db.sh up",
+    "db:nuke": "./scripts/local-db.sh nuke",
     "db:generate": "pnpm --filter @focus/db db:generate",
     "db:migrate": "pnpm --filter @focus/db db:migrate",
     "db:deploy": "pnpm --filter @focus/db db:deploy",
@@ -27,6 +31,7 @@
     "check:migration-safety": "./scripts/check-migration-safety.sh",
     "git:pre-commit": "sh scripts/husky/pre-commit.sh",
     "git:pre-push": "sh scripts/husky/pre-push.sh",
+    "clean": "./scripts/clean.sh",
     "prepare": "husky"
   },
   "devDependencies": {
