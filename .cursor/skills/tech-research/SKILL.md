@@ -8,161 +8,45 @@ Produces a ~2000-word black-and-white printable PDF analyzing employer technical
 
 ---
 
-## Career Identity (Read This First — It Shapes Every Judgment Call)
+## Step 0: Read Reference Files First (REQUIRED — Do Not Skip)
+
+**Before doing anything else**, read the three reference files that ground every judgment in this skill. Do NOT rely on memory or prior session knowledge. Re-read every time — the source files may have changed.
+
+Read these files in full using the Read tool:
+
+1. **`./references/resume.md`** — Sean's current resume. The single source of truth for his roles, projects, skills stack, and education. Use this verbatim when assessing what Sean has shipped, what tools he has used in production, and what claims are defensible on a resume.
+2. **`./references/tech-stack.md`** — The Rowan platform tech stack (apps, packages, DB, storage, auth, background jobs, AI/LLM stack, deployment, env). Use this as the **"daily use @ Rowan"** baseline. Tech listed here is a strong signal of familiarity. Tech absent from this file is a genuine gap candidate when comparing against an employer's stack.
+3. **`./references/full-stack-ai-engineer.md`** — The polymath domain framework (article: "Full Stack AI Engineer: A Modern Day Polymath"). Use this as the canonical list of full-stack AI domains. Every gap identified during research must be cross-referenced against the domains in this file.
+
+If any file is unreadable, surface that explicitly to the user and ask whether to proceed without it. Never substitute remembered content for the real file.
+
+---
+
+## Career Identity (Shapes Every Judgment Call)
 
 Sean is building toward the archetypal **Founding Engineer / Full Stack AI Polymath**: the single person on a lean team who can own the entire solution — frontend, backend, agents, data infrastructure, financial modeling, and go-to-market technical work — without needing a specialist for each layer. The mental model is Leonardo da Vinci, not a narrowly optimized senior engineer: breadth enables innovation that depth alone cannot.
 
 This identity has direct implications for how to frame gaps and learning priorities:
 
-- A gap in a **foundational full-stack AI capability** (MLOps, distributed training, vector DB alternatives, cloud-native infra, LangChain, data pipeline orchestration) is **high-priority** regardless of whether this specific employer requires it. These are polymath table stakes.
+- A gap in a **foundational full-stack AI capability** (any domain enumerated in `./references/full-stack-ai-engineer.md`) is **high-priority** regardless of whether this specific employer requires it. These are polymath table stakes.
 - A gap in a **niche enterprise tool** (specific SaaS integration, legacy stack, compliance framework) is **lower priority** — learnable on the job, not worth frontloading.
 - When assessing learnability, ask: _does closing this gap make Sean more capable across many future roles, or just this one?_ Prioritize the former.
 - The target employers are **lean startups and investment firms applying full-stack AI to real problems** — not FAANG, not large enterprise. Optimize framing for that context.
 
-Full-stack AI polymath domains (from the article "Full Stack AI Engineer: A Modern Day Polymath"):
-
-1. AI Data Infrastructure: Modern Datalakes (Apache Iceberg, Hudi, Delta Lake), object storage, Open Table Formats, schema evolution, time travel / snapshots.
-2. MLOps: experiment tracking, model versioning, packaging + deployment pipelines. Key tools: MLflow (Databricks), Kubeflow (Google), MLRun.
-3. Distributed Training: multi-node/multi-GPU training. Key frameworks: Ray / Anyscale, TorchDistributor on Spark, spark-tensorflow-distributor.
-4. Vector Databases: Pinecone, Milvus, Weaviate — beyond pgvector for production-scale RAG.
-5. Traditional AI: supervised, unsupervised, reinforcement learning — scikit-learn for fast prototyping; PyTorch / TensorFlow for production neural networks.
-6. Generative AI & LLM orchestration: RAG pipelines, fine-tuning, LangChain, HuggingFace.
-7. Full-stack software: frontend (React/Next.js), backend (FastAPI/Express), databases, auth, background jobs, deployment — end-to-end ownership without handoffs.
-
-Cross-reference this domain list against every gap identified in the research. If a gap falls inside one of these seven domains, flag it as a **polymath priority gap**, not just a job-fit gap.
-
----
-
-## Step 0: Read Project Context First
-
-**Before doing anything else**, extract the user's full background from the documents already in context. Do NOT rely on memory or prior session knowledge. Re-read every time — documents may have changed.
-
-**Resume (Froning_Sean_Resume.md):**
-
-```markdown
-Sean Froning — Full Stack AI Engineer @ Rowan (Jul 2025–Present), Chicago IL
-
-- 25+ SMB owners, fractional CFOs, PE buyers; production agent $1M/month value
-- Automated AR/receivables workflows (-8 hrs/week manual collection effort)
-- Stack: Next.js, TypeScript/React, FastAPI/Python, Postgres/Supabase, Redis
-- Agent workflows: embedding + reranking pipelines, pgvector vector DB integration
-- Supported 3 lower-middle-market M&A transactions up to $50M EV
-
-Data Engineer @ ND University Relations (Jan 2022–May 2025), Notre Dame IN
-
-- Alumni engagement strategy: $5M+ donations, 10+ countries
-- 5+ strategy presentations → $300K additional funding
-- Tableau + PowerBI dashboards; 10% engagement rate improvement
-- Python app: 130+ students, Google Sheets API, 100+ daily transactions
-- Automated 5 legacy processes (Excel); -14 hrs/week manual work
-
-Healthcare Investment Analyst @ Focus Healthcare Partners LLC (May–Aug 2024), Chicago IL
-
-- 15+ acquisitions evaluated via 3-statement LBOs; $1B+ deal pipeline
-- Built LLM RAG model (LlamaIndex, CrewAI, GPT-4o): 10K+ data points, expense forecasting
-- 20+ senior housing targets; $300M+ investment opportunities identified
-- Asset management: 4 portfolio companies ($250M), 12% EBITDA improvement
-- $350M fund, 10+ client calls, high LP retention
-
-Energy Systems Analyst @ South Bend Dept of Energy (Aug 2023–May 2024), South Bend IN
-
-- Energy audit: $28–$40K annual savings identified
-- $520K solar investment plan, 12-year ROI analysis
-- Financial models across multiple energy systems; cross-functional student team
-- 38–55% energy consumption savings recommendation
-
-Projects:
-
-- Financial Health Chatbot: Flask API, HTML/CSS/JS, pandas/regex pipeline, AP/AR/NWC analysis, dual-model architecture, financial time-series visualization
-- AI Pokemon Team Builder: BeautifulSoup scraping (3000+ datasets, 1GB+), LlamaIndex + CrewAI, GPT-4o-Mini RAG, Google Drive automation, embedding tuning
-
-Skills:
-
-- Languages: Python, Next.js, TypeScript, C/C++, PostgreSQL/Supabase, Prisma ORM, HTML/CSS
-- Data/Viz: Tableau, PowerBI, MatLab
-- Hardware: LinuxOS, RISC-V, Verilog, DSLX Dataflow, Cadence Virtuoso
-- AI/ML: RAG, LLMs, TensorFlow, CrewAI, LlamaIndex, OpenAI API, PyTorch
-- Finance: LBOs, DCFs, Due Diligence, SaaS Valuation, Excel/Office
-
-Education: BS Computer Engineering, University of Notre Dame (May 2025)
-
-- Minors: Engineering Finance & Strategy, Accounting
-- GPA: 3.87 / 4.00 | Cum Laude | Dean's List 5x
-```
+**Polymath priority test:** After reading `./references/full-stack-ai-engineer.md`, cross-reference every gap identified during research against the domains it enumerates. If a gap falls inside one of those domains, flag it as a **[Polymath Priority]** gap — relevant beyond this role alone — not just a job-fit gap.
 
 ---
 
 ## Rowan Platform Stack Context
 
-Sean currently builds on this monorepo. Use this to assess "familiar" vs "unfamiliar" when evaluating employer stacks. Tech Sean uses daily at Rowan is a strong signal; tech absent from this architecture represents a genuine gap.
+Sean currently builds on the Rowan monorepo described in `./references/tech-stack.md`. When evaluating an employer's stack, use that file to determine what counts as "familiar" vs "unfamiliar":
 
-```markdown
-rowan-platform/ (Turborepo + pnpm workspaces)
-├── apps/
-│ ├── receivables/ ← Next.js (TypeScript + React). Vercel.
-│ │ receivables.trustrowan.com — AR/receivables dashboard, agent UI,
-│ │ QuickBooks Online flows, server actions + Prisma.
-│ │ Uses @rowan/auth + @rowan/iam for auth and org management.
-│ ├── ready/ ← Next.js (TypeScript + React). Vercel.
-│ │ ready.trustrowan.com — sale-readiness / prep product.
-│ │ Org-scoped via [orgSlug] routing. Uses @rowan/auth + @rowan/iam.
-│ ├── receivables-worker/ ← FastAPI (Python). Render.
-│ │ Long-running API + workers: AR/AI agents, QBO sync, document
-│ │ processing, Redis/RQ job queues.
-│ │ DB via raw SQL (psycopg2 pool), NOT Prisma.
-│ │ Shared code from packages/python (rowan_workers).
-│ ├── ready-worker/ ← FastAPI (Python). Render.
-│ │ Background worker for Ready product. Same rowan_workers stack
-│ │ as receivables-worker (psycopg2, Redis/RQ).
-│ ├── platform-express/ ← Express (Node.js + TypeScript). Render.
-│ │ Integrations, cron-style work, Gmail-adjacent HTTP surface.
-│ ├── collect-tool/ ← Next.js. Vercel. Embedded into trustrowan.com.
-│ │ Redis-backed rate limiting. No auth.
-│ ├── buyer-search-tool/ ← Next.js. Vercel. Embeddable (IframeHeightNotifier).
-│ │ Uses @rowan/db (Prisma). Leaflet maps. No auth.
-│ └── valuation-tool/ ← Next.js. Vercel. Embeddable (IframeHeightNotifier).
-│ Uses @rowan/db (Prisma). No Redis. No auth.
-├── packages/
-│ ├── auth/ ← @rowan/auth — Shared Supabase Auth: SSO (Google, Azure/Outlook),
-│ │ login/signup components, auth hooks, session guards, action guards,
-│ │ route handlers. Three subpath exports:
-│ │ @rowan/auth (client), @rowan/auth/server (guards, handlers),
-│ │ @rowan/auth/middleware (Edge-safe updateSession).
-│ ├── iam/ ← @rowan/iam — Shared IAM: OrgProvider, AuthProvider, UserProvider,
-│ │ AppProvider, OrgSwitcher, UserMenu, org/user/profile components,
-│ │ TanStack Query hooks, server actions, routes.
-│ │ Two subpath exports: @rowan/iam (UI), @rowan/iam/server (actions).
-│ ├── db/ ← Prisma: schema/\*.prisma, migrations, @rowan/db client
-│ ├── config/ ← @rowan/config (env + shared settings)
-│ ├── config-js/ ← @rowan/config-js
-│ ├── types/ ← @rowan/types
-│ ├── ui/ ← @rowan/ui
-│ ├── utils/ ← @rowan/utils
-│ ├── services/ ← @rowan/services
-│ ├── analytics/ ← @rowan/analytics
-│ ├── tsconfig/ ← Shared TypeScript bases
-│ └── python/ ← Shared Python package used by workers (rowan_workers)
+- Tech that appears in `./references/tech-stack.md` (in the apps, packages, DB, AI/LLM stack, deployment, or env sections) is **"Daily use @ Rowan"** — strong signal of production familiarity.
+- Tech that does **not** appear in `./references/tech-stack.md` and does not appear as a project in `./references/resume.md` is a **genuine gap** vs the employer's requirements.
+- Tech that appears only in `./references/resume.md` (older projects, prior roles) is **"Prior project / experience"** — real but not current.
+- Tech that is conceptually adjacent to something in `./references/tech-stack.md` (e.g., LangChain vs LlamaIndex/CrewAI; Pinecone vs pgvector; Snowflake vs Postgres) is **"Adjacent (transferable concept)"**.
 
-Infrastructure:
-
-- DB: PostgreSQL (Supabase-hosted). Prisma (TS apps) vs psycopg2 raw SQL (Python workers).
-- Auth: Supabase Auth via shared @rowan/auth package. SSO with Google and Azure/Outlook
-  via Supabase OAuth. Auth is not app-local — receivables and ready both import from the
-  shared package. Tool apps (collect-tool, buyer-search-tool, valuation-tool): no auth.
-- IAM: Shared @rowan/iam package for org/user/profile management (providers, components,
-  hooks, server actions). Apps extend with app-specific routes.
-- Background jobs: Redis + RQ (Python workers); Redis rate limiting (collect-tool).
-- Env: single repo-root `.env` (see `.env.example`); symlink into `apps/dashboard` and `packages/db` as in README.
-- Deployments: Vercel (Next.js apps), Render (FastAPI + Express always-on services).
-- Key integrations: QuickBooks Online, ElevenLabs, PostHog, Gmail (platform-express).
-- AI surface: receivables-worker (FastAPI/Python) is primary agent/LLM execution layer. pgvector for vector storage, embedding + reranking pipelines.
-
-Tech Sean uses daily (STRONG signal):
-Next.js, TypeScript, React, FastAPI, Python, PostgreSQL, Supabase, Prisma ORM, Redis, RQ, pgvector, LlamaIndex, CrewAI, OpenAI API, TanStack Query, Turborepo, pnpm, Vercel, Render, QuickBooks Online integration, Tableau, PowerBI, LBOs/financial modeling.
-
-Tech NOT present in current stack (potential gaps vs employer requirements):
-Kubernetes / container orchestration, AWS/GCP/Azure (native cloud), Kafka/Celery/Airflow, dbt/Snowflake/BigQuery, LangChain, Pinecone/Weaviate/Qdrant, Terraform/IaC, GraphQL, Django/Flask (Flask used in older project, not current), Spark/Databricks, Java/Go/Rust.
-```
+Do NOT enumerate the Rowan stack inline in this skill or in any draft. Always derive familiarity claims by re-reading `./references/tech-stack.md` at the start of each research session.
 
 ---
 
@@ -344,7 +228,7 @@ This section exists to help Sean make an honest self-assessment and decide what 
 - **Confirmed Gaps**: Technologies in their stack with "Gap" signal — not present at Rowan, not used in prior projects. For each gap:
   - Name the technology and what it does in their context.
   - Explain why it exists in their stack (what problem it solves, why experienced teams use it).
-  - Flag whether this gap falls inside one of the seven polymath domains (see Career Identity section). If yes, label it **[Polymath Priority]** — relevant beyond this role alone.
+  - Flag whether this gap falls inside one of the polymath domains enumerated in `./references/full-stack-ai-engineer.md`. If yes, label it **[Polymath Priority]** — relevant beyond this role alone.
   - Assess learnability: weekend project, month of study, or fundamental paradigm shift?
   - Suggest the most direct path to close the gap (specific docs, project idea, or course).
 - **Adjacent Gaps**: Technologies where Sean has conceptual exposure but lacks production depth. Distinguish "I understand the concept" from "I've shipped this to production."
@@ -394,6 +278,8 @@ This section exists to help Sean make an honest self-assessment and decide what 
 
 ## Quality Checklist (Before Outputting)
 
+- [ ] All three reference files read at the start: `./references/resume.md`, `./references/tech-stack.md`, `./references/full-stack-ai-engineer.md`
+- [ ] No resume/stack/polymath content reproduced from memory — every claim grounded in the reference files
 - [ ] Output is a `.pdf` file presented via `present_files`
 - [ ] No color — strictly B&W/grayscale
 - [ ] No emoji — replaced with `[+]` / `[-]` / `[!]`
