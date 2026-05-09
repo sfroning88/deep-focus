@@ -1,0 +1,4 @@
+# Predict workflow preset
+# Replace property_id with a real UUID before running the predict orchestrator
+property_id=00000000-0000-0000-0000-000000000000
+multi_enabled=false
