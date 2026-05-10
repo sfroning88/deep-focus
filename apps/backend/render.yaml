@@ -17,7 +17,7 @@ services:
       value: https://focus-backend-api.onrender.com
       previewValue: https://focus-backend-api-staging.onrender.com
     - key: AI_API_URL
-      value: https://focus-ai-api.onrender.com
-      previewValue: https://focus-ai-api-staging.onrender.com
+      value: https://focus-ai-api-0nkf.onrender.com
+      previewValue: https://focus-ai-api-0nkf.onrender.com
     - key: JOB_DOMAIN
       value: predictions
