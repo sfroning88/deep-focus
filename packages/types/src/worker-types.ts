@@ -1,5 +1,5 @@
 import { createRoute } from "./route-types";
-import { Prediction } from "@focus/types";
+import { Prediction } from "./prediction-types";
 
 export type WorkerServiceConfig = {
   baseUrl: string;

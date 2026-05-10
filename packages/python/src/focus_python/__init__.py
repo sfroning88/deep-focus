@@ -53,7 +53,7 @@ from .models import (
     TrainingModel,
 )
 from .services import (
-    ModalStorageServices,
+    ModelStorageServices,
 )
 from .utils import (
     NICUtils,
@@ -106,7 +106,7 @@ __all__ = [
     'TrainingFeature',
     'TrainingBatch',
     'TrainingModel',
-    'ModalStorageServices',
+    'ModelStorageServices',
     'NICUtils',
     'NumberUtils',
     'SchemaUtils',

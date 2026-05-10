@@ -7,7 +7,7 @@ import threading
 from typing import Any, Dict, List, Optional
 from focus_python import db_pool, logging  # pyright: ignore[reportMissingImports]
 from focus_python import (  # pyright: ignore[reportMissingImports]
-    ModalStorageServices,
+    ModelStorageServices,
     TRAINING_BATCH_TABLE,
     TRAINING_MODEL_TABLE,
     TrainingStatus,
@@ -46,7 +46,7 @@ class ModelRegistry:
             for row in latest["models"]:
                 model_type = row["type"]
                 try:
-                    payload = ModalStorageServices.load(row["storage_path"])
+                    payload = ModelStorageServices.load(row["storage_path"])
                 except Exception as e:
                     logger.error("registry_load_failed", type=model_type, key=row["storage_path"], error=str(e))
                     continue

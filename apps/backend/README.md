@@ -1,4 +1,4 @@
-# Focus Backend AI+ML
+# Focus AI+ML
 
 FastAPI service for Focus full stack AI/ML app.
 

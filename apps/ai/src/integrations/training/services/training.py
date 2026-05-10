@@ -15,7 +15,7 @@ from sklearn.model_selection import GroupShuffleSplit  # pyright: ignore[reportM
 from focus_python import logging  # pyright: ignore[reportMissingImports]
 from focus_python import (  # pyright: ignore[reportMissingImports]
     FEATURE_COLUMNS,
-    ModalStorageServices,
+    ModelStorageServices,
     TRAINING_FEATURE_SCHEMA_VERSION,
     TRAINING_SPLIT_SEED,
     TRAINING_TEST_SPLIT,
@@ -127,7 +127,7 @@ class TrainingServices:
                 "batch_id": batch_id,
             }
             key = f"{batch_id}/{training_type.value}.pkl"
-            storage_path = ModalStorageServices.save(payload, key)
+            storage_path = ModelStorageServices.save(payload, key)
 
             PersistServices.set_model_completed(TrainingModel(
                 type=training_type,

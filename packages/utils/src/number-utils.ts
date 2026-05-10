@@ -68,6 +68,7 @@ export function formatDateTime(date: Date | string): string {
     year: "numeric",
     hour: "numeric",
     minute: "2-digit",
+    timeZone: "UTC",
   });
 }
 

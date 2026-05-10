@@ -20,7 +20,7 @@ logger = logging.get_logger(__name__)
 _ARTIFACT_HMAC_META_KEY = "artifact-hmac-sha256"
 
 
-class ModalStorageServices:
+class ModelStorageServices:
     """S3-backed joblib pickle storage shared across training (writer) and inference (reader)"""
 
     _lock = threading.Lock()
