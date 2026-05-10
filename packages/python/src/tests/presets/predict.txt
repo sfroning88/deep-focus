@@ -1,4 +1,4 @@
 # Predict workflow preset
-# Replace property_id with a real UUID before running the predict orchestrator
-property_id=00000000-0000-0000-0000-000000000000
+# Treeo Senior Living
+property_id=020c0c89-7f92-4511-b717-59d272898c3c
 multi_enabled=false

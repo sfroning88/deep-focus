@@ -55,6 +55,9 @@ from .redis_clear import clear_redis_queue  # noqa: E402
 
 MONOREPO_MARKER = "pnpm-workspace.yaml"
 HEALTH_TIMEOUT_SECONDS = 30
+SHARED_PYTHON_SRC = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, "src",
+)
 
 WORKER_APPS = {
     "backend": "apps/backend",
@@ -100,6 +103,8 @@ def _spawn_workers(root: str, specs: Tuple[WorkerSpec, ...]) -> List[subprocess.
         python = _resolve_python(app_dir)
         port = WORKER_PORTS[spec.domain]
         env = {**os.environ, "JOB_DOMAIN": spec.domain}
+        existing = env.get("PYTHONPATH", "")
+        env["PYTHONPATH"] = SHARED_PYTHON_SRC + (os.pathsep + existing if existing else "")
 
         procs.append(subprocess.Popen(
             [python, "-m", "uvicorn", "src.main:app", "--port", str(port)],
