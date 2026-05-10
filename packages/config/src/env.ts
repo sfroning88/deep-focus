@@ -16,6 +16,9 @@ export const env = createEnv({
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
     DATABASE_URL: z.string().min(1),
     DIRECT_URL: z.string().min(1),
+    BACKEND_API_URL: z.string().min(1),
+    AI_API_URL: z.string().min(1),
+    AUTH_TOKEN: z.string().min(1),
   },
   client: {},
   experimental__runtimeEnv: {

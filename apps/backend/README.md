@@ -4,7 +4,9 @@ FastAPI service for Focus full stack AI/ML app.
 
 ## Local development
 
-Run installs from **`apps/backend`** so the editable path resolves. Use **Python 3.13** (same as **`python:3.13-slim`** in the Dockerfile); on macOS/Homebrew this is typically `python3`.
+Run installs from **`apps/backend`** so the editable path resolves.
+Use **Python 3.13** (same as **`python:3.13-slim`** in the Dockerfile).
+On macOS/Homebrew this is typically `python3`.
 
 ```sh
 cd apps/backend

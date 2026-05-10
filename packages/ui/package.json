@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@focus/db": "workspace:*",
+    "@focus/types": "workspace:*",
     "@focus/utils": "workspace:*",
     "@supabase/supabase-js": "^2.49.1"
   },

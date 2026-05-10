@@ -1,8 +1,6 @@
 # Config
 
-Author: Sean Froning
-Created Date: 5.9.2026
-Documentation for shared focus_python package
+Last updated: **May 2026**
 
 ## Shared Python package
 

@@ -15,9 +15,9 @@ services:
       - packages/python/**
   envVars:
     - fromGroup: Focus-Environment
-    - key: SERVICE_TYPE
-      value: api
-    - key: API_URL
+    - key: BACKEND_API_URL
       value: https://focus-backend-api.onrender.com
+    - key: AI_API_URL
+      value: https://focus-ai-api.onrender.com
     - key: JOB_DOMAIN
       value: predictions

@@ -26,7 +26,7 @@ load_dotenv(env_path)
 redis_conn = Redis.from_url(config.get_required("redis"))
 listen = [config.get_required("domain")]
 
-def cleanup_on_shutdown(signum: int, frame) -> None:
+def cleanup_on_shutdown(signum: int, _frame) -> None:
     """Graceful shutdown handler"""
     logger.info(f"🛑 Received signal {signum}, shutting down gracefully...")
     sys.exit(0)

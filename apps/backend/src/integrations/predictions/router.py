@@ -20,9 +20,12 @@ predictions_available: bool = False
 try:
     from .services import InferenceServices
     predictions_available = True
+except ImportError as e:
+    training_available = False
+    logger.error("Failed to import Inference", error=str(e))
 except Exception as e:
     predictions_available = False
-    logger.error(f"Failed to import Predictions: {str(e)}")
+    logger.error(f"Failed to boot up Predictions: {str(e)}")
 
 
 @router.post("/predict/controllable_prd", dependencies=[Depends(dependency.get_token_header)])

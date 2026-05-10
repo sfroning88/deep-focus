@@ -49,7 +49,7 @@ def _find_root_env() -> str:
 
 load_dotenv(_find_root_env())
 
-from .endpoints import worker_url  # noqa: E402
+from .endpoints import WORKER_PORTS, worker_url  # noqa: E402
 from .helpers import TESTS_DIR, wait_for_health  # noqa: E402
 from .redis_clear import clear_redis_queue  # noqa: E402
 
@@ -98,7 +98,7 @@ def _spawn_workers(root: str, specs: Tuple[WorkerSpec, ...]) -> List[subprocess.
     for spec in specs:
         app_dir = os.path.join(root, WORKER_APPS[spec.domain])
         python = _resolve_python(app_dir)
-        port = worker_url(spec.domain).rsplit(":", 1)[-1]
+        port = WORKER_PORTS[spec.domain]
         env = {**os.environ, "JOB_DOMAIN": spec.domain}
 
         procs.append(subprocess.Popen(

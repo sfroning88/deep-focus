@@ -265,6 +265,9 @@ importers:
 
   packages/services:
     dependencies:
+      '@focus/config':
+        specifier: workspace:*
+        version: link:../config
       '@focus/db':
         specifier: workspace:*
         version: link:../db
@@ -311,6 +314,9 @@ importers:
       '@focus/db':
         specifier: workspace:*
         version: link:../db
+      '@focus/types':
+        specifier: workspace:*
+        version: link:../types
       '@focus/utils':
         specifier: workspace:*
         version: link:../utils

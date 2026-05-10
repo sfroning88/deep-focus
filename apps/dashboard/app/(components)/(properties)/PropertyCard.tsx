@@ -1,6 +1,7 @@
 "use client";
 
 import { createPortal } from "react-dom";
+import { toNum } from "@focus/utils";
 import { useFetchPropertyCard } from "@/app/(hooks)/use-fetch-property-card";
 import { CardHeader } from "./(propertyCard)/CardHeader";
 import { CreateSnapshotModal } from "./(propertyCard)/CreateSnapshotModal";
@@ -8,6 +9,7 @@ import { KpiStrip } from "./(propertyCard)/KpiStrip";
 import { UnitMixCard } from "./(propertyCard)/UnitMixCard";
 import { ExpenseBreakdownCard } from "./(propertyCard)/ExpenseBreakdownCard";
 import { PrdDetailCard } from "./(propertyCard)/PrdDetailCard";
+import { PredictPrdCard } from "./(predictions)/PredictPrdCard";
 import { SnapshotHistoryTable } from "./(propertyCard)/SnapshotHistoryTable";
 
 type PropertyCardProps = {
@@ -92,6 +94,11 @@ export function PropertyCard({
             </div>
 
             <PrdDetailCard card={card} snapshot={latestSnapshot} />
+            <PredictPrdCard
+              userId={userId}
+              propertyId={card.id}
+              currentPrd={toNum(latestSnapshot.controllablePRD)}
+            />
             <SnapshotHistoryTable snapshots={card.snapshots} />
           </div>
         )}

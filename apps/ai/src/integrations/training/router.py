@@ -21,9 +21,12 @@ try:
     from .background import TrainingBackgroundJobs
     from .services import TrainingServices
     training_available = True
+except ImportError as e:
+    training_available = False
+    logger.error("Failed to import Training", error=str(e))
 except Exception as e:
     training_available = False
-    logger.error(f"Failed to import Training: {str(e)}")
+    logger.error(f"Failed to boot up Training: {str(e)}")
 
 
 @router.post("/train/controllable_prd", dependencies=[Depends(dependency.get_token_header)])

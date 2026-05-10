@@ -11,6 +11,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@focus/config": "workspace:*",
     "@focus/db": "workspace:*",
     "@focus/types": "workspace:*",
     "@supabase/supabase-js": "^2.49.1",

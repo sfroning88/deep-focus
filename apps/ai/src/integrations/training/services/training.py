@@ -201,6 +201,14 @@ class TrainingServices:
             test_size=TRAINING_TEST_SPLIT,
             random_state=TRAINING_SPLIT_SEED,
         )
+        n_unique_groups = groups.nunique()
+        if n_unique_groups * TRAINING_TEST_SPLIT < 2:
+            estimator.fit(X, y)
+            predictions = estimator.predict(X)
+            score = float(r2_score(y, predictions))
+            rmse = float(np.sqrt(mean_squared_error(y, predictions)))
+            return estimator, score, rmse
+
         train_indices, test_indices = next(splitter.split(X, y, groups=groups))
         X_train, X_test = X.iloc[train_indices], X.iloc[test_indices]
         y_train, y_test = y.iloc[train_indices], y.iloc[test_indices]
