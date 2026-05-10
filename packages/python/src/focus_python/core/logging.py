@@ -50,10 +50,8 @@ class _Logging:
     def get_logger(self, name: str):
         return structlog.get_logger(name)
 
-    def bind_context(self, correlation_id: str, client_id: Optional[str] = None, path: Optional[str] = None):
+    def bind_context(self, correlation_id: str, path: Optional[str] = None):
         ctx = {"correlation_id": correlation_id}
-        if client_id is not None:
-            ctx["client_id"] = client_id
         if path is not None:
             ctx["path"] = path
         structlog.contextvars.bind_contextvars(**ctx)
@@ -61,10 +59,13 @@ class _Logging:
     def bind_job_context(
         self, 
         property_id: Optional[str] = None, 
+        training_id: Optional[str] = None,
     ):
         ctx = {}
         if property_id is not None:
             ctx["property_id"] = property_id
+        if training_id is not None:
+            ctx["training_id"] = training_id
         if ctx:
             structlog.contextvars.bind_contextvars(**ctx)
 
@@ -73,7 +74,8 @@ class _Logging:
 
     def unbind_job_context(self) -> None:
         structlog.contextvars.unbind_contextvars(
-            "property_id"
+            "property_id",
+            "training_id"
         )
 
 logging = _Logging()

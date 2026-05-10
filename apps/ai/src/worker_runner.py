@@ -14,7 +14,7 @@ sys.path.insert(0, str(_root))
 from redis import Redis  # pyright: ignore[reportMissingImports]
 from rq import Queue, Worker, SimpleWorker  # pyright: ignore[reportMissingImports]
 from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
-from rowan_workers import config, logging  # pyright: ignore[reportMissingImports]
+from focus_python import config, logging  # pyright: ignore[reportMissingImports]
 
 logging.setup_structured_logging()
 logger = logging.get_logger(__name__)
@@ -26,7 +26,7 @@ load_dotenv(env_path)
 redis_conn = Redis.from_url(config.get_required("redis"))
 listen = [config.get_required("domain")]
 
-def cleanup_on_shutdown(signum: int, frame) -> None:
+def cleanup_on_shutdown(signum: int, _frame) -> None:
     """Graceful shutdown handler"""
     logger.info(f"🛑 Received signal {signum}, shutting down gracefully...")
     sys.exit(0)

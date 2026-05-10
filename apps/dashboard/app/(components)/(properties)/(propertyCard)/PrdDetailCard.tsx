@@ -1,7 +1,6 @@
 import type { PropertyCard } from "@focus/types";
-import { SectionLabel } from "@focus/ui";
+import { SectionLabel, ValueBox } from "@focus/ui";
 import { toNum } from "@focus/utils";
-import { PrdBox } from "./PrdBox";
 
 type PrdDetailCardProps = {
   card: PropertyCard;
@@ -22,9 +21,9 @@ export function PrdDetailCard({ card, snapshot }: PrdDetailCardProps) {
     <div className="border border-white/10 rounded-sm p-3 md:p-4">
       <SectionLabel>Controllable PRD Detail</SectionLabel>
       <div className="mt-2.5 md:mt-3 grid grid-cols-3 gap-2 md:gap-3">
-        <PrdBox label="Controllable PRD" value={controllablePrd} />
-        <PrdBox label="Revenue PRD" value={revenuePrd} />
-        <PrdBox label="Expense PRD" value={expensePrd} highlight />
+        <ValueBox label="Controllable PRD" value={controllablePrd} />
+        <ValueBox label="Revenue PRD" value={revenuePrd} />
+        <ValueBox label="Expense PRD" value={expensePrd} highlight />
       </div>
     </div>
   );

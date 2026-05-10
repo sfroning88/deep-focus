@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { formatCurrency } from "@focus/utils";
 
 export function Dot({ className }: { className?: string }) {
   return (
@@ -48,6 +49,85 @@ export function KpiCard({
         {children}
       </p>
       <p className="mt-0.5 text-[10px] md:text-xs text-white/40">{sublabel}</p>
+    </div>
+  );
+}
+
+export function ValueBox({
+  label,
+  value,
+  highlight,
+}: {
+  label: string;
+  value: number | null;
+  highlight?: boolean;
+}) {
+  return (
+    <div
+      className={`rounded-sm px-2 md:px-4 py-2.5 md:py-3 text-center ${
+        highlight
+          ? "bg-fhp-blue-800/60 border border-fhp-blue-600/40"
+          : "bg-white/[0.03] border border-white/10"
+      }`}
+    >
+      {value === null ? (
+        <p
+          className="min-h-[1.5rem] md:min-h-8 flex items-center justify-center"
+          aria-label="Not available"
+        >
+          <span className="block w-9 md:w-11 max-w-[60%] h-px bg-white/35 rounded-full" />
+        </p>
+      ) : (
+        <p className="text-base md:text-xl font-semibold font-data-mono text-white">
+          {formatCurrency(value)}
+        </p>
+      )}
+      <p className="mt-0.5 text-[9px] md:text-[11px] text-white/40">{label}</p>
+    </div>
+  );
+}
+
+export function DeltaBox({
+  delta,
+  baseline,
+}: {
+  delta: number;
+  baseline: number | null;
+}) {
+  const pct =
+    baseline != null && baseline !== 0
+      ? ((delta / Math.abs(baseline)) * 100).toFixed(1)
+      : null;
+
+  const isPositive = delta > 0;
+  const isNeutral = delta === 0;
+
+  const color = isNeutral
+    ? "text-white/50"
+    : isPositive
+      ? "text-green-400"
+      : "text-red-400";
+
+  const sign = isPositive ? "+" : "";
+
+  return (
+    <div className="rounded-sm px-2 md:px-4 py-2.5 md:py-3 text-center bg-white/[0.03] border border-white/10">
+      <p
+        className={`text-base md:text-xl font-semibold font-data-mono ${color}`}
+      >
+        {sign}
+        {formatCurrency(delta)}
+      </p>
+      {pct != null ? (
+        <p className={`mt-0.5 text-[9px] md:text-[11px] ${color}`}>
+          {sign}
+          {pct}%
+        </p>
+      ) : (
+        <p className="mt-0.5 text-[9px] md:text-[11px] text-white/40">
+          Variance
+        </p>
+      )}
     </div>
   );
 }

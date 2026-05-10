@@ -26,6 +26,7 @@ model Property {
     updatedAt               DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
     snapshots               PropertySnapshot[]
+    predictions             Prediction[]
 
     @@index([msaId], map: "idx_property_by_msa")
     @@map("property")

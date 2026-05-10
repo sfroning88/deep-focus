@@ -1,2 +1,9 @@
-export { occupancyColors } from "./tokens";
-export { Badge, Dot, KpiCard, SectionLabel } from "./components";
+export { occupancyColors, trainingStatusColors } from "./tokens";
+export {
+  Badge,
+  DeltaBox,
+  Dot,
+  KpiCard,
+  SectionLabel,
+  ValueBox,
+} from "./components";

@@ -12,8 +12,8 @@ REQUIRED_ENV = {
     "database": "DATABASE_URL", 
     "redis": "REDIS_URL",
     "domain": "JOB_DOMAIN",
-    "app_url": "API_URL",
-    "ai_url": "AI_URL",
+    "backend_api_url": "BACKEND_API_URL",
+    "ai_api_url": "AI_API_URL",
     "token": "AUTH_TOKEN",
 }
 

@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { selfUserAction } from "@focus/auth/server";
-import { PropertyService } from "@lib/services/src/property/server/property-service";
+import { PropertyService } from "@lib/services";
 import { type PropertyCard, type PropertyListEntry } from "@focus/types";
 
 const fetchPropertiesSchema = z.object({});

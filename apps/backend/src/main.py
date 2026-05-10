@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from fastapi import FastAPI  # pyright: ignore[reportMissingImports]
 from focus_python import config, exception, logging, middleware  # pyright: ignore[reportMissingImports]
 from core import health, lifespan
+from integrations import PredictionsRouter
 
 # Setup structured logging
 logging.setup_structured_logging()
@@ -32,6 +33,7 @@ exception.register_exception_handlers(app)
 
 # Include routers
 app.include_router(health.router)
+app.include_router(PredictionsRouter.router)
 
 # Root endpoint
 @app.get("/")
