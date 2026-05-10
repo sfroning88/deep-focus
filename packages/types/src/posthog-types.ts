@@ -5,4 +5,5 @@ export const POSTHOG_EVENTS = {
   property_snapshot_created: "property_snapshot_created",
   model_training_started: "model_training_started",
   model_prediction_requested: "model_prediction_requested",
+  prediction_feedback_given: "prediction_feedback_given",
 } as const;

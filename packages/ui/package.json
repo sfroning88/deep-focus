@@ -15,7 +15,8 @@
     "@focus/db": "workspace:*",
     "@focus/types": "workspace:*",
     "@focus/utils": "workspace:*",
-    "@supabase/supabase-js": "^2.49.1"
+    "@supabase/supabase-js": "^2.49.1",
+    "iconoir-react": "^7.11.0"
   },
   "devDependencies": {
     "@focus/tsconfig": "workspace:*",

@@ -3,6 +3,8 @@ export {
   Badge,
   DeltaBox,
   Dot,
+  FeedbackThanksIcon,
+  FeedbackThumbs,
   KpiCard,
   SectionLabel,
   ValueBox,
