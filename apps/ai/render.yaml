@@ -1,12 +1,10 @@
 previews:
-  generation: automatic
+  generation: off
 services:
 - type: web
   runtime: docker
   name: focus-ai-api
   plan: free
-  previews:
-    plan: free
   numInstances: 1
   dockerfilePath: apps/backend/Dockerfile
   buildFilter:
@@ -30,8 +28,6 @@ services:
   runtime: docker
   name: focus-ai-worker
   plan: free
-  previews:
-    plan: free
   numInstances: 1
   dockerfilePath: apps/ai/Dockerfile
   buildFilter:

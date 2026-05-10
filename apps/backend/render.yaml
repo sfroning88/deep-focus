@@ -1,12 +1,10 @@
 previews:
-  generation: automatic
+  generation: off
 services:
 - type: web
   runtime: docker
   name: focus-backend-api
   plan: starter
-  previews:
-    plan: starter
   numInstances: 1
   dockerfilePath: apps/backend/Dockerfile
   buildFilter:
