@@ -11,6 +11,7 @@ from focus_python import (  # pyright: ignore[reportMissingImports]
     FEATURE_COLUMNS,
     MSA_FEATURE_COLUMN,
     MSA_UNKNOWN,
+    SNAPSHOT_DATE_COLUMN,
     PREDICTION_TARGETS,
     PredictionType,
     Property,
@@ -21,7 +22,7 @@ from focus_python import (  # pyright: ignore[reportMissingImports]
 
 
 class Features:
-    """Feature engineering for property-level training"""
+    """Feature engineering for snapshot-level training"""
 
     @staticmethod
     def build_training_dataframe(
@@ -29,26 +30,29 @@ class Features:
         snapshots: List[PropertySnapshot],
         prediction_type: PredictionType,
     ) -> Tuple[pd.DataFrame, pd.Series, pd.Series, LabelEncoder, str]:
-        """Join properties + snapshots, aggregate target per-property, encode MSA"""
+        """Join each snapshot with its property features; one sample per snapshot"""
         if not properties or not snapshots:
             raise ValueError("Properties and snapshots are required for training")
 
         target = PREDICTION_TARGETS[prediction_type]
 
         snap_df = pd.DataFrame([
-            {"property_id": s.property_id, target: NumberUtils._to_float(getattr(s, target, None))}
+            {
+                "property_id": s.property_id,
+                target: NumberUtils._to_float(getattr(s, target, None)),
+                SNAPSHOT_DATE_COLUMN: s.reported_at.toordinal() if s.reported_at else None,
+            }
             for s in snapshots
         ])
-        snap_df = snap_df.dropna(subset=[target])
+        snap_df = snap_df.dropna(subset=[target, SNAPSHOT_DATE_COLUMN])
         snap_df = snap_df[snap_df[target] > 0]
-        target_per_property = snap_df.groupby("property_id")[target].median().reset_index()
 
         prop_df = pd.DataFrame([
             {"property_id": p.id, "msa_id": p.msa_id or MSA_UNKNOWN, **NICUtils._acuity_mix(p)}
             for p in properties
         ])
 
-        df = prop_df.merge(target_per_property, on="property_id", how="inner")
+        df = prop_df.merge(snap_df, on="property_id", how="inner")
         if df.empty:
             raise ValueError("No overlapping properties + snapshots after join")
 
