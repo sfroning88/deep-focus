@@ -5,7 +5,7 @@ Core backend API orchestration
 """
 from fastapi import APIRouter, Depends  # pyright: ignore[reportMissingImports]
 from focus_python import dependency, error, logging  # pyright: ignore[reportMissingImports]
-from focus_python import PredictionType  # pyright: ignore[reportMissingImports]
+from focus_python import PredictionType, PrismaPrediction  # pyright: ignore[reportMissingImports]
 from .schemas import PredictionRequest, PredictionResponse
 
 logger = logging.get_logger(__name__)
@@ -21,7 +21,7 @@ try:
     from .services import InferenceServices
     predictions_available = True
 except ImportError as e:
-    training_available = False
+    predictions_available = False
     logger.error("Failed to import Inference", error=str(e))
 except Exception as e:
     predictions_available = False
@@ -41,7 +41,9 @@ async def model_predict(request: PredictionRequest) -> PredictionResponse:
             multi_enabled=request.multi_enabled,
             prediction_type=PredictionType.CONTROLLABLE_PRD,
         )
-        return PredictionResponse(predictions=predictions)
+        return PredictionResponse(
+            predictions=[PrismaPrediction.from_prediction(p) for p in predictions],
+        )
     except ValueError as e:
         logger.warning("model_prediction_rejected", error=str(e))
         raise error(str(e), status_code=404)

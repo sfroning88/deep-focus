@@ -33,6 +33,7 @@ from .core import (
 from .enums import (
     NICState,
     PredictionType,
+    PrismaPredictionType,
     DomainOption,
     TrainingType,
     TrainingStatus,
@@ -45,8 +46,10 @@ from .fastapi import (
 )
 from .models import (
     BaseFocus,
+    BasePrisma,
     NICMSA,
     Prediction,
+    PrismaPrediction,
     Property,
     PropertySnapshot,
     TrainingFeature,
@@ -93,6 +96,7 @@ __all__ = [
     'queue',
     'NICState',
     'PredictionType',
+    'PrismaPredictionType',
     'DomainOption',
     'TrainingType',
     'TrainingStatus',
@@ -101,8 +105,10 @@ __all__ = [
     'exception',
     'middleware',
     'BaseFocus',
+    'BasePrisma',
     'NICMSA',
     'Prediction',
+    'PrismaPrediction',
     'Property',
     'PropertySnapshot',
     'TrainingFeature',

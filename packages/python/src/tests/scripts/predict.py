@@ -50,17 +50,21 @@ def run_prediction_tests() -> None:
         raise RuntimeError(f"Expected 1 prediction (single-winner mode), got {len(predictions)}")
 
     for pred in predictions:
-        if pred.get("property_id") != property_id:
+        if pred.get("propertyId") != property_id:
             raise RuntimeError(
-                f"Prediction property_id mismatch: {pred.get('property_id')} != {property_id}"
+                f"Prediction propertyId mismatch: {pred.get('propertyId')} != {property_id}"
             )
         if pred.get("result") is None:
             raise RuntimeError(f"Prediction missing result: {pred}")
-        if not pred.get("model_type"):
-            raise RuntimeError(f"Prediction missing model_type: {pred}")
+        if pred.get("type") != "controllablePrd":
+            raise RuntimeError(f"Prediction type must be controllablePrd, got {pred.get('type')!r}")
+        if not pred.get("modelType"):
+            raise RuntimeError(f"Prediction missing modelType: {pred}")
+        if not pred.get("modelBatchId"):
+            raise RuntimeError(f"Prediction missing modelBatchId: {pred}")
 
     print(f"Got {len(predictions)} prediction(s) for property {property_id}")
     for pred in predictions:
-        print(f"  - {pred.get('model_type')}: {round(float(pred['result']), 2)}")
+        print(f"  - {pred.get('modelType')}: {round(float(pred['result']), 2)}")
 
     print("\nPrediction integration testing complete")

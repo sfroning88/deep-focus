@@ -5,8 +5,10 @@ Response models for Predictions
 """
 from pydantic import BaseModel
 from typing import List
-from focus_python import Prediction  # pyright: ignore[reportMissingImports]
+from focus_python import PrismaPrediction  # pyright: ignore[reportMissingImports]
+
 
 class PredictionResponse(BaseModel):
     """Response model for retrieving prediction from winning model or all models"""
-    predictions: List[Prediction]
+
+    predictions: List[PrismaPrediction]
