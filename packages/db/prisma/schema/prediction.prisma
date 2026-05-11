@@ -12,7 +12,7 @@ enum PredictionType {
 model Prediction {
     type                    PredictionType
     result                  Decimal @db.Decimal(14,2)
-    feedbackScore           Decimal? @db.Decimal(14,2)
+    feedbackScore           Decimal? @map("feedback_score") @db.Decimal(14,2)
 
     modelType               TrainingType @map("model_type")
     modelBatchId            String @map("model_batch_id") @db.Uuid

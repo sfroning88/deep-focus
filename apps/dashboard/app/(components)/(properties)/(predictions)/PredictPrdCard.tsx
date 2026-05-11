@@ -3,6 +3,7 @@
 import { SectionLabel, ValueBox, DeltaBox } from "@focus/ui";
 import { toNum } from "@focus/utils";
 import { usePredictControllablePrd } from "@/app/(hooks)/use-predict-controllable-prd";
+import { PredictFeedback } from "./PredictFeedback";
 
 type PredictPrdCardProps = {
   userId: string;
@@ -86,6 +87,21 @@ export function PredictPrdCard({
           </div>
         )}
       </div>
+
+      {isSuccess && data.predictions[0] ? (
+        <PredictFeedback
+          userId={userId}
+          propertyId={propertyId}
+          type={data.predictions[0].type}
+          modelType={data.predictions[0].modelType}
+          modelBatchId={data.predictions[0].modelBatchId}
+          feedbackScore={
+            data.predictions[0].feedbackScore != null
+              ? toNum(data.predictions[0].feedbackScore)
+              : null
+          }
+        />
+      ) : null}
     </div>
   );
 }

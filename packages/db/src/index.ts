@@ -1,15 +1,17 @@
 export { db } from "./client";
+export {
+  NICState,
+  PredictionType,
+  TrainingType,
+  TrainingStatus,
+} from "../prisma/src/generated/prisma";
 export type {
   Prisma,
   User,
-  NICState,
   NICMSA,
-  PredictionType,
   Prediction,
   Property,
   PropertySnapshot,
-  TrainingType,
-  TrainingStatus,
   TrainingFeature,
   TrainingBatch,
   TrainingModel,

@@ -1,5 +1,14 @@
 import type { ReactNode } from "react";
 import { formatCurrency } from "@focus/utils";
+import { ThumbsDown, ThumbsUp } from "iconoir-react";
+
+const iconClass = "h-4 w-4 md:h-[18px] md:w-[18px]";
+
+const btnClass = `
+  inline-flex items-center justify-center rounded-md border transition-colors p-1.5 md:p-2
+  border-white/15 bg-white/[0.04] text-white/80 hover:bg-white/[0.08]
+  disabled:opacity-40 disabled:pointer-events-none
+`;
 
 export function Dot({ className }: { className?: string }) {
   return (
@@ -129,5 +138,60 @@ export function DeltaBox({
         </p>
       )}
     </div>
+  );
+}
+
+export function FeedbackThumbs({
+  onPositive,
+  onNegative,
+  disabled,
+  className,
+}: {
+  onPositive: () => void;
+  onNegative: () => void;
+  disabled?: boolean;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`inline-flex items-center gap-1.5 ${className ?? ""}`}
+      role="group"
+      aria-label="Prediction feedback"
+    >
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={onPositive}
+        className={btnClass}
+        aria-label="Mark prediction as helpful"
+      >
+        <ThumbsUp className={iconClass} strokeWidth={2} />
+      </button>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={onNegative}
+        className={btnClass}
+        aria-label="Mark prediction as not helpful"
+      >
+        <ThumbsDown className={iconClass} strokeWidth={2} />
+      </button>
+    </div>
+  );
+}
+
+export function FeedbackThanksIcon({
+  variant,
+  className,
+}: {
+  variant: "up" | "down";
+  className?: string;
+}) {
+  const Icon = variant === "up" ? ThumbsUp : ThumbsDown;
+  return (
+    <Icon
+      className={`${iconClass} shrink-0 text-fhp-blue-400 ${className ?? ""}`}
+      strokeWidth={2}
+    />
   );
 }
