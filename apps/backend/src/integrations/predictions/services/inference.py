@@ -3,7 +3,8 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Processing functions for model inference
 """
-from typing import List
+from datetime import date
+from typing import List, Optional
 from focus_python import logging  # pyright: ignore[reportMissingImports]
 from focus_python import (  # pyright: ignore[reportMissingImports]
     Prediction,
@@ -36,13 +37,29 @@ class InferenceServices:
         if prop is None:
             raise ValueError(f"Property '{property_id}' not found")
 
+        snapshot_reported_at = PersistServices.fetch_latest_snapshot_reported_at(property_id)
+        if snapshot_reported_at is None:
+            logger.warning(
+                "inference_missing_snapshot_date",
+                property_id=property_id,
+                detail="Using UTC calendar date for snapshot_date feature",
+            )
+
         if multi_enabled:
             keys = model_registry.loaded_model_types()
-            return [InferenceServices._run(prop, key, prediction_type) for key in keys]
-        return [InferenceServices._run(prop, WINNER_KEY, prediction_type)]
+            return [
+                InferenceServices._run(prop, key, prediction_type, snapshot_reported_at)
+                for key in keys
+            ]
+        return [InferenceServices._run(prop, WINNER_KEY, prediction_type, snapshot_reported_at)]
 
     @staticmethod
-    def _run(prop: Property, model_key: str, prediction_type: PredictionType) -> Prediction:
+    def _run(
+        prop: Property,
+        model_key: str,
+        prediction_type: PredictionType,
+        snapshot_reported_at: Optional[date],
+    ) -> Prediction:
         """Single-model inference path: load encoder, build vector, predict, package response"""
         model = model_registry.get(model_key)
         meta = model_registry.get_metadata(model_key)
@@ -50,7 +67,7 @@ class InferenceServices:
         if encoder is None:
             raise RuntimeError(f"Model '{model_key}' missing msa_encoder metadata")
 
-        X = Features.build_predict_vector(prop, encoder)
+        X = Features.build_predict_vector(prop, encoder, snapshot_reported_at)
         result = float(model.predict(X)[0])
 
         resolved_type = meta.get("winner_type") or model_key

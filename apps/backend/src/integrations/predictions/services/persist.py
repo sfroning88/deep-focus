@@ -3,10 +3,12 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Database persistence for prediction inference
 """
+from datetime import date, datetime
 from typing import Optional
 from psycopg2 import sql  # pyright: ignore[reportMissingModuleSource]
 from focus_python import db_pool, logging  # pyright: ignore[reportMissingImports]
 from focus_python import (  # pyright: ignore[reportMissingImports]
+    PROPERTY_SNAPSHOT_TABLE,
     PROPERTY_TABLE,
     Property,
 )
@@ -50,3 +52,27 @@ class PersistServices:
         if not row:
             return None
         return Property(**row)
+
+    @staticmethod
+    def fetch_latest_snapshot_reported_at(property_id: str) -> Optional[date]:
+        """Latest snapshot reported_at for the property (matches training snapshot_date feature)."""
+        query = sql.SQL("""
+            SELECT reported_at::date AS reported_at
+            FROM {table}
+            WHERE property_id = %s::uuid
+            ORDER BY reported_at DESC
+            LIMIT 1
+        """).format(
+            table=sql.Identifier(*PROPERTY_SNAPSHOT_TABLE)
+        )
+        with db_pool.get_cursor() as cursor:
+            query_string = query.as_string(cursor)
+        row = db_pool.execute_query(query_string, (property_id,), fetch_one=True)
+        if not row:
+            return None
+        raw = row.get("reported_at")
+        if raw is None:
+            return None
+        if isinstance(raw, datetime):
+            return raw.date()
+        return raw
