@@ -58,3 +58,6 @@ jobs:
           NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          BACKEND_API_URL: ${{ secrets.BACKEND_API_URL }}
+          AI_API_URL: ${{ secrets.AI_API_URL }}
+          AUTH)_TOKEN: ${{ secrets.AUTH_TOKEN }}
