@@ -45,27 +45,26 @@ export class PredictionService {
   }
 
   private async persistPredictions(predictions: Prediction[]): Promise<void> {
-    await Promise.all(
-      predictions.map((p) =>
-        db.prediction.upsert({
-          where: {
-            type_modelType_modelBatchId_propertyId: {
-              type: p.type,
-              modelType: p.modelType,
-              modelBatchId: p.modelBatchId,
-              propertyId: p.propertyId,
-            },
-          },
-          update: { result: p.result },
-          create: {
+    const operations = predictions.map((p) =>
+      db.prediction.upsert({
+        where: {
+          type_modelType_modelBatchId_propertyId: {
             type: p.type,
-            result: p.result,
             modelType: p.modelType,
             modelBatchId: p.modelBatchId,
             propertyId: p.propertyId,
           },
-        }),
-      ),
+        },
+        update: { result: p.result },
+        create: {
+          type: p.type,
+          result: p.result,
+          modelType: p.modelType,
+          modelBatchId: p.modelBatchId,
+          propertyId: p.propertyId,
+        },
+      }),
     );
+    await db.$transaction(operations);
   }
 }
