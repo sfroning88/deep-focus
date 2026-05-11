@@ -22,35 +22,44 @@ export function PredictFeedback({
   modelBatchId,
   feedbackScore: feedbackScoreFromServer,
 }: PredictFeedbackProps) {
-  const { mutate, isPending } = useGivePredictionFeedback(userId);
+  const { mutate, isPending, isError, reset } =
+    useGivePredictionFeedback(userId);
   const [submittedScore, setSubmittedScore] = useState<number | null>(null);
 
   const feedbackScore = submittedScore ?? feedbackScoreFromServer;
-  const disabled = feedbackScore != null || isPending;
+  const hasAnswered = feedbackScore != null;
+  const disabled = hasAnswered || isPending;
 
-  const send = (feedbackScore: number) => {
+  const send = (score: number) => {
+    if (isError) reset();
     mutate(
       {
         type,
         modelType,
         modelBatchId,
         propertyId,
-        feedbackScore,
+        feedbackScore: score,
       },
-      { onSuccess: () => setSubmittedScore(feedbackScore) },
+      { onSuccess: () => setSubmittedScore(score) },
     );
   };
 
   return (
     <div className="mt-2.5 flex flex-wrap items-center gap-2 md:gap-3">
       <span className="text-[10px] md:text-[11px] text-white/40">
-        Was this prediction helpful?
+        {isError
+          ? "Something went wrong — try again?"
+          : hasAnswered
+            ? "Thanks for the feedback!"
+            : "Was this prediction helpful?"}
       </span>
-      <FeedbackThumbs
-        disabled={disabled}
-        onPositive={() => send(1)}
-        onNegative={() => send(0)}
-      />
+      {!hasAnswered && (
+        <FeedbackThumbs
+          disabled={disabled}
+          onPositive={() => send(1)}
+          onNegative={() => send(0)}
+        />
+      )}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import "server-only";
 
 import { db } from "@focus/db";
 import type {
+  Prediction,
   PredictionType,
   TrainingType,
   ModelPredictControllablePrdRequest,
@@ -18,7 +19,9 @@ export class PredictionService {
   async predictControllablePrd(
     args: ModelPredictControllablePrdRequest,
   ): Promise<ModelPredictControllablePrdResponse> {
-    return this.workerService.modelPredictControllablePrd(args);
+    const response = await this.workerService.modelPredictControllablePrd(args);
+    await this.persistPredictions(response.predictions);
+    return response;
   }
 
   async givePredictionFeedback(
@@ -39,5 +42,29 @@ export class PredictionService {
         },
       },
     });
+  }
+
+  private async persistPredictions(predictions: Prediction[]): Promise<void> {
+    const operations = predictions.map((p) =>
+      db.prediction.upsert({
+        where: {
+          type_modelType_modelBatchId_propertyId: {
+            type: p.type,
+            modelType: p.modelType,
+            modelBatchId: p.modelBatchId,
+            propertyId: p.propertyId,
+          },
+        },
+        update: { result: p.result },
+        create: {
+          type: p.type,
+          result: p.result,
+          modelType: p.modelType,
+          modelBatchId: p.modelBatchId,
+          propertyId: p.propertyId,
+        },
+      }),
+    );
+    await db.$transaction(operations);
   }
 }
