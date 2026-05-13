@@ -65,3 +65,6 @@ __pycache__/
 
 # Prisma generated client
 packages/db/prisma/src
+
+# macOs folder icons
+Icon?
