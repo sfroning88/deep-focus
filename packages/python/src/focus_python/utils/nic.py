@@ -3,7 +3,9 @@ Author: Sean Froning
 Created Date: 5.9.2026
 NIC general purpose utils
 """
+
 from ..models import Property
+
 
 class NICUtils:
     """General purpose utilities for NIC"""
@@ -16,10 +18,10 @@ class NICUtils:
             total_calc = sum(
                 int(getattr(prop, k, 0) or 0)
                 for k in (
-                    "cottage_units", 
-                    "independent_units", 
-                    "assisted_units", 
-                    "memory_units"
+                    "cottage_units",
+                    "independent_units",
+                    "assisted_units",
+                    "memory_units",
                 )
             )
             total = total_calc

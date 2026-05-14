@@ -1,35 +1,35 @@
-from ._focus_object import (
+from ._base_focus import (
     BaseFocus,
 )
-from ._prisma_object import (
+from ._base_prisma import (
     BasePrisma,
 )
-from .nic_object import (
+from .nic import (
     NICMSA,
 )
-from .prediction_object import (
+from .prediction import (
     Prediction,
     PrismaPrediction,
 )
-from .property_object import (
+from .property import (
     Property,
     PropertySnapshot,
 )
-from .training_object import (
+from .training import (
     TrainingFeature,
     TrainingBatch,
     TrainingModel,
 )
 
 __all__ = [
-    'BaseFocus',
-    'BasePrisma',
-    'NICMSA',
-    'Prediction',
-    'PrismaPrediction',
-    'Property',
-    'PropertySnapshot',
-    'TrainingFeature',
-    'TrainingBatch',
-    'TrainingModel',
+    "BaseFocus",
+    "BasePrisma",
+    "NICMSA",
+    "Prediction",
+    "PrismaPrediction",
+    "Property",
+    "PropertySnapshot",
+    "TrainingFeature",
+    "TrainingBatch",
+    "TrainingModel",
 ]

@@ -3,14 +3,16 @@ Author: Sean Froning
 Modified Date: 5.11.2026
 Class objects for model predictions
 """
+
 from typing import Optional
-from ._focus_object import BaseFocus
-from ._prisma_object import BasePrisma
+from ._base_focus import BaseFocus
+from ._base_prisma import BasePrisma
 from ..enums import PredictionType, PrismaPredictionType, TrainingType
 
 
 class Prediction(BaseFocus):
     """Normalized model prediction"""
+
     type: Optional[PredictionType] = None
     result: Optional[float] = None
     feedback_score: Optional[float] = None

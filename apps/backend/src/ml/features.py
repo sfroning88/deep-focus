@@ -3,12 +3,13 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Model inference feature engineering
 """
+
 from datetime import date, datetime, timezone
 from typing import Optional
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder  # pyright: ignore[reportMissingImports]
-from focus_python import (  # pyright: ignore[reportMissingImports]
+from sklearn.preprocessing import LabelEncoder
+from focus_python import (
     FEATURE_COLUMNS,
     MSA_FEATURE_COLUMN,
     MSA_UNKNOWN,
@@ -27,12 +28,7 @@ class Features:
         msa_encoder: LabelEncoder,
         snapshot_reported_at: Optional[date] = None,
     ) -> pd.DataFrame:
-        """Build a single-row inference DataFrame matching FEATURE_COLUMNS.
-
-        snapshot_reported_at should match the snapshot used for property metrics (same
-        ordinal as training's ``reported_at.toordinal()``). If omitted, UTC calendar
-        date is used so the feature is stable across host timezones.
-        """
+        """Build a single-row inference DataFrame matching FEATURE_COLUMNS"""
         msa_value = str(prop.msa_id or MSA_UNKNOWN)
         encoded = (
             int(msa_encoder.transform([msa_value])[0])

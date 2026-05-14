@@ -3,28 +3,35 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Class objects for training runs
 """
+
 from datetime import datetime
 from typing import List, Optional
-from ._focus_object import BaseFocus
+from ._base_focus import BaseFocus
 from ..enums import TrainingType, TrainingStatus
+
 
 class TrainingFeature(BaseFocus):
     """Normalized model training feature"""
+
     columns: Optional[List[str]] = None
     target: Optional[str] = None
     classes: Optional[List[str]] = None
     schema_version: Optional[int] = None
     batch_id: Optional[str] = None
 
+
 class TrainingBatch(BaseFocus):
     """Normalized model training batch"""
+
     status: Optional[TrainingStatus] = None
     samples: Optional[int] = None
     split_seed: Optional[int] = None
     feature: Optional[TrainingFeature] = None
 
+
 class TrainingModel(BaseFocus):
     """Normalized model training run"""
+
     type: Optional[TrainingType] = None
     status: Optional[TrainingStatus] = None
     score: Optional[float] = None

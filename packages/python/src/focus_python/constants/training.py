@@ -3,6 +3,7 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Definitions for training structures
 """
+
 from typing import List
 from ..enums import TrainingType
 
@@ -10,12 +11,16 @@ ACUITY_FEATURE_COLUMNS: List[str] = ["pct_cottage", "pct_il", "pct_al", "pct_mc"
 MSA_FEATURE_COLUMN: str = "msa_id_encoded"
 MSA_UNKNOWN: str = "unknown"
 SNAPSHOT_DATE_COLUMN: str = "snapshot_date"
-FEATURE_COLUMNS: List[str] = [*ACUITY_FEATURE_COLUMNS, MSA_FEATURE_COLUMN, SNAPSHOT_DATE_COLUMN]
+FEATURE_COLUMNS: List[str] = [
+    *ACUITY_FEATURE_COLUMNS,
+    MSA_FEATURE_COLUMN,
+    SNAPSHOT_DATE_COLUMN,
+]
 TRAINING_JOBS = {
-    'linear': TrainingType.LINEAR,
-    'ridge': TrainingType.RIDGE,
-    'forest': TrainingType.FOREST,
-    'gbm': TrainingType.GBM,
+    "linear": TrainingType.LINEAR,
+    "ridge": TrainingType.RIDGE,
+    "forest": TrainingType.FOREST,
+    "gbm": TrainingType.GBM,
 }
 TRAINING_FEATURE_SCHEMA_VERSION = 2
 TRAINING_SPLIT_SEED = 42

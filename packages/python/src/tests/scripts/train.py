@@ -3,6 +3,7 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Train Sklearn testing script
 """
+
 from typing import Any, Dict, List
 
 from ..endpoints import TRAIN_CONTROLLABLE_PRD_URL, endpoint_test

@@ -6,6 +6,7 @@ on:
     paths:
       - "apps/backend/**"
       - "apps/ai/**"
+      - "packages/python/**"
 
 jobs:
   changes:
@@ -24,6 +25,8 @@ jobs:
               - 'apps/backend/**'
             ai:
               - 'apps/ai/**'
+            packages:
+              - 'packages/python/**'
 
   python-nurse:
     needs: changes

@@ -3,23 +3,28 @@ Author: Sean Froning
 Created Date: 5.3.2026
 Centralized logging with structlog
 """
+
 import sys
-import structlog  # pyright: ignore[reportMissingImports]
-from structlog import DropEvent  # pyright: ignore[reportMissingImports]
+import structlog
+from structlog import DropEvent
 from typing import Optional
 from .config import config
 
 LOG_FORMAT = config.get_log_format()
 
+
 class _Logging:
     """Centralized logging configuration with structlog"""
 
-    def drop_health_logs(self, logger, method_name, event_dict):
+    def drop_health_logs(self, _logger, _method_name, event_dict):
         path = event_dict.get("path") or event_dict.get("request_path")
-        if path in ("/health", "/ready"): raise DropEvent
+        if path in ("/health", "/ready"):
+            raise DropEvent
         return event_dict
 
-    def configure_structlog(self, ):
+    def configure_structlog(
+        self,
+    ):
         shared_processors = [
             structlog.stdlib.filter_by_level,
             structlog.contextvars.merge_contextvars,
@@ -44,6 +49,7 @@ class _Logging:
 
     def setup_structured_logging(self):
         import logging
+
         logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.INFO)
         self.configure_structlog()
 
@@ -57,8 +63,8 @@ class _Logging:
         structlog.contextvars.bind_contextvars(**ctx)
 
     def bind_job_context(
-        self, 
-        property_id: Optional[str] = None, 
+        self,
+        property_id: Optional[str] = None,
         training_id: Optional[str] = None,
     ):
         ctx = {}
@@ -73,9 +79,7 @@ class _Logging:
         structlog.contextvars.clear_contextvars()
 
     def unbind_job_context(self) -> None:
-        structlog.contextvars.unbind_contextvars(
-            "property_id",
-            "training_id"
-        )
+        structlog.contextvars.unbind_contextvars("property_id", "training_id")
+
 
 logging = _Logging()

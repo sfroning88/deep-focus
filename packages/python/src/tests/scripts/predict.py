@@ -3,6 +3,7 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Predict from models testing script
 """
+
 from typing import Any, Dict, List
 
 from ..endpoints import PREDICT_CONTROLLABLE_PRD_URL, endpoint_test
@@ -47,7 +48,9 @@ def run_prediction_tests() -> None:
         raise RuntimeError("Prediction endpoint returned no predictions")
 
     if not multi_enabled and len(predictions) != 1:
-        raise RuntimeError(f"Expected 1 prediction (single-winner mode), got {len(predictions)}")
+        raise RuntimeError(
+            f"Expected 1 prediction (single-winner mode), got {len(predictions)}"
+        )
 
     for pred in predictions:
         if pred.get("propertyId") != property_id:
@@ -57,7 +60,9 @@ def run_prediction_tests() -> None:
         if pred.get("result") is None:
             raise RuntimeError(f"Prediction missing result: {pred}")
         if pred.get("type") != "controllablePrd":
-            raise RuntimeError(f"Prediction type must be controllablePrd, got {pred.get('type')!r}")
+            raise RuntimeError(
+                f"Prediction type must be controllablePrd, got {pred.get('type')!r}"
+            )
         if not pred.get("modelType"):
             raise RuntimeError(f"Prediction missing modelType: {pred}")
         if not pred.get("modelBatchId"):

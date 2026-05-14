@@ -3,10 +3,11 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Centralized route registry and endpoint test factories
 """
+
 import time as Time
 from typing import Any, Dict, Optional
 
-import requests  # pyright: ignore[reportMissingModuleSource]
+import requests
 
 WORKER_PORTS = {
     "backend": 8000,
@@ -52,10 +53,17 @@ def endpoint_test(
     """Fire an API endpoint, check success, return extracted field or full data dict"""
     print(f"\n**{name}** {method} {url}")
     if method.upper() == "GET":
-        response = requests.get(url, headers=HEADERS, params=params, timeout=REQUEST_TIMEOUT)
+        response = requests.get(
+            url, headers=HEADERS, params=params, timeout=REQUEST_TIMEOUT
+        )
     else:
         response = requests.request(
-            method, url, headers=HEADERS, json=payload or {}, params=params, timeout=REQUEST_TIMEOUT,
+            method,
+            url,
+            headers=HEADERS,
+            json=payload or {},
+            params=params,
+            timeout=REQUEST_TIMEOUT,
         )
     Time.sleep(1)
     response.raise_for_status()

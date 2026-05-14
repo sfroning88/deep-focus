@@ -3,20 +3,13 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Processing functions for model persistence
 """
+
 from datetime import datetime, timezone
 from typing import List
-from psycopg2 import sql  # pyright: ignore[reportMissingModuleSource]
-from focus_python import db_pool, logging  # pyright: ignore[reportMissingImports]
-from focus_python import (  # pyright: ignore[reportMissingImports]
-    PROPERTY_SNAPSHOT_TABLE,
-    PROPERTY_TABLE,
+from focus_python import db_pool, logging
+from focus_python import (
     TRAINING_JOBS,
     TRAINING_ERROR_MSG_MAX_LENGTH,
-    TRAINING_FEATURE_TABLE,
-    TRAINING_BATCH_TABLE,
-    TRAINING_MODEL_TABLE,
-    TRAINING_STATUS_ENUM,
-    TRAINING_TYPE_ENUM,
     Property,
     PropertySnapshot,
     TrainingBatch,
@@ -24,6 +17,19 @@ from focus_python import (  # pyright: ignore[reportMissingImports]
     TrainingStatus,
     TrainingType,
 )
+from ..queries.fetch_properties import QUERY as FETCH_PROPERTIES
+from ..queries.fetch_property_snapshots import QUERY as FETCH_PROPERTY_SNAPSHOTS
+from ..queries.seed_batch import QUERY as SEED_BATCH
+from ..queries.seed_feature import QUERY as SEED_FEATURE
+from ..queries.seed_model import QUERY as SEED_MODEL
+from ..queries.set_model_executing import QUERY as SET_MODEL_EXECUTING
+from ..queries.bump_batch_executing import QUERY as BUMP_BATCH_EXECUTING
+from ..queries.set_model_completed import QUERY as SET_MODEL_COMPLETED
+from ..queries.set_model_failed import QUERY as SET_MODEL_FAILED
+from ..queries.select_batch_by_id import QUERY as SELECT_BATCH_BY_ID
+from ..queries.set_batch_failed import QUERY as SET_BATCH_FAILED
+from ..queries.set_batch_winner import QUERY as SET_BATCH_WINNER
+from ..queries.set_batch_completed import QUERY as SET_BATCH_COMPLETED
 
 logger = logging.get_logger(__name__)
 
@@ -34,48 +40,16 @@ class PersistServices:
     @staticmethod
     def fetch_properties() -> List[Property]:
         """Pull all property rows and hydrate Property pydantic models"""
-        query = sql.SQL("""
-            SELECT
-                id::text AS id,
-                name,
-                address,
-                city,
-                state,
-                zip,
-                year_built,
-                year_renovated,
-                unit_size,
-                cottage_units,
-                independent_units,
-                assisted_units,
-                memory_units,
-                total_units,
-                total_beds,
-                msa_id::text AS msa_id
-            FROM {table}
-        """).format(
-            table=sql.Identifier(*PROPERTY_TABLE)
-        )
-        with db_pool.get_cursor() as cursor: queryString = query.as_string(cursor)
+        with db_pool.get_cursor() as cursor:
+            queryString = FETCH_PROPERTIES.as_string(cursor)
         rows = db_pool.execute_query(queryString)
         return [Property(**row) for row in rows]
 
     @staticmethod
     def fetch_snapshots() -> List[PropertySnapshot]:
         """Pull all property_snapshot rows and hydrate PropertySnapshot pydantic models"""
-        query = sql.SQL("""
-            SELECT
-                property_id::text AS property_id,
-                reported_at,
-                occupancy,
-                total_revenues,
-                controllable_expenses,
-                controllable_prd
-            FROM {table}
-        """).format(
-            table=sql.Identifier(*PROPERTY_SNAPSHOT_TABLE)
-        )
-        with db_pool.get_cursor() as cursor: queryString = query.as_string(cursor)
+        with db_pool.get_cursor() as cursor:
+            queryString = FETCH_PROPERTY_SNAPSHOTS.as_string(cursor)
         rows = db_pool.execute_query(queryString)
         return [PropertySnapshot(**row) for row in rows]
 
@@ -86,61 +60,37 @@ class PersistServices:
             raise ValueError("seed_batch requires batch.feature")
         feature = batch.feature
         now = datetime.now(tz=timezone.utc)
-        batch_query = sql.SQL("""
-            INSERT INTO {table}
-                (id, status, samples, split_seed, updated_at)
-            VALUES
-                (%s::uuid, %s::{status_enum}, %s, %s, NOW())
-        """).format(
-            table=sql.Identifier(*TRAINING_BATCH_TABLE),
-            status_enum=sql.Identifier(*TRAINING_STATUS_ENUM),
-        )
-        feature_query = sql.SQL("""
-            INSERT INTO {table}
-                (batch_id, columns, target, classes, schema_version, updated_at)
-            VALUES
-                (%s::uuid, %s, %s, %s, %s, NOW())
-        """).format(
-            table=sql.Identifier(*TRAINING_FEATURE_TABLE)
-        )
-        model_query = sql.SQL("""
-            INSERT INTO {table}
-                (type, status, score, rmse, winner, storage_path, trained_at, batch_id, updated_at)
-            VALUES
-                (%s::{type_enum}, %s::{status_enum}, 0, 0, false, '', %s, %s::uuid, NOW())
-        """).format(
-            table=sql.Identifier(*TRAINING_MODEL_TABLE),
-            type_enum=sql.Identifier(*TRAINING_TYPE_ENUM),
-            status_enum=sql.Identifier(*TRAINING_STATUS_ENUM),
-        )
         with db_pool.get_cursor() as cursor:
             cursor.execute(
-                batch_query.as_string(cursor),
-                (batch.id, TrainingStatus.PENDING.value, batch.samples, batch.split_seed),
+                SEED_BATCH.as_string(cursor),
+                (
+                    batch.id,
+                    TrainingStatus.PENDING.value,
+                    batch.samples,
+                    batch.split_seed,
+                ),
             )
             cursor.execute(
-                feature_query.as_string(cursor),
-                (batch.id, feature.columns, feature.target, feature.classes, feature.schema_version),
+                SEED_FEATURE.as_string(cursor),
+                (
+                    batch.id,
+                    feature.columns,
+                    feature.target,
+                    feature.classes,
+                    feature.schema_version,
+                ),
             )
             for training_type in TRAINING_JOBS.values():
                 cursor.execute(
-                    model_query.as_string(cursor),
+                    SEED_MODEL.as_string(cursor),
                     (training_type.value, TrainingStatus.PENDING.value, now, batch.id),
                 )
 
     @staticmethod
     def set_model_executing(training_type: TrainingType, batch_id: str) -> None:
         """Move a pending TrainingModel row into executing state"""
-        query = sql.SQL("""
-            UPDATE {table}
-            SET status = %s::{status_enum}, updated_at = NOW()
-            WHERE type = %s::{type_enum} AND batch_id = %s::uuid
-        """).format(
-            table=sql.Identifier(*TRAINING_MODEL_TABLE),
-            status_enum=sql.Identifier(*TRAINING_STATUS_ENUM),
-            type_enum=sql.Identifier(*TRAINING_TYPE_ENUM),
-        )
-        with db_pool.get_cursor() as cursor: queryString = query.as_string(cursor)
+        with db_pool.get_cursor() as cursor:
+            queryString = SET_MODEL_EXECUTING.as_string(cursor)
         db_pool.execute_query(
             queryString,
             (TrainingStatus.EXECUTING.value, training_type.value, batch_id),
@@ -149,15 +99,8 @@ class PersistServices:
     @staticmethod
     def bump_batch_executing(batch_id: str) -> None:
         """Move TrainingBatch from pending → executing the first time a worker starts"""
-        query = sql.SQL("""
-            UPDATE {table}
-            SET status = %s::{status_enum}, updated_at = NOW()
-            WHERE id = %s::uuid AND status = %s::{status_enum}
-        """).format(
-            table=sql.Identifier(*TRAINING_BATCH_TABLE),
-            status_enum=sql.Identifier(*TRAINING_STATUS_ENUM),
-        )
-        with db_pool.get_cursor() as cursor: queryString = query.as_string(cursor)
+        with db_pool.get_cursor() as cursor:
+            queryString = BUMP_BATCH_EXECUTING.as_string(cursor)
         db_pool.execute_query(
             queryString,
             (TrainingStatus.EXECUTING.value, batch_id, TrainingStatus.PENDING.value),
@@ -166,22 +109,8 @@ class PersistServices:
     @staticmethod
     def set_model_completed(model: TrainingModel) -> None:
         """Persist successful training run metrics + storage location"""
-        query = sql.SQL("""
-            UPDATE {table}
-            SET status = %s::{status_enum},
-                score = %s,
-                rmse = %s,
-                storage_path = %s,
-                trained_at = %s,
-                error_message = NULL,
-                updated_at = NOW()
-            WHERE type = %s::{type_enum} AND batch_id = %s::uuid
-        """).format(
-            table=sql.Identifier(*TRAINING_MODEL_TABLE),
-            status_enum=sql.Identifier(*TRAINING_STATUS_ENUM),
-            type_enum=sql.Identifier(*TRAINING_TYPE_ENUM),
-        )
-        with db_pool.get_cursor() as cursor: queryString = query.as_string(cursor)
+        with db_pool.get_cursor() as cursor:
+            queryString = SET_MODEL_COMPLETED.as_string(cursor)
         db_pool.execute_query(
             queryString,
             (
@@ -199,18 +128,8 @@ class PersistServices:
     def set_model_failed(model: TrainingModel) -> None:
         """Mark a training run as failed and capture the error for debugging"""
         truncated = (model.error_message or "")[:TRAINING_ERROR_MSG_MAX_LENGTH]
-        query = sql.SQL("""
-            UPDATE {table}
-            SET status = %s::{status_enum},
-                error_message = %s,
-                updated_at = NOW()
-            WHERE type = %s::{type_enum} AND batch_id = %s::uuid
-        """).format(
-            table=sql.Identifier(*TRAINING_MODEL_TABLE),
-            status_enum=sql.Identifier(*TRAINING_STATUS_ENUM),
-            type_enum=sql.Identifier(*TRAINING_TYPE_ENUM),
-        )
-        with db_pool.get_cursor() as cursor: queryString = query.as_string(cursor)
+        with db_pool.get_cursor() as cursor:
+            queryString = SET_MODEL_FAILED.as_string(cursor)
         db_pool.execute_query(
             queryString,
             (TrainingStatus.FAILED.value, truncated, model.type.value, model.batch_id),
@@ -219,63 +138,75 @@ class PersistServices:
     @staticmethod
     def finalize_batch(batch_id: str) -> None:
         """Resolve batch terminal state + winner based on child model rows"""
-        select_query = sql.SQL("""
-            SELECT type::text AS type, status::text AS status, score
-            FROM {table}
-            WHERE batch_id = %s::uuid
-        """).format(
-            table=sql.Identifier(*TRAINING_MODEL_TABLE)
-        )
-        with db_pool.get_cursor() as cursor: select_string = select_query.as_string(cursor)
-        rows = db_pool.execute_query(select_string, (batch_id,))
+        models = PersistServices._fetch_batch_models(batch_id)
+        outcome = PersistServices._resolve_batch_outcome(models)
 
-        statuses = {row["status"] for row in rows}
-        expected_types = {training_type.value for training_type in TrainingType}
-        completed_types = {row["type"] for row in rows if row["status"] == TrainingStatus.COMPLETED.value}
-
-        if TrainingStatus.FAILED.value in statuses:
-            fail_query = sql.SQL("""
-                UPDATE {table}
-                SET status = %s::{status_enum}, updated_at = NOW()
-                WHERE id = %s::uuid AND status <> %s::{status_enum}
-            """).format(
-                table=sql.Identifier(*TRAINING_BATCH_TABLE),
-                status_enum=sql.Identifier(*TRAINING_STATUS_ENUM),
-            )
-            with db_pool.get_cursor() as cursor: fail_string = fail_query.as_string(cursor)
-            db_pool.execute_query(
-                fail_string,
-                (TrainingStatus.FAILED.value, batch_id, TrainingStatus.FAILED.value),
-            )
-            logger.warning("training_batch_failed", batch=batch_id, statuses=list(statuses))
+        if outcome == TrainingStatus.FAILED:
+            PersistServices._fail_batch(batch_id, models)
             return
 
-        if not expected_types.issubset(completed_types):
+        if outcome != TrainingStatus.COMPLETED:
             return
 
-        winner_row = max(rows, key=lambda row: float(row["score"]))
-        winner_type = winner_row["type"]
-        winner_query = sql.SQL("""
-            UPDATE {table}
-            SET winner = (type::text = %s), updated_at = NOW()
-            WHERE batch_id = %s::uuid
-        """).format(
-            table=sql.Identifier(*TRAINING_MODEL_TABLE)
-        )
-        complete_query = sql.SQL("""
-            UPDATE {table}
-            SET status = %s::{status_enum}, updated_at = NOW()
-            WHERE id = %s::uuid
-        """).format(
-            table=sql.Identifier(*TRAINING_BATCH_TABLE),
-            status_enum=sql.Identifier(*TRAINING_STATUS_ENUM),
-        )
+        winner = PersistServices._pick_winner(models)
+        PersistServices._complete_batch(batch_id, winner)
+
+    @staticmethod
+    def _fetch_batch_models(batch_id: str) -> List[TrainingModel]:
+        """Fetch all model rows for a batch and hydrate into TrainingModel objects"""
         with db_pool.get_cursor() as cursor:
-            cursor.execute(winner_query.as_string(cursor), (winner_type, batch_id))
-            cursor.execute(complete_query.as_string(cursor), (TrainingStatus.COMPLETED.value, batch_id))
+            query_string = SELECT_BATCH_BY_ID.as_string(cursor)
+        rows = db_pool.execute_query(query_string, (batch_id,)) or []
+        return [TrainingModel(**row) for row in rows]
+
+    @staticmethod
+    def _resolve_batch_outcome(models: List[TrainingModel]) -> TrainingStatus:
+        """Return FAILED if any model failed, COMPLETED if all types completed, EXECUTING otherwise"""
+        statuses = {m.status for m in models}
+        if TrainingStatus.FAILED in statuses:
+            return TrainingStatus.FAILED
+        expected_types = {t for t in TrainingType}
+        completed_types = {
+            m.type for m in models if m.status == TrainingStatus.COMPLETED
+        }
+        if expected_types.issubset(completed_types):
+            return TrainingStatus.COMPLETED
+        return TrainingStatus.EXECUTING
+
+    @staticmethod
+    def _pick_winner(models: List[TrainingModel]) -> TrainingModel:
+        """Return the completed model with the highest score"""
+        return max(
+            (m for m in models if m.status == TrainingStatus.COMPLETED),
+            key=lambda m: float(m.score or 0),
+        )
+
+    @staticmethod
+    def _fail_batch(batch_id: str, models: List[TrainingModel]) -> None:
+        """Persist FAILED terminal state for a batch and log"""
+        statuses = [m.status.value for m in models if m.status]
+        with db_pool.get_cursor() as cursor:
+            fail_string = SET_BATCH_FAILED.as_string(cursor)
+        db_pool.execute_query(
+            fail_string,
+            (TrainingStatus.FAILED.value, batch_id, TrainingStatus.FAILED.value),
+        )
+        logger.warning("training_batch_failed", batch=batch_id, statuses=statuses)
+
+    @staticmethod
+    def _complete_batch(batch_id: str, winner: TrainingModel) -> None:
+        """Persist winner + COMPLETED terminal state for a batch and log"""
+        with db_pool.get_cursor() as cursor:
+            cursor.execute(
+                SET_BATCH_WINNER.as_string(cursor), (winner.type.value, batch_id)
+            )
+            cursor.execute(
+                SET_BATCH_COMPLETED.as_string(cursor),
+                (TrainingStatus.COMPLETED.value, batch_id),
+            )
         logger.info(
             "training_batch_completed",
             batch=batch_id,
-            winner=winner_type,
-            score=float(winner_row["score"]),
+            winner=winner.type.value,
+            score=float(winner.score or 0),
         )

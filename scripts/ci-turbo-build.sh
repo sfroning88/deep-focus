@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# Turbo build for GitHub Actions: affected packages vs merge base (PR), previous commit (push), or full build.
-# Expected env from the workflow: CI_EVENT_NAME, CI_BASE_REF (pull_request), CI_EVENT_BEFORE (push).
 set -euo pipefail
 
 EVENT_NAME="${CI_EVENT_NAME:?CI_EVENT_NAME is required}"

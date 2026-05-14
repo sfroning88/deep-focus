@@ -3,13 +3,14 @@ Author: Sean Froning
 Created Date: 5.3.2026
 Centralized database connection manager
 """
+
 import re
 import threading
 from contextlib import contextmanager
 from typing import Dict, List, Optional, Tuple, Union
 from urllib.parse import parse_qs, urlencode, urlparse
-import psycopg2.pool  # pyright: ignore[reportMissingModuleSource]
-from psycopg2.extras import RealDictCursor  # pyright: ignore[reportMissingModuleSource]
+import psycopg2.pool
+from psycopg2.extras import RealDictCursor
 from .config import config
 from .logging import logging
 
@@ -19,6 +20,7 @@ DB_POOL_MIN = config.get_db_pool_min()
 DB_POOL_MAX = config.get_db_pool_max()
 DATABASE_URL = config.get_required("database")
 DB_APP_NAME = f"db-" + config.get_required("domain")
+
 
 class DatabaseConnectionPool:
     _instance = None
@@ -44,7 +46,9 @@ class DatabaseConnectionPool:
             qs = parse_qs(parsed.query)
             qs.pop("pgbouncer", None)
             new_q = urlencode(qs, doseq=True)
-            return f"{parsed.scheme}://{parsed.netloc}{parsed.path}" + (f"?{new_q}" if new_q else "")
+            return f"{parsed.scheme}://{parsed.netloc}{parsed.path}" + (
+                f"?{new_q}" if new_q else ""
+            )
         return url
 
     def _init_pool(self) -> None:
@@ -67,7 +71,7 @@ class DatabaseConnectionPool:
         with self._lock:
             self._ensure_pool()
             pool = self.connection_pool
-        if pool is None: 
+        if pool is None:
             raise RuntimeError("Database pool is closed")
         return pool.getconn()
 
@@ -126,5 +130,6 @@ class DatabaseConnectionPool:
         if pool is not None:
             pool.closeall()
             logger.info("Database pool closed")
+
 
 db_pool = DatabaseConnectionPool()

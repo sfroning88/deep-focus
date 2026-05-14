@@ -3,11 +3,17 @@ Author: Sean Froning
 Created Date: 5.3.2026
 Lifespan events for FastAPI app
 """
+
 from contextlib import asynccontextmanager
-from fastapi import FastAPI  # pyright: ignore[reportMissingImports]
-from focus_python import db_pool, logging, queue  # pyright: ignore[reportMissingImports]
+from fastapi import FastAPI
+from focus_python import (
+    db_pool,
+    logging,
+    queue,
+)
 
 logger = logging.get_logger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

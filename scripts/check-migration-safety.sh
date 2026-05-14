@@ -1,6 +1,4 @@
 #!/usr/bin/env sh
-# If migration.sql files are staged, pattern-check their staged content (like diff-type-check).
-# See .cursor/skills/migration-safety/SKILL.md for rationale.
 set -e
 
 die() {

@@ -3,7 +3,8 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Shared redis cleanup for tests
 """
-from ..focus_python import config, queue  # pyright: ignore[reportMissingImports]
+
+from ..focus_python import config, queue
 
 
 def clear_redis_queue() -> None:
