@@ -35,6 +35,7 @@ class TrainingModel(BaseFocus):
     type: Optional[TrainingType] = None
     status: Optional[TrainingStatus] = None
     score: Optional[float] = None
+    train_score: Optional[float] = None
     rmse: Optional[float] = None
     winner: Optional[bool] = None
     storage_path: Optional[str] = None

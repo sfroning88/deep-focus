@@ -116,7 +116,15 @@ class ModelRegistry:
             target_column=payload.get("target_column"),
             samples=payload.get("samples"),
         )
-        return entry, payload["model"]
+        estimator = payload.get("model")
+        if estimator is None:
+            logger.error(
+                "registry_payload_missing_model",
+                type=model_type,
+                key=row["storage_path"],
+            )
+            return None, None
+        return entry, estimator
 
     @staticmethod
     def _resolve_winner(metadata: Dict[str, LoadedModel]) -> Optional[str]:

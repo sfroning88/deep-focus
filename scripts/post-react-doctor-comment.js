@@ -8,10 +8,16 @@ module.exports = async ({ github, context }) => {
   const raw = fs.readFileSync(outputPath, "utf8").trim();
   if (!raw) return;
 
-  const filtered = execSync(
-    `sh scripts/filter-react-doctor-output.sh "${outputPath}"`,
-    { encoding: "utf8", maxBuffer: 10 * 1024 * 1024 },
-  ).trim();
+  let filtered;
+  try {
+    filtered = execSync(
+      `sh scripts/filter-react-doctor-output.sh "${outputPath}"`,
+      { encoding: "utf8", maxBuffer: 10 * 1024 * 1024 },
+    ).trim();
+  } catch (e) {
+    console.error("Filter script failed:", e.message);
+    return;
+  }
   if (!filtered) return;
 
   const marker = "<!-- react-doctor -->";

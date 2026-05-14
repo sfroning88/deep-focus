@@ -22,7 +22,7 @@ from sklearn.metrics import (
     r2_score,
 )
 from sklearn.model_selection import (
-    GroupShuffleSplit,
+    GroupKFold,
 )
 from focus_python import logging
 from focus_python import (
@@ -30,7 +30,6 @@ from focus_python import (
     ModelStorageServices,
     TRAINING_FEATURE_SCHEMA_VERSION,
     TRAINING_SPLIT_SEED,
-    TRAINING_TEST_SPLIT,
     TRAINING_MIN_SPLIT_SAMPLES,
     TRAINING_RIDGE_ALPHA,
     TRAINING_N_ESTIMATORS,
@@ -66,6 +65,8 @@ class TrainingServices:
         frame = Features.build_training_dataframe(
             properties, snapshots, prediction_type
         )
+        if len(frame.X) == 0:
+            raise ValueError("No training samples available for batch")
         batch = TrainingServices._build_batch(frame, batch_id, prediction_type)
 
         PersistServices.seed_batch(batch)
@@ -104,13 +105,14 @@ class TrainingServices:
             )
 
             estimator = TrainingServices._build_estimator(training_type)
-            model, score, rmse = TrainingServices._train_and_score(
+            model, score, train_score, rmse = TrainingServices._train_and_score(
                 estimator, frame.X, frame.y, frame.groups
             )
             logger.info(
                 "training_scored",
                 type=training_type.value,
                 r2=round(score, 4),
+                train_r2=round(train_score, 4),
                 rmse=round(rmse, 2),
                 samples=len(frame.X),
             )
@@ -127,6 +129,7 @@ class TrainingServices:
                     type=training_type,
                     batch_id=batch_id,
                     score=score,
+                    train_score=train_score,
                     rmse=rmse,
                     storage_path=storage_path,
                     trained_at=datetime.now(tz=timezone.utc),
@@ -251,36 +254,38 @@ class TrainingServices:
     @staticmethod
     def _train_and_score(
         estimator: BaseEstimator, X, y, groups
-    ) -> Tuple[BaseEstimator, float, float]:
-        """Group-aware train/test split with full-data refit; returns model + test metrics"""
-        if len(X) < TRAINING_MIN_SPLIT_SAMPLES:
+    ) -> Tuple[BaseEstimator, float, float, float]:
+        """Group-aware 5-fold CV; returns model + mean test R², mean train R², mean RMSE"""
+        n_folds = 5
+        if len(X) < TRAINING_MIN_SPLIT_SAMPLES or groups.nunique() < n_folds:
             return TrainingServices._fit_and_score_full(estimator, X, y)
 
-        splitter = GroupShuffleSplit(
-            n_splits=1,
-            test_size=TRAINING_TEST_SPLIT,
-            random_state=TRAINING_SPLIT_SEED,
-        )
-        if groups.nunique() * TRAINING_TEST_SPLIT < 2:
-            return TrainingServices._fit_and_score_full(estimator, X, y)
-
-        train_indices, test_indices = next(splitter.split(X, y, groups=groups))
-        X_train, X_test = X.iloc[train_indices], X.iloc[test_indices]
-        y_train, y_test = y.iloc[train_indices], y.iloc[test_indices]
-        estimator.fit(X_train, y_train)
-        predictions = estimator.predict(X_test)
-        score = float(r2_score(y_test, predictions))
-        rmse = float(np.sqrt(mean_squared_error(y_test, predictions)))
+        splitter = GroupKFold(n_splits=n_folds)
+        test_scores, train_scores, rmses = [], [], []
+        for train_indices, test_indices in splitter.split(X, y, groups=groups):
+            X_train, X_test = X.iloc[train_indices], X.iloc[test_indices]
+            y_train, y_test = y.iloc[train_indices], y.iloc[test_indices]
+            estimator.fit(X_train, y_train)
+            test_scores.append(float(r2_score(y_test, estimator.predict(X_test))))
+            train_scores.append(float(r2_score(y_train, estimator.predict(X_train))))
+            rmses.append(
+                float(np.sqrt(mean_squared_error(y_test, estimator.predict(X_test))))
+            )
         estimator.fit(X, y)
-        return estimator, score, rmse
+        return (
+            estimator,
+            float(np.mean(test_scores)),
+            float(np.mean(train_scores)),
+            float(np.mean(rmses)),
+        )
 
     @staticmethod
     def _fit_and_score_full(
         estimator: BaseEstimator, X, y
-    ) -> Tuple[BaseEstimator, float, float]:
+    ) -> Tuple[BaseEstimator, float, float, float]:
         """Fit on full dataset and score in-sample; used when split is not viable"""
         estimator.fit(X, y)
         predictions = estimator.predict(X)
         score = float(r2_score(y, predictions))
         rmse = float(np.sqrt(mean_squared_error(y, predictions)))
-        return estimator, score, rmse
+        return estimator, score, score, rmse

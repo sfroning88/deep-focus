@@ -60,4 +60,4 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           BACKEND_API_URL: ${{ secrets.BACKEND_API_URL }}
           AI_API_URL: ${{ secrets.AI_API_URL }}
-          AUTH)_TOKEN: ${{ secrets.AUTH_TOKEN }}
+          AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
