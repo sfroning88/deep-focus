@@ -4,8 +4,8 @@ from .exception import exception
 from .middleware import middleware
 
 __all__ = [
-    'dependency',
-    'error',
-    'exception',
-    'middleware',
+    "dependency",
+    "error",
+    "exception",
+    "middleware",
 ]

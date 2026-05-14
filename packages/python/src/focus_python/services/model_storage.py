@@ -3,15 +3,18 @@ Author: Sean Froning
 Created Date: 5.9.2026
 S3-backed joblib pickle storage for trained models
 """
+
 import hashlib
 import hmac
 import io
 import os
 import threading
 from typing import Any, Optional
-import boto3  # pyright: ignore[reportMissingImports]
-import joblib  # pyright: ignore[reportMissingImports]
-from botocore.client import Config as BotoConfig  # pyright: ignore[reportMissingImports]
+import boto3
+import joblib
+from botocore.client import (
+    Config as BotoConfig,
+)
 from ..constants import TRAINING_MODEL_BUCKET
 from ..core import logging
 
@@ -43,7 +46,9 @@ class ModelStorageServices:
                     region_name=os.environ.get("S3_BUCKET_REGION") or "us-east-1",
                     aws_access_key_id=key_id,
                     aws_secret_access_key=key_secret,
-                    config=BotoConfig(signature_version="s3v4", retries={"max_attempts": 3}),
+                    config=BotoConfig(
+                        signature_version="s3v4", retries={"max_attempts": 3}
+                    ),
                 )
         return cls._client
 
@@ -72,7 +77,9 @@ class ModelStorageServices:
             ContentType="application/octet-stream",
             Metadata={_ARTIFACT_HMAC_META_KEY: sig},
         )
-        logger.info("model_saved", bucket=TRAINING_MODEL_BUCKET, key=key, bytes=len(body))
+        logger.info(
+            "model_saved", bucket=TRAINING_MODEL_BUCKET, key=key, bytes=len(body)
+        )
         return key
 
     @classmethod
@@ -81,7 +88,6 @@ class ModelStorageServices:
         obj = cls._get_client().get_object(Bucket=TRAINING_MODEL_BUCKET, Key=key)
         body = obj["Body"].read()
         meta = obj.get("Metadata") or {}
-        # S3 normalizes metadata keys to lowercase
         expected = meta.get(_ARTIFACT_HMAC_META_KEY)
         if not expected:
             raise RuntimeError(

@@ -3,19 +3,21 @@ Author: Sean Froning
 Created Date: 5.3.2026
 Configuration for focus_python
 """
+
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
 REQUIRED_ENV = {
-    "database": "DATABASE_URL", 
+    "database": "DATABASE_URL",
     "redis": "REDIS_URL",
     "domain": "JOB_DOMAIN",
     "backend_api_url": "BACKEND_API_URL",
     "ai_api_url": "AI_API_URL",
     "token": "AUTH_TOKEN",
 }
+
 
 class _Config:
     """Centralized environment config"""
@@ -24,13 +26,13 @@ class _Config:
         return os.getenv(key, default)
 
     def _required_key_to_var(self, key: str) -> str:
-        if key not in REQUIRED_ENV.keys(): 
+        if key not in REQUIRED_ENV.keys():
             raise ValueError(f"Bad key {key} for required env")
         return os.getenv(REQUIRED_ENV.get(key))
 
     def get_required(self, key: str) -> str:
         val = self._required_key_to_var(key)
-        if not val: 
+        if not val:
             raise ValueError(f"Required env {key} not set")
         return val
 
@@ -48,5 +50,6 @@ class _Config:
 
     def validate_required_services(self) -> bool:
         return all(self.get_required_services_status().values())
+
 
 config = _Config()

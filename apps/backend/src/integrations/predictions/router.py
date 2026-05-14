@@ -3,9 +3,17 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Core backend API orchestration
 """
-from fastapi import APIRouter, Depends  # pyright: ignore[reportMissingImports]
-from focus_python import dependency, error, logging  # pyright: ignore[reportMissingImports]
-from focus_python import PredictionType, PrismaPrediction  # pyright: ignore[reportMissingImports]
+
+from fastapi import APIRouter, Depends
+from focus_python import (
+    dependency,
+    error,
+    logging,
+)
+from focus_python import (
+    PredictionType,
+    PrismaPrediction,
+)
 from .schemas import PredictionRequest, PredictionResponse
 
 logger = logging.get_logger(__name__)
@@ -19,6 +27,7 @@ router = APIRouter(
 predictions_available: bool = False
 try:
     from .services import InferenceServices
+
     predictions_available = True
 except ImportError as e:
     predictions_available = False
@@ -28,7 +37,9 @@ except Exception as e:
     logger.error(f"Failed to boot up Predictions: {str(e)}")
 
 
-@router.post("/predict/controllable_prd", dependencies=[Depends(dependency.get_token_header)])
+@router.post(
+    "/predict/controllable_prd", dependencies=[Depends(dependency.get_token_header)]
+)
 async def model_predict(request: PredictionRequest) -> PredictionResponse:
     """Retrieve controllable PRD prediction(s) from the latest training batch"""
     if not predictions_available:

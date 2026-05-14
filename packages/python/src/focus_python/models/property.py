@@ -3,14 +3,17 @@ Author: Sean Froning
 Created Date: 5.3.2026
 Class objects for property schemas
 """
+
 from typing import Optional
 from decimal import Decimal
 from datetime import date
 from ..enums import NICState
-from ._focus_object import BaseFocus
+from ._base_focus import BaseFocus
+
 
 class Property(BaseFocus):
     """Normalized Property"""
+
     id: Optional[str] = None
     name: Optional[str] = None
     address: Optional[str] = None
@@ -28,8 +31,10 @@ class Property(BaseFocus):
     total_beds: Optional[int] = None
     msa_id: Optional[str] = None
 
+
 class PropertySnapshot(BaseFocus):
     """Normalized Property Snapshot"""
+
     reported_at: Optional[date] = None
     occupancy: Optional[Decimal] = None
     total_revenues: Optional[Decimal] = None

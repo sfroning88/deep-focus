@@ -1,7 +1,6 @@
 #!/bin/sh
 set -e
 
-# Run from anywhere: removes node_modules, .next, and .turbo trees under the monorepo root.
 ROOT="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 

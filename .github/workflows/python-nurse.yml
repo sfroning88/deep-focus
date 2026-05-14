@@ -6,6 +6,7 @@ on:
     paths:
       - "apps/backend/**"
       - "apps/ai/**"
+      - "packages/python/**"
 
 jobs:
   changes:
@@ -24,6 +25,8 @@ jobs:
               - 'apps/backend/**'
             ai:
               - 'apps/ai/**'
+            packages:
+              - 'packages/python/**'
 
   python-nurse:
     needs: changes
@@ -40,6 +43,6 @@ jobs:
     steps:
       - uses: sfroning88/python-nurse@v1.0.3
         with:
-          app-path: apps/${{ matrix.worker }}
+          app-path: ${{ matrix.worker == 'python' && 'packages/python' || format('apps/{0}', matrix.worker) }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           score-preset: structure

@@ -1,12 +1,6 @@
 #!/bin/sh
 set -e
 
-# Determine which FastAPI apps have relevant changes.
-# Used for: pre-push checks, Render deploy status workflow logic.
-#
-# backend: triggers on apps/backend/**
-# ai: triggers on apps/ai/**
-
 BASE="${BASE_SHA:-origin/staging}"
 HEAD="${HEAD_SHA:-HEAD}"
 CHANGED=$(git diff --name-only "$BASE"...$HEAD 2>/dev/null || true)
@@ -14,14 +8,16 @@ CHANGED=$(git diff --name-only "$BASE"...$HEAD 2>/dev/null || true)
 
 BACKEND=0
 AI=0
+PACKAGES=0
 
 for path in $CHANGED; do
   case "$path" in
     apps/backend/*) BACKEND=1 ;;
     apps/ai/*) AI=1 ;;
+    packages/python/*) PACKAGES=1 ;;
   esac
 done
 
-# Output services that need deploy check (for use in hooks or CI)
 [ "$BACKEND" = 1 ] && echo "backend"
 [ "$AI" = 1 ] && echo "ai"
+[ "$PACKAGES" = 1 ] && echo "packages"

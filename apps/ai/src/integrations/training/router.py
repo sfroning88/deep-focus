@@ -3,9 +3,18 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Core AI API orchestration
 """
-from fastapi import APIRouter, Depends  # pyright: ignore[reportMissingImports]
-from focus_python import dependency, error, logging, queue  # pyright: ignore[reportMissingImports]
-from focus_python import PredictionType, TRAINING_JOBS  # pyright: ignore[reportMissingImports]
+
+from fastapi import APIRouter, Depends
+from focus_python import (
+    dependency,
+    error,
+    logging,
+    queue,
+)
+from focus_python import (
+    PredictionType,
+    TRAINING_JOBS,
+)
 from .schemas import TrainingRequest, TrainingResponse
 
 logger = logging.get_logger(__name__)
@@ -20,6 +29,7 @@ training_available: bool = False
 try:
     from .background import TrainingBackgroundJobs
     from .services import TrainingServices
+
     training_available = True
 except ImportError as e:
     training_available = False
@@ -29,7 +39,9 @@ except Exception as e:
     logger.error(f"Failed to boot up Training: {str(e)}")
 
 
-@router.post("/train/controllable_prd", dependencies=[Depends(dependency.get_token_header)])
+@router.post(
+    "/train/controllable_prd", dependencies=[Depends(dependency.get_token_header)]
+)
 async def model_train(_request: TrainingRequest) -> TrainingResponse:
     """Train batch of sklearn models for controllable prd"""
     if not training_available:
@@ -46,12 +58,14 @@ async def model_train(_request: TrainingRequest) -> TrainingResponse:
     try:
         specs = []
         for training_type in TRAINING_JOBS.values():
-            specs.append({
-                "func": TrainingBackgroundJobs.background_model_train,
-                "args": (training_type.value, batch_id, prediction_type.value),
-                "job_id": f"model_training_{training_type.value}_{batch_id}",
-                "job_timeout": 6000,
-            })
+            specs.append(
+                {
+                    "func": TrainingBackgroundJobs.background_model_train,
+                    "args": (training_type.value, batch_id, prediction_type.value),
+                    "job_id": f"model_training_{training_type.value}_{batch_id}",
+                    "job_timeout": 6000,
+                }
+            )
         jobs = queue.enqueue_jobs(specs)
         return TrainingResponse(job_ids=[job.id for job in jobs])
     except Exception as e:

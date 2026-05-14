@@ -4,8 +4,8 @@ from .logging import logging
 from .queue import queue
 
 __all__ = [
-    'config',
-    'db_pool',
-    'logging',
-    'queue',
+    "config",
+    "db_pool",
+    "logging",
+    "queue",
 ]

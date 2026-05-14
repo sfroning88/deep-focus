@@ -3,11 +3,12 @@ Author: Sean Froning
 Created Date: 5.3.2026
 Health check for FastAPI App
 """
+
 import atexit
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
-from fastapi import APIRouter  # pyright: ignore[reportMissingImports]
-from fastapi.responses import JSONResponse  # pyright: ignore[reportMissingImports]
-from focus_python import db_pool, logging  # pyright: ignore[reportMissingImports]
+from fastapi import APIRouter
+from fastapi.responses import JSONResponse
+from focus_python import db_pool, logging
 
 logger = logging.get_logger(__name__)
 
@@ -17,6 +18,7 @@ CHECK_TIMEOUT = 5
 _executor = ThreadPoolExecutor(max_workers=2)
 atexit.register(_executor.shutdown, wait=False)
 
+
 def _check_db() -> bool:
     try:
         db_pool.execute_query("SELECT 1")
@@ -25,9 +27,11 @@ def _check_db() -> bool:
         logger.warning(f"DB health check failed: {e}")
         return False
 
+
 def _check_redis() -> bool:
     try:
         from core import queue
+
         conn = queue.get_connection()
         conn.ping()
         return True
@@ -35,9 +39,11 @@ def _check_redis() -> bool:
         logger.warning(f"Redis health check failed: {e}")
         return False
 
+
 @router.get("/health")
 def liveness():
     return {"status": "ok"}
+
 
 @router.get("/ready")
 def readiness():

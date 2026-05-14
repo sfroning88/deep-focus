@@ -3,16 +3,21 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Processing functions for model inference
 """
+
 from datetime import date
 from typing import List, Optional
-from focus_python import logging  # pyright: ignore[reportMissingImports]
-from focus_python import (  # pyright: ignore[reportMissingImports]
+from focus_python import logging
+from focus_python import (
     Prediction,
     PredictionType,
     Property,
     TrainingType,
 )
-from ml import Features, WINNER_KEY, model_registry  # pyright: ignore[reportMissingImports]
+from ml import (
+    Features,
+    WINNER_KEY,
+    model_registry,
+)
 from .persist import PersistServices
 
 logger = logging.get_logger(__name__)
@@ -37,7 +42,9 @@ class InferenceServices:
         if prop is None:
             raise ValueError(f"Property '{property_id}' not found")
 
-        snapshot_reported_at = PersistServices.fetch_latest_snapshot_reported_at(property_id)
+        snapshot_reported_at = PersistServices.fetch_latest_snapshot_reported_at(
+            property_id
+        )
         if snapshot_reported_at is None:
             logger.warning(
                 "inference_missing_snapshot_date",
@@ -51,7 +58,11 @@ class InferenceServices:
                 InferenceServices._run(prop, key, prediction_type, snapshot_reported_at)
                 for key in keys
             ]
-        return [InferenceServices._run(prop, WINNER_KEY, prediction_type, snapshot_reported_at)]
+        return [
+            InferenceServices._run(
+                prop, WINNER_KEY, prediction_type, snapshot_reported_at
+            )
+        ]
 
     @staticmethod
     def _run(

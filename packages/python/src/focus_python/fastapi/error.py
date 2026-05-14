@@ -3,7 +3,9 @@ Author: Sean Froning
 Created Date: 5.3.2026
 App Error handling for FastAPI App
 """
+
 from typing import Any, Dict, Optional, Union
+
 
 class _Error(Exception):
     def __init__(
@@ -26,5 +28,6 @@ class _Error(Exception):
             "code": self.status_code,
             "details": self.details,
         }
+
 
 error = _Error

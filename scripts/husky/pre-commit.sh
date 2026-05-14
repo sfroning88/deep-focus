@@ -1,6 +1,4 @@
 #!/usr/bin/env sh
-# Staged formatting/lint (JS/TS/etc. via lint-staged), full TS graph, Prisma migration guard.
-# Add Python or other checks in pre-commit-extra.sh (optional).
 set -e
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT" || exit 1

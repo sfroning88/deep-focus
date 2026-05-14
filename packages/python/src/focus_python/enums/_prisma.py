@@ -3,6 +3,7 @@ Author: Sean Froning
 Created Date: 5.11.2026
 Class definitions for Prisma enums
 """
+
 from __future__ import annotations
 from enum import Enum
 from .prediction import PredictionType

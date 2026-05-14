@@ -4,6 +4,7 @@ Created Date: 5.9.2026
 Number field validator utils
 """
 
+
 class NumberUtils:
     """Field serializers for numbers"""
 
@@ -16,4 +17,3 @@ class NumberUtils:
             return float(value)
         except (TypeError, ValueError):
             return float("nan")
-            

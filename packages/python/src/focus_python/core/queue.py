@@ -3,13 +3,14 @@ Author: Sean Froning
 Created Date: 5.3.2026
 Redis queue manager with connection pooling
 """
+
 import time
 import threading
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
-from redis import Redis, ConnectionPool  # pyright: ignore[reportMissingImports]
-from rq import Queue  # pyright: ignore[reportMissingImports]
-from rq.job import Job  # pyright: ignore[reportMissingImports]
+from redis import Redis, ConnectionPool
+from rq import Queue
+from rq.job import Job
 from .config import config
 from .logging import logging
 
@@ -17,6 +18,7 @@ logger = logging.get_logger(__name__)
 
 QUEUE_NAME = config.get_required("domain")
 JOB_TIMEOUT = 3600
+
 
 class _Queue:
     _init_lock = threading.Lock()
@@ -51,7 +53,9 @@ class _Queue:
         if self._rq_queue is None:
             with self._init_lock:
                 if self._rq_queue is None:
-                    self._rq_queue = Queue(QUEUE_NAME, connection=self._get_connection())
+                    self._rq_queue = Queue(
+                        QUEUE_NAME, connection=self._get_connection()
+                    )
         return self._rq_queue
 
     def enqueue_jobs(self, jobs: List[Dict[str, Any]]) -> List[Job]:
@@ -74,19 +78,36 @@ class _Queue:
                     job = rq.enqueue(func, *args, tags=tags, **job_kwargs_clean)
                 else:
                     job = rq.enqueue(func, *args, **job_kwargs_clean)
-                func_name = getattr(func, "__name__", None) or getattr(func, "__qualname__", None) or str(func)
+                func_name = (
+                    getattr(func, "__name__", None)
+                    or getattr(func, "__qualname__", None)
+                    or str(func)
+                )
                 logger.info(f"Job enqueued: {job.id} | {QUEUE_NAME} | {func_name}")
                 enqueued.append(job)
             except Exception as e:
                 failures.append({"job_id": job_data.get("job_id"), "error": str(e)})
-                logger.error("job_enqueue_failed", job_id=job_data.get("job_id"), error=str(e))
-        if failures: raise RuntimeError(f"{len(failures)} jobs failed to enqueue")
+                logger.error(
+                    "job_enqueue_failed", job_id=job_data.get("job_id"), error=str(e)
+                )
+        if failures:
+            raise RuntimeError(f"{len(failures)} jobs failed to enqueue")
         return enqueued
 
-    def enqueue_chunked_jobs(self, items: List[Any], chunk_size: int, func: Any, job_id_prefix: str, extra_args: Tuple[Any, ...] = (), job_timeout: Optional[int] = None) -> List[Job]:
+    def enqueue_chunked_jobs(
+        self,
+        items: List[Any],
+        chunk_size: int,
+        func: Any,
+        job_id_prefix: str,
+        extra_args: Tuple[Any, ...] = (),
+        job_timeout: Optional[int] = None,
+    ) -> List[Job]:
         """Enqueue one RQ job per chunk of items with a shared timestamp in each job_id"""
-        if not items: return []
-        if chunk_size < 1: raise ValueError("chunk_size must be at least 1")
+        if not items:
+            return []
+        if chunk_size < 1:
+            raise ValueError("chunk_size must be at least 1")
         timeout = job_timeout if job_timeout is not None else JOB_TIMEOUT
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         specs: List[Dict[str, Any]] = []
@@ -120,7 +141,9 @@ class _Queue:
             rq = self._get_rq_queue()
             queued = len(rq)
             failed = len(rq.failed_job_registry)
-            status = "healthy" if failed < 50 else "warning" if failed < 100 else "critical"
+            status = (
+                "healthy" if failed < 50 else "warning" if failed < 100 else "critical"
+            )
             return {
                 "status": status,
                 "redis": {"connected": True, "ping_ms": round(ping_ms, 2)},

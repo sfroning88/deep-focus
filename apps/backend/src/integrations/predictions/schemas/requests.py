@@ -3,13 +3,15 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Request models for Predictions
 """
+
 from pydantic import BaseModel, Field, AfterValidator
 from typing import Annotated
-from focus_python import SchemaUtils  # pyright: ignore[reportMissingImports]
+from focus_python import SchemaUtils
 
 
 class PredictionRequest(BaseModel):
     """Request model for retrieving prediction from winning model or all models"""
+
     property_id: Annotated[str, AfterValidator(SchemaUtils.valid_uuid)] = Field(
         ...,
         description="Property to retrieve prediction for",

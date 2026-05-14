@@ -1,9 +1,9 @@
-from .nic_utils import NICUtils
-from .number_utils import NumberUtils
-from .schema_utils import SchemaUtils
+from .nic import NICUtils
+from .number import NumberUtils
+from .schema import SchemaUtils
 
 __all__ = [
-    'NICUtils',
-    'NumberUtils',
-    'SchemaUtils',
+    "NICUtils",
+    "NumberUtils",
+    "SchemaUtils",
 ]

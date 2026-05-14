@@ -3,6 +3,7 @@ Author: Sean Froning
 Created Date: 5.3.2026
 Worker runner for processing RQ jobs (queue name = WORKER_DOMAIN)
 """
+
 import os
 import sys
 import signal
@@ -11,10 +12,10 @@ from pathlib import Path
 _root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_root / "src"))
 sys.path.insert(0, str(_root))
-from redis import Redis  # pyright: ignore[reportMissingImports]
-from rq import Queue, Worker, SimpleWorker  # pyright: ignore[reportMissingImports]
-from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
-from focus_python import config, logging  # pyright: ignore[reportMissingImports]
+from redis import Redis
+from rq import Queue, Worker, SimpleWorker
+from dotenv import load_dotenv
+from focus_python import config, logging
 
 logging.setup_structured_logging()
 logger = logging.get_logger(__name__)
@@ -26,10 +27,12 @@ load_dotenv(env_path)
 redis_conn = Redis.from_url(config.get_required("redis"))
 listen = [config.get_required("domain")]
 
+
 def cleanup_on_shutdown(signum: int, _frame) -> None:
     """Graceful shutdown handler"""
     logger.info(f"🛑 Received signal {signum}, shutting down gracefully...")
     sys.exit(0)
+
 
 if __name__ == "__main__":
     try:
@@ -42,7 +45,9 @@ if __name__ == "__main__":
         worker_class = os.getenv("RQ_WORKER_CLASS", "Worker")
         if worker_class == "SimpleWorker":
             worker = SimpleWorker(queues, connection=redis_conn)
-            logger.info(f"Worker {worker.name} initialized (SimpleWorker - development mode)")
+            logger.info(
+                f"Worker {worker.name} initialized (SimpleWorker - development mode)"
+            )
             logger.warning("⚠️  SimpleWorker does not support parallel job processing")
         else:
             worker = Worker(queues, connection=redis_conn)

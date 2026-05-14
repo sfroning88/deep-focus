@@ -3,8 +3,12 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Background functions for model training
 """
-from focus_python import logging  # pyright: ignore[reportMissingImports]
-from focus_python import PredictionType, TrainingType  # pyright: ignore[reportMissingImports]
+
+from focus_python import logging
+from focus_python import (
+    PredictionType,
+    TrainingType,
+)
 from .services import TrainingServices
 
 logger = logging.get_logger(__name__)

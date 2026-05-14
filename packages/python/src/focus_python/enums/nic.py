@@ -3,10 +3,13 @@ Author: Sean Froning
 Created Date: 5.3.2026
 Class definitions for NIC enums
 """
+
 from enum import Enum
+
 
 class NICState(str, Enum):
     """State reference enumeration"""
+
     AK = "AK"
     AL = "AL"
     AR = "AR"

@@ -1,5 +1,4 @@
 #!/bin/sh
-# Filters React Doctor output for PR comments: strips ANSI codes and noisy metadata
 sed 's/\x1b\[[0-9;]*m//g' "$1" \
   | grep -v "^react-doctor v" \
   | grep -v "No feature branch or uncommitted changes detected" \

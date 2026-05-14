@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import eslint from "@eslint/js";
 import { defineConfig, globalIgnores } from "eslint/config";
+import globals from "globals";
 import tseslint from "typescript-eslint";
 
 const repoRoot = path.dirname(fileURLToPath(import.meta.url));
@@ -37,6 +38,23 @@ export default defineConfig([
                 tsconfigRootDir: repoRoot,
                 project: "./apps/dashboard/tsconfig.json",
             },
+        },
+    },
+    {
+        files: ["scripts/*.js"],
+        languageOptions: {
+            globals: {
+                ...globals.node,
+                ...globals.commonjs,
+            },
+        },
+        rules: {
+            "@typescript-eslint/no-require-imports": "off",
+        },
+    },
+    {
+        rules: {
+            "@next/next/no-html-link-for-pages": "off",
         },
     },
 ]);

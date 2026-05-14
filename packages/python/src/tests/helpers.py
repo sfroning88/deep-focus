@@ -3,14 +3,15 @@ Author: Sean Froning
 Created Date: 5.9.2026
 Shared utility helpers for tests
 """
+
 import os
 import time as Time
 from typing import List, Tuple
 
-import requests  # pyright: ignore[reportMissingModuleSource]
-from rq.job import Job  # pyright: ignore[reportMissingImports]
+import requests
+from rq.job import Job
 
-from ..focus_python import queue  # pyright: ignore[reportMissingImports]
+from ..focus_python import queue
 
 TESTS_DIR = os.path.dirname(__file__)
 
@@ -50,7 +51,11 @@ def load_preset_lines(preset_path: str) -> List[str]:
     """Load non-comment non-empty lines from a preset file"""
     try:
         with open(preset_path, encoding="utf-8") as f:
-            return [ln.strip() for ln in f.readlines() if ln.strip() and not ln.startswith("#")]
+            return [
+                ln.strip()
+                for ln in f.readlines()
+                if ln.strip() and not ln.startswith("#")
+            ]
     except OSError as e:
         raise RuntimeError(f"Could not read {preset_path}: {e}") from e
 
@@ -60,7 +65,7 @@ def load_preset_sections(preset_path: str) -> Tuple[List[str], List[str]]:
     lines = load_preset_lines(preset_path)
     if "---" in lines:
         idx = lines.index("---")
-        return lines[:idx], lines[idx + 1:]
+        return lines[:idx], lines[idx + 1 :]
     return lines, []
 
 
@@ -97,4 +102,3 @@ def wait_for_jobs(job_ids: List[str], timeout: int = 600) -> None:
             failures.append(job_id)
     if failures:
         raise RuntimeError(f"{len(failures)} job(s) did not complete: {failures}")
-        
