@@ -68,6 +68,7 @@ model NICMSA {
     updatedAt               DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
     properties              Property[]
+    encodings               TrainingMSAEncoding[]
 
     @@map("nic_msa")
     @@schema("property")

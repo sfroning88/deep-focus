@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Created Date: 5.9.2026
+Modified Date: 5.14.2026
 Processing functions for model training
 """
 
@@ -77,7 +77,6 @@ class TrainingServices:
             target=frame.target,
             samples=batch.samples,
             columns=batch.feature.columns,
-            classes_count=len(batch.feature.classes or []),
         )
         return batch_id
 
@@ -128,7 +127,7 @@ class TrainingServices:
                 TrainingModel(
                     type=training_type,
                     batch_id=batch_id,
-                    score=score,
+                    r2_score=score,
                     train_score=train_score,
                     rmse=rmse,
                     storage_path=storage_path,
@@ -165,7 +164,6 @@ class TrainingServices:
                 batch_id=batch_id,
                 columns=list(FEATURE_COLUMNS),
                 target=frame.target,
-                classes=[str(c) for c in frame.msa_encoder.classes_],
                 schema_version=TRAINING_FEATURE_SCHEMA_VERSION,
             ),
         )
