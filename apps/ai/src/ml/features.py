@@ -4,10 +4,9 @@ Modified Date: 5.14.2026
 Model training feature engineering
 """
 
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
 from focus_python import (
     FEATURE_COLUMNS,
     MSA_FEATURE_COLUMN,
@@ -17,6 +16,7 @@ from focus_python import (
     PredictionType,
     Property,
     PropertySnapshot,
+    TrainingMSAEncoding,
     NICUtils,
     NumberUtils,
 )
@@ -45,13 +45,17 @@ class Features:
         if df.empty:
             raise ValueError("No overlapping properties + snapshots after join")
 
-        df, msa_encoder = Features._encode_msa(df)
+        msa_encoding, msa_records = Features._compute_msa_encoding(df, target)
+        global_mean = float(df[target].mean())
+        df[MSA_FEATURE_COLUMN] = df["msa_id"].map(msa_encoding).fillna(global_mean)
 
         return TrainingFrame(
             X=df[FEATURE_COLUMNS].astype(np.float64),
             y=df[target].astype(np.float64),
             groups=df["property_id"],
-            msa_encoder=msa_encoder,
+            msa_id=df["msa_id"].reset_index(drop=True),
+            msa_encoding=msa_encoding,
+            msa_records=msa_records,
             target=target,
         )
 
@@ -90,9 +94,16 @@ class Features:
         )
 
     @staticmethod
-    def _encode_msa(df: pd.DataFrame) -> Tuple[pd.DataFrame, LabelEncoder]:
-        """Fit and apply a LabelEncoder to the msa_id column"""
-        encoder = LabelEncoder()
-        df = df.copy()
-        df[MSA_FEATURE_COLUMN] = encoder.fit_transform(df["msa_id"].astype(str))
-        return df, encoder
+    def _compute_msa_encoding(
+        df: pd.DataFrame, target: str
+    ) -> Tuple[Dict[str, float], List[TrainingMSAEncoding]]:
+        """Compute mean target and sample count per msa_id"""
+        grouped = df.groupby("msa_id")[target].agg(["mean", "count"])
+        encoding = grouped["mean"].to_dict()
+        records = [
+            TrainingMSAEncoding(
+                msa_id=msa_id, mean_target=row["mean"], sample_count=row["count"]
+            )
+            for msa_id, row in grouped.iterrows()
+        ]
+        return encoding, records

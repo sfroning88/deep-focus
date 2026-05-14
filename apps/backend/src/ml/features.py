@@ -5,10 +5,9 @@ Model inference feature engineering
 """
 
 from datetime import date, datetime, timezone
-from typing import Optional
+from typing import Dict, Optional
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
 from focus_python import (
     FEATURE_COLUMNS,
     MSA_FEATURE_COLUMN,
@@ -25,16 +24,12 @@ class Features:
     @staticmethod
     def build_predict_vector(
         prop: Property,
-        msa_encoder: LabelEncoder,
+        msa_encoding: Dict[str, float],
         snapshot_reported_at: Optional[date] = None,
     ) -> pd.DataFrame:
         """Build a single-row inference DataFrame matching FEATURE_COLUMNS"""
         msa_value = str(prop.msa_id or MSA_UNKNOWN)
-        encoded = (
-            int(msa_encoder.transform([msa_value])[0])
-            if msa_value in set(msa_encoder.classes_)
-            else -1
-        )
+        encoded = msa_encoding.get(msa_value, msa_encoding.get(MSA_UNKNOWN, 0.0))
         ref_date = snapshot_reported_at or datetime.now(timezone.utc).date()
         row = {
             **NICUtils._acuity_mix(prop),

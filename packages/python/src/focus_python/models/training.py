@@ -10,6 +10,15 @@ from ._base_focus import BaseFocus
 from ..enums import TrainingType, TrainingStatus
 
 
+class TrainingMSAEncoding(BaseFocus):
+    """Normalized model training msa encoding"""
+
+    mean_target: Optional[float] = None
+    sample_count: Optional[int] = None
+    msa_id: Optional[str] = None
+    batch_id: Optional[str] = None
+
+
 class TrainingFeature(BaseFocus):
     """Normalized model training feature"""
 

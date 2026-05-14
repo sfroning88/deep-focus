@@ -111,7 +111,7 @@ class ModelRegistry:
             trained_at=row["trained_at"],
             winner=bool(row["winner"]),
             batch_id=batch_id,
-            msa_encoder=payload.get("msa_encoder"),
+            msa_encoding=payload.get("msa_encoding"),
             feature_columns=payload.get("feature_columns"),
             target_column=payload.get("target_column"),
             samples=payload.get("samples"),

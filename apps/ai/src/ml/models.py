@@ -5,9 +5,9 @@ Training-side in-memory feature engineering and model artifacts
 """
 
 from dataclasses import dataclass
-from typing import Any, List
+from typing import Any, Dict, List
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
+from focus_python import TrainingMSAEncoding
 
 
 @dataclass
@@ -17,7 +17,9 @@ class TrainingFrame:
     X: pd.DataFrame
     y: pd.Series
     groups: pd.Series
-    msa_encoder: LabelEncoder
+    msa_id: pd.Series
+    msa_encoding: Dict[str, float]
+    msa_records: List[TrainingMSAEncoding]
     target: str
 
 
@@ -26,7 +28,7 @@ class ModelPayload:
     """Structured artifact persisted to S3 for a completed training run"""
 
     model: Any
-    msa_encoder: LabelEncoder
+    msa_encoding: Dict[str, float]
     feature_columns: List[str]
     target_column: str
     prediction_type: str
@@ -40,7 +42,7 @@ class ModelPayload:
     def to_dict(self) -> dict:
         return {
             "model": self.model,
-            "msa_encoder": self.msa_encoder,
+            "msa_encoding": self.msa_encoding,
             "feature_columns": self.feature_columns,
             "target_column": self.target_column,
             "prediction_type": self.prediction_type,

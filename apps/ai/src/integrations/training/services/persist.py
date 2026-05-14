@@ -14,11 +14,13 @@ from focus_python import (
     PropertySnapshot,
     TrainingBatch,
     TrainingModel,
+    TrainingMSAEncoding,
     TrainingStatus,
     TrainingType,
 )
 from ..queries.fetch_properties import QUERY as FETCH_PROPERTIES
 from ..queries.fetch_property_snapshots import QUERY as FETCH_PROPERTY_SNAPSHOTS
+from ..queries.seed_msa_encoding import QUERY as SEED_MSA_ENCODING
 from ..queries.seed_batch import QUERY as SEED_BATCH
 from ..queries.seed_feature import QUERY as SEED_FEATURE
 from ..queries.seed_model import QUERY as SEED_MODEL
@@ -83,6 +85,16 @@ class PersistServices:
                 cursor.execute(
                     SEED_MODEL.as_string(cursor),
                     (training_type.value, TrainingStatus.PENDING.value, now, batch.id),
+                )
+
+    @staticmethod
+    def seed_msa_encodings(batch_id: str, records: List[TrainingMSAEncoding]) -> None:
+        """Bulk insert MSA mean-target encoding rows for a batch"""
+        with db_pool.get_cursor() as cursor:
+            for record in records:
+                cursor.execute(
+                    SEED_MSA_ENCODING.as_string(cursor),
+                    (batch_id, record.msa_id, record.mean_target, record.sample_count),
                 )
 
     @staticmethod

@@ -71,14 +71,14 @@ class InferenceServices:
         prediction_type: PredictionType,
         snapshot_reported_at: Optional[date],
     ) -> Prediction:
-        """Single-model inference path: load encoder, build vector, predict, package response"""
+        """Single-model inference path: load encoding, build vector, predict, package response"""
         model = model_registry.get(model_key)
         meta = model_registry.get_metadata(model_key)
-        encoder = meta.get("msa_encoder")
-        if encoder is None:
-            raise RuntimeError(f"Model '{model_key}' missing msa_encoder metadata")
+        encoding = meta.get("msa_encoding")
+        if encoding is None:
+            raise RuntimeError(f"Model '{model_key}' missing msa_encoding metadata")
 
-        X = Features.build_predict_vector(prop, encoder, snapshot_reported_at)
+        X = Features.build_predict_vector(prop, encoding, snapshot_reported_at)
         result = float(model.predict(X)[0])
 
         resolved_type = meta.get("winner_type") or model_key
