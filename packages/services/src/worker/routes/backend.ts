@@ -8,16 +8,14 @@ import { WorkerService } from "../worker-service";
 
 export class BackendWorkerService extends WorkerService {
   static fromEnvironment(): BackendWorkerService {
-    const baseUrl = env.BACKEND_API_URL;
-    const authToken = env.AUTH_TOKEN;
+    const baseUrl = env.BACKEND_API_URL ?? "";
+    const authToken = env.AUTH_TOKEN ?? "";
     if (!baseUrl || !authToken) {
-      throw new Error("Worker configuration missing");
+      console.warn(
+        "BackendWorkerService: BACKEND_API_URL or AUTH_TOKEN is missing",
+      );
     }
-    return new BackendWorkerService({
-      baseUrl,
-      authToken,
-      timeout: 300000,
-    });
+    return new BackendWorkerService({ baseUrl, authToken, timeout: 300000 });
   }
 
   async modelPredictControllablePrd(

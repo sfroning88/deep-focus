@@ -15,7 +15,6 @@ class TrainingFeature(BaseFocus):
 
     columns: Optional[List[str]] = None
     target: Optional[str] = None
-    classes: Optional[List[str]] = None
     schema_version: Optional[int] = None
     batch_id: Optional[str] = None
 

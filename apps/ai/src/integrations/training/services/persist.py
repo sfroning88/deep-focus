@@ -76,7 +76,6 @@ class PersistServices:
                     batch.id,
                     feature.columns,
                     feature.target,
-                    feature.classes,
                     feature.schema_version,
                 ),
             )

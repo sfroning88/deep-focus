@@ -77,7 +77,6 @@ class TrainingServices:
             target=frame.target,
             samples=batch.samples,
             columns=batch.feature.columns,
-            classes_count=len(batch.feature.classes or []),
         )
         return batch_id
 
@@ -165,7 +164,6 @@ class TrainingServices:
                 batch_id=batch_id,
                 columns=list(FEATURE_COLUMNS),
                 target=frame.target,
-                classes=[str(c) for c in frame.msa_encoder.classes_],
                 schema_version=TRAINING_FEATURE_SCHEMA_VERSION,
             ),
         )

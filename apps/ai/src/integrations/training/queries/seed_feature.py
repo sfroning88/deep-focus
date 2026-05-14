@@ -7,10 +7,9 @@ QUERY = sql.SQL("""
             batch_id, 
             columns, 
             target, 
-            classes, 
             schema_version, 
             updated_at
         )
     VALUES
-        (%s::uuid, %s, %s, %s, %s, NOW())
+        (%s::uuid, %s, %s, %s, NOW())
 """).format(table=sql.Identifier(*TRAINING_FEATURE_TABLE))

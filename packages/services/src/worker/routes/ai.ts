@@ -7,16 +7,12 @@ import { WorkerService } from "../worker-service";
 
 export class AIWorkerService extends WorkerService {
   static fromEnvironment(): AIWorkerService {
-    const baseUrl = env.AI_API_URL;
-    const authToken = env.AUTH_TOKEN;
+    const baseUrl = env.AI_API_URL ?? "";
+    const authToken = env.AUTH_TOKEN ?? "";
     if (!baseUrl || !authToken) {
-      throw new Error("Worker configuration missing");
+      console.warn("AIWorkerService: AI_API_URL or AUTH_TOKEN is missing");
     }
-    return new AIWorkerService({
-      baseUrl,
-      authToken,
-      timeout: 300000,
-    });
+    return new AIWorkerService({ baseUrl, authToken, timeout: 300000 });
   }
 
   async modelTrainControllablePrd(): Promise<ModelTrainControllablePrdResponse> {
