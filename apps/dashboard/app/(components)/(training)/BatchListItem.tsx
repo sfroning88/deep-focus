@@ -45,9 +45,10 @@ export function BatchListItem({ batch, isMobile }: BatchListItemProps) {
       </div>
 
       <div className="flex items-center gap-2 md:gap-3 shrink-0">
-        {winnerModel && winnerModel.score != null && (
+        {winnerModel && winnerModel.r2score != null && (
           <Badge>
-            {winnerModel.type} · R&sup2; {Number(winnerModel.score).toFixed(3)}
+            {winnerModel.type} · R&sup2;{" "}
+            {Number(winnerModel.r2score).toFixed(3)}
           </Badge>
         )}
       </div>

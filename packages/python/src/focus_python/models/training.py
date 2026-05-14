@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Created Date: 5.9.2026
+Modified Date: 5.14.2026
 Class objects for training runs
 """
 
@@ -34,7 +34,7 @@ class TrainingModel(BaseFocus):
 
     type: Optional[TrainingType] = None
     status: Optional[TrainingStatus] = None
-    score: Optional[float] = None
+    r2_score: Optional[float] = None
     train_score: Optional[float] = None
     rmse: Optional[float] = None
     winner: Optional[bool] = None

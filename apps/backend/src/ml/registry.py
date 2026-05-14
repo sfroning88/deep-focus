@@ -106,7 +106,7 @@ class ModelRegistry:
             return None, None
         entry = LoadedModel(
             type=model_type,
-            score=float(row["score"]),
+            score=float(row["r2_score"]),
             rmse=float(row["rmse"]),
             trained_at=row["trained_at"],
             winner=bool(row["winner"]),

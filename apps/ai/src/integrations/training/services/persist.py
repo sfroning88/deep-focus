@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Created Date: 5.9.2026
+Modified Date: 5.14.2026
 Processing functions for model persistence
 """
 
@@ -115,7 +115,8 @@ class PersistServices:
             queryString,
             (
                 TrainingStatus.COMPLETED.value,
-                float(model.score),
+                float(model.r2_score),
+                float(model.train_score) if model.train_score is not None else None,
                 float(model.rmse),
                 model.storage_path,
                 model.trained_at,
@@ -178,7 +179,7 @@ class PersistServices:
         """Return the completed model with the highest score"""
         return max(
             (m for m in models if m.status == TrainingStatus.COMPLETED),
-            key=lambda m: float(m.score or 0),
+            key=lambda m: float(m.r2_score or 0),
         )
 
     @staticmethod
@@ -208,5 +209,5 @@ class PersistServices:
             "training_batch_completed",
             batch=batch_id,
             winner=winner.type.value,
-            score=float(winner.score or 0),
+            score=float(winner.r2_score or 0),
         )

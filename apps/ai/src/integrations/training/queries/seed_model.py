@@ -10,7 +10,7 @@ QUERY = sql.SQL("""
         (
             type, 
             status, 
-            score, 
+            r2_score, 
             rmse, 
             winner, 
             storage_path, 

@@ -19,7 +19,7 @@ export type TrainingBatchListEntry = Prisma.TrainingBatchGetPayload<{
       select: {
         type: true;
         status: true;
-        score: true;
+        r2score: true;
         winner: true;
       };
     };

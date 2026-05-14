@@ -4,7 +4,7 @@ from focus_python import TRAINING_MODEL_TABLE, TRAINING_STATUS_ENUM
 QUERY = sql.SQL("""
     SELECT type::text AS type, 
         storage_path, 
-        score, 
+        r2_score, 
         rmse, 
         winner, 
         trained_at

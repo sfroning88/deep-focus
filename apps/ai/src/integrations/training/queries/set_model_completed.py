@@ -8,7 +8,8 @@ from focus_python import (
 QUERY = sql.SQL("""
     UPDATE {table}
     SET status = %s::{status_enum},
-    score = %s,
+    r2_score = %s,
+    train_score = %s,
     rmse = %s,
     storage_path = %s,
     trained_at = %s,

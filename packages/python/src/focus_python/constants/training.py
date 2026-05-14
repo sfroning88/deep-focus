@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Created Date: 5.9.2026
+Modified Date: 5.14.2026
 Definitions for training structures
 """
 
@@ -22,7 +22,7 @@ TRAINING_JOBS = {
     "forest": TrainingType.FOREST,
     "gbm": TrainingType.GBM,
 }
-TRAINING_FEATURE_SCHEMA_VERSION = 2
+TRAINING_FEATURE_SCHEMA_VERSION = 3
 TRAINING_SPLIT_SEED = 42
 TRAINING_TEST_SPLIT = 0.2
 TRAINING_MIN_SPLIT_SAMPLES = 5

@@ -24,7 +24,7 @@ export class TrainingService {
           select: {
             type: true,
             status: true,
-            score: true,
+            r2score: true,
             winner: true,
           },
         },

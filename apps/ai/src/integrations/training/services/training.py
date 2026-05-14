@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Created Date: 5.9.2026
+Modified Date: 5.14.2026
 Processing functions for model training
 """
 
@@ -128,7 +128,7 @@ class TrainingServices:
                 TrainingModel(
                     type=training_type,
                     batch_id=batch_id,
-                    score=score,
+                    r2_score=score,
                     train_score=train_score,
                     rmse=rmse,
                     storage_path=storage_path,
