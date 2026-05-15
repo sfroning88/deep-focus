@@ -104,6 +104,14 @@ class ModelRegistry:
                 error=str(e),
             )
             return None, None
+        msa_encoding = payload.get("msa_encoding")
+        if not isinstance(msa_encoding, dict) or not msa_encoding:
+            logger.error(
+                "registry_payload_missing_msa_encoding",
+                type=model_type,
+                key=row["storage_path"],
+            )
+            return None, None
         entry = LoadedModel(
             type=model_type,
             score=float(row["r2_score"]),
@@ -111,7 +119,7 @@ class ModelRegistry:
             trained_at=row["trained_at"],
             winner=bool(row["winner"]),
             batch_id=batch_id,
-            msa_encoding=payload.get("msa_encoding"),
+            msa_encoding=msa_encoding,
             feature_columns=payload.get("feature_columns"),
             target_column=payload.get("target_column"),
             samples=payload.get("samples"),

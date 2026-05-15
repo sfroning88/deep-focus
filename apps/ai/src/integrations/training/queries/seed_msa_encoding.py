@@ -11,5 +11,10 @@ QUERY = sql.SQL("""
             updated_at
         )
     VALUES
-        (%s::uuid, %s, %s, %s, NOW())           
+        (%s::uuid, %s, %s, %s, NOW()) 
+    ON CONFLICT (batch_id, msa_id)
+    DO UPDATE SET
+        mean_target = EXCLUDED.mean_target,
+        sample_count = EXCLUDED.sample_count,
+        updated_at = NOW()          
 """).format(table=sql.Identifier(*TRAINING_MSA_ENCODING_TABLE))

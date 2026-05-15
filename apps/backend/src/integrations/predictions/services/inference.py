@@ -75,7 +75,7 @@ class InferenceServices:
         model = model_registry.get(model_key)
         meta = model_registry.get_metadata(model_key)
         encoding = meta.get("msa_encoding")
-        if encoding is None:
+        if not isinstance(encoding, dict) or not encoding:
             raise RuntimeError(f"Model '{model_key}' missing msa_encoding metadata")
 
         X = Features.build_predict_vector(prop, encoding, snapshot_reported_at)
