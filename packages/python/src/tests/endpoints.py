@@ -40,6 +40,11 @@ PREDICT_PATH = "/api/predict"
 PREDICT_CONTROLLABLE_PRD_PATH = f"{PREDICT_PATH}/controllable_prd"
 PREDICT_CONTROLLABLE_PRD_URL = f"{BACKEND_URL}{PREDICT_CONTROLLABLE_PRD_PATH}"
 
+# -- Model registry (served by apps/backend) --
+ML_PATH = "/api/ml"
+ML_RELOAD_PATH = f"{ML_PATH}/reload"
+ML_RELOAD_URL = f"{BACKEND_URL}{ML_RELOAD_PATH}"
+
 
 def endpoint_test(
     url: str,

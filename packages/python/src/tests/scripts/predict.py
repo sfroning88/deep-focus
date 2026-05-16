@@ -6,7 +6,7 @@ Predict from models testing script
 
 from typing import Any, Dict, List
 
-from ..endpoints import PREDICT_CONTROLLABLE_PRD_URL, endpoint_test
+from ..endpoints import ML_RELOAD_URL, PREDICT_CONTROLLABLE_PRD_URL, endpoint_test
 from ..helpers import PREDICT_PRESET_PATH, load_preset_lines
 
 
@@ -19,6 +19,23 @@ def _parse_preset(lines: List[str]) -> Dict[str, str]:
         key, value = ln.split("=", 1)
         out[key.strip()] = value.strip()
     return out
+
+
+def run_reload_test() -> None:
+    """Simulate CRON: POST /api/ml/reload and assert model_ids are returned"""
+    print("Model registry reload (CRON simulation) start")
+
+    response: Dict[str, Any] = endpoint_test(
+        ML_RELOAD_URL,
+        name="ml_reload",
+    )
+
+    model_ids: List[str] = list(response.get("model_ids") or [])
+    if not model_ids:
+        raise RuntimeError("Registry reload returned no model_ids — no winner loaded")
+
+    print(f"Registry reloaded with {len(model_ids)} model(s): {model_ids}")
+    print("Model registry reload complete")
 
 
 def run_prediction_tests() -> None:

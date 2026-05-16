@@ -18,6 +18,7 @@ from focus_python import (
 )
 from core import health, lifespan
 from integrations import PredictionsRouter
+from ml import router as ModelsRouter
 
 # Setup structured logging
 logging.setup_structured_logging()
@@ -40,6 +41,7 @@ exception.register_exception_handlers(app)
 # Include routers
 app.include_router(health.router)
 app.include_router(PredictionsRouter.router)
+app.include_router(ModelsRouter.router)
 
 
 # Root endpoint

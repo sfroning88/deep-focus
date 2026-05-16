@@ -4,9 +4,10 @@ Modified Date: 5.14.2026
 Processing functions for model persistence
 """
 
+import httpx
 from datetime import datetime, timezone
 from typing import List
-from focus_python import db_pool, logging
+from focus_python import db_pool, logging, config
 from focus_python import (
     TRAINING_JOBS,
     TRAINING_ERROR_MSG_MAX_LENGTH,
@@ -34,6 +35,12 @@ from ..queries.set_batch_winner import QUERY as SET_BATCH_WINNER
 from ..queries.set_batch_completed import QUERY as SET_BATCH_COMPLETED
 
 logger = logging.get_logger(__name__)
+
+BACKEND_API_URL: str | None = config.get("BACKEND_API_URL")
+AUTH_TOKEN: str | None = config.get("AUTH_TOKEN")
+
+if not BACKEND_API_URL or not AUTH_TOKEN:
+    raise RuntimeError("BACKEND_API_URL and AUTH_TOKEN must be configured")
 
 
 class PersistServices:
@@ -206,6 +213,32 @@ class PersistServices:
         logger.warning("training_batch_failed", batch=batch_id, statuses=statuses)
 
     @staticmethod
+    def _notify_backend_reload(batch_id: str) -> None:
+        """Fire-and-forget POST to backend /api/ml/reload after a new winner is committed"""
+        if BACKEND_API_URL is None or AUTH_TOKEN is None:
+            logger.warning("notify_backend_reload_skipped_no_config", batch=batch_id)
+            return
+
+        try:
+            with httpx.Client(timeout=10.0) as client:
+                response = client.post(
+                    f"{BACKEND_API_URL}/api/ml/reload",
+                    headers={
+                        "auth-token": AUTH_TOKEN,
+                        "Content-Type": "application/json",
+                    },
+                    json={},
+                )
+                response.raise_for_status()
+                logger.info(
+                    "notify_backend_reload_sent",
+                    batch=batch_id,
+                    status=response.status_code,
+                )
+        except Exception as e:
+            logger.warning("notify_backend_reload_failed", batch=batch_id, error=str(e))
+
+    @staticmethod
     def _complete_batch(batch_id: str, winner: TrainingModel) -> None:
         """Persist winner + COMPLETED terminal state for a batch and log"""
         with db_pool.get_cursor() as cursor:
@@ -222,3 +255,4 @@ class PersistServices:
             winner=winner.type.value,
             score=float(winner.r2_score or 0),
         )
+        PersistServices._notify_backend_reload(batch_id)

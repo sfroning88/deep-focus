@@ -26,17 +26,22 @@ class ModelRegistry:
         self._metadata: Dict[str, LoadedModel] = {}
         self._batch_id: Optional[str] = None
 
-    def load(self) -> None:
-        """Resolve latest completed batch and pull each model's pkl into the cache"""
+    def load(self, force: bool = False) -> None:
+        """Idemptotently resolve latest batch and pull each model's pkl into the cache"""
+        try:
+            batch_id, rows = self._fetch_latest_batch()
+        except Exception as e:
+            logger.error("registry_lookup_failed", error=str(e))
+            return
+
+        if batch_id is None:
+            logger.info("registry_no_completed_batch")
+            self._models, self._metadata, self._batch_id = {}, {}, None
+            return
+
         with self._lock:
-            try:
-                batch_id, rows = self._fetch_latest_batch()
-            except Exception as e:
-                logger.error("registry_lookup_failed", error=str(e))
-                return
-            if batch_id is None:
-                logger.info("registry_no_completed_batch")
-                self._models, self._metadata, self._batch_id = {}, {}, None
+            if not force and batch_id == self._batch_id:
+                logger.debug("registry_already_current", batch=batch_id)
                 return
 
             estimators: Dict[str, Any] = {}
