@@ -5,7 +5,7 @@ Inference-side in-memory model
 """
 
 from datetime import datetime
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 from pydantic import BaseModel
 
 
@@ -18,7 +18,7 @@ class LoadedModel(BaseModel):
     trained_at: datetime
     winner: bool
     batch_id: str
-    msa_encoder: Optional[Any] = None
+    msa_encoding: Optional[Dict[str, float]] = None
     feature_columns: Optional[List[str]] = None
     target_column: Optional[str] = None
     samples: Optional[int] = None

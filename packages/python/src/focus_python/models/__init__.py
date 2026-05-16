@@ -16,6 +16,7 @@ from .property import (
     PropertySnapshot,
 )
 from .training import (
+    TrainingMSAEncoding,
     TrainingFeature,
     TrainingBatch,
     TrainingModel,
@@ -29,6 +30,7 @@ __all__ = [
     "PrismaPrediction",
     "Property",
     "PropertySnapshot",
+    "TrainingMSAEncoding",
     "TrainingFeature",
     "TrainingBatch",
     "TrainingModel",

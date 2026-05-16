@@ -7,6 +7,7 @@ Processing functions for model training
 import uuid
 from datetime import datetime, timezone
 from typing import Tuple
+import pandas as pd
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.ensemble import (
@@ -27,6 +28,7 @@ from sklearn.model_selection import (
 from focus_python import logging
 from focus_python import (
     FEATURE_COLUMNS,
+    MSA_FEATURE_COLUMN,
     ModelStorageServices,
     TRAINING_FEATURE_SCHEMA_VERSION,
     TRAINING_SPLIT_SEED,
@@ -70,6 +72,7 @@ class TrainingServices:
         batch = TrainingServices._build_batch(frame, batch_id, prediction_type)
 
         PersistServices.seed_batch(batch)
+        PersistServices.seed_msa_encodings(batch_id, frame.msa_records)
         logger.info(
             "training_batch_seeded",
             batch=batch_id,
@@ -105,7 +108,7 @@ class TrainingServices:
 
             estimator = TrainingServices._build_estimator(training_type)
             model, score, train_score, rmse = TrainingServices._train_and_score(
-                estimator, frame.X, frame.y, frame.groups
+                estimator, frame.X, frame.y, frame.groups, frame.msa_id
             )
             logger.info(
                 "training_scored",
@@ -181,7 +184,7 @@ class TrainingServices:
         """Construct the artifact payload to be persisted to S3"""
         return ModelPayload(
             model=model,
-            msa_encoder=frame.msa_encoder,
+            msa_encoding=frame.msa_encoding,
             feature_columns=list(FEATURE_COLUMNS),
             target_column=frame.target,
             prediction_type=prediction_type.value,
@@ -251,7 +254,7 @@ class TrainingServices:
 
     @staticmethod
     def _train_and_score(
-        estimator: BaseEstimator, X, y, groups
+        estimator: BaseEstimator, X, y, groups, msa_id
     ) -> Tuple[BaseEstimator, float, float, float]:
         """Group-aware 5-fold CV; returns model + mean test R², mean train R², mean RMSE"""
         n_folds = 5
@@ -261,8 +264,26 @@ class TrainingServices:
         splitter = GroupKFold(n_splits=n_folds)
         test_scores, train_scores, rmses = [], [], []
         for train_indices, test_indices in splitter.split(X, y, groups=groups):
-            X_train, X_test = X.iloc[train_indices], X.iloc[test_indices]
+            X_train = X.iloc[train_indices].copy()
+            X_test = X.iloc[test_indices].copy()
             y_train, y_test = y.iloc[train_indices], y.iloc[test_indices]
+
+            fold_msa_train = msa_id.iloc[train_indices]
+            fold_msa_test = msa_id.iloc[test_indices]
+            fold_encoding = (
+                pd.Series(y_train.values, index=fold_msa_train.values)
+                .groupby(level=0)
+                .mean()
+                .to_dict()
+            )
+            fold_mean = float(y_train.mean())
+            X_train[MSA_FEATURE_COLUMN] = (
+                fold_msa_train.map(fold_encoding).fillna(fold_mean).values
+            )
+            X_test[MSA_FEATURE_COLUMN] = (
+                fold_msa_test.map(fold_encoding).fillna(fold_mean).values
+            )
+
             estimator.fit(X_train, y_train)
             test_scores.append(float(r2_score(y_test, estimator.predict(X_test))))
             train_scores.append(float(r2_score(y_train, estimator.predict(X_train))))
