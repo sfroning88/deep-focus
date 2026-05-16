@@ -5,6 +5,7 @@ Core AI API orchestration
 """
 
 from fastapi import APIRouter, Depends
+from datetime import datetime
 from focus_python import (
     dependency,
     error,
@@ -15,7 +16,7 @@ from focus_python import (
     PredictionType,
     TRAINING_JOBS,
 )
-from .schemas import TrainingRequest, TrainingResponse
+from .schemas import ShuffleRequest, TrainingRequest, ShuffleResponse, TrainingResponse
 
 logger = logging.get_logger(__name__)
 
@@ -37,6 +38,31 @@ except ImportError as e:
 except Exception as e:
     training_available = False
     logger.error(f"Failed to boot up Training: {str(e)}")
+
+
+@router.post("/shuffle", dependencies=[Depends(dependency.get_token_header)])
+async def group_shuffle(_request: ShuffleRequest) -> ShuffleResponse:
+    """Shuffle snapshots into different TrainingSplit"""
+    if not training_available:
+        raise error("Training service unavailable", status_code=503)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    try:
+        jobs = queue.enqueue_jobs(
+            [
+                {
+                    "func": TrainingBackgroundJobs.background_shuffle_groups,
+                    "args": (),
+                    "job_id": f"model_shuffling_{timestamp}",
+                    "job_timeout": 3000,
+                }
+            ]
+        )
+        return ShuffleResponse(job_id=jobs[0].id)
+    except Exception as e:
+        logger.error("model_shuffle_enqueue_failed", error=str(e))
+        raise error("Model shuffling failed", status_code=500)
 
 
 @router.post(

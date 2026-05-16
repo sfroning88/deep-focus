@@ -8,6 +8,7 @@ QUERY = sql.SQL("""
         occupancy,
         total_revenues,
         controllable_expenses,
-        controllable_prd
+        controllable_prd,
+        function
     FROM {table}
 """).format(table=sql.Identifier(*PROPERTY_SNAPSHOT_TABLE))

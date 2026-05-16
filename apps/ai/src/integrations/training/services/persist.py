@@ -1,12 +1,13 @@
 """
 Author: Sean Froning
-Modified Date: 5.14.2026
+Modified Date: 5.16.2026
 Processing functions for model persistence
 """
 
 import httpx
 from datetime import datetime, timezone
 from typing import List
+from psycopg2.extras import execute_values
 from focus_python import db_pool, logging, config
 from focus_python import (
     TRAINING_JOBS,
@@ -16,15 +17,22 @@ from focus_python import (
     TrainingBatch,
     TrainingModel,
     TrainingMSAEncoding,
+    TrainingSplit,
     TrainingStatus,
     TrainingType,
+    TrainingFunction,
 )
 from ..queries.fetch_properties import QUERY as FETCH_PROPERTIES
+from ..queries.fetch_property_ids import QUERY as FETCH_PROPERTY_IDS
 from ..queries.fetch_property_snapshots import QUERY as FETCH_PROPERTY_SNAPSHOTS
+from ..queries.bulk_update_snapshot_functions import (
+    QUERY as BULK_UPDATE_SNAPSHOT_FUNCTIONS,
+)
 from ..queries.seed_msa_encoding import QUERY as SEED_MSA_ENCODING
 from ..queries.seed_batch import QUERY as SEED_BATCH
 from ..queries.seed_feature import QUERY as SEED_FEATURE
 from ..queries.seed_model import QUERY as SEED_MODEL
+from ..queries.seed_split import QUERY as SEED_SPLIT
 from ..queries.set_model_executing import QUERY as SET_MODEL_EXECUTING
 from ..queries.bump_batch_executing import QUERY as BUMP_BATCH_EXECUTING
 from ..queries.set_model_completed import QUERY as SET_MODEL_COMPLETED
@@ -63,6 +71,40 @@ class PersistServices:
         return [PropertySnapshot(**row) for row in rows]
 
     @staticmethod
+    def fetch_property_ids() -> List[str]:
+        """Pull distinct property IDs"""
+        with db_pool.get_cursor() as cursor:
+            queryString = FETCH_PROPERTY_IDS.as_string(cursor)
+        rows = db_pool.execute_query(queryString)
+        return [row["id"] for row in rows]
+
+    @staticmethod
+    def bulk_update_snapshot_functions(
+        assignments: dict[str, TrainingFunction],
+    ) -> None:
+        """Bulk update property_snapshot.function for all snapshots by property_id"""
+        records = [(pid, func.value) for pid, func in assignments.items()]
+        with db_pool.get_cursor() as cursor:
+            execute_values(
+                cursor, BULK_UPDATE_SNAPSHOT_FUNCTIONS.as_string(cursor), records
+            )
+
+    @staticmethod
+    def seed_split(split: TrainingSplit) -> None:
+        """Upsert a TrainingSplit version record"""
+        with db_pool.get_cursor() as cursor:
+            cursor.execute(
+                SEED_SPLIT.as_string(cursor),
+                (
+                    split.version,
+                    split.train_ratio,
+                    split.validate_ratio,
+                    split.test_ratio,
+                    split.shuffled_at,
+                ),
+            )
+
+    @staticmethod
     def seed_batch(batch: TrainingBatch) -> None:
         """Insert TrainingBatch + TrainingFeature + pending TrainingModel rows atomically"""
         if not batch.feature:
@@ -77,6 +119,7 @@ class PersistServices:
                     TrainingStatus.PENDING.value,
                     batch.samples,
                     batch.split_seed,
+                    batch.split_version_id,
                 ),
             )
             cursor.execute(
@@ -135,6 +178,11 @@ class PersistServices:
                 TrainingStatus.COMPLETED.value,
                 float(model.r2_score),
                 float(model.train_score) if model.train_score is not None else None,
+                (
+                    float(model.validate_score)
+                    if model.validate_score is not None
+                    else None
+                ),
                 float(model.rmse),
                 model.storage_path,
                 model.trained_at,

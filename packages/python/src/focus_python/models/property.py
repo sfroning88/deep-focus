@@ -1,13 +1,13 @@
 """
 Author: Sean Froning
-Created Date: 5.3.2026
+Created Date: 5.16.2026
 Class objects for property schemas
 """
 
 from typing import Optional
 from decimal import Decimal
 from datetime import date
-from ..enums import NICState
+from ..enums import NICState, TrainingFunction
 from ._base_focus import BaseFocus
 
 
@@ -56,4 +56,5 @@ class PropertySnapshot(BaseFocus):
     total_expenses: Optional[Decimal] = None
     operating_margin: Optional[Decimal] = None
     controllable_prd: Optional[Decimal] = None
+    function: Optional[TrainingFunction] = None
     property_id: Optional[str] = None

@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Created Date: 5.9.2026
+Modified Date: 5.16.2026
 Class definitions for Training enums
 """
 
@@ -24,3 +24,11 @@ class TrainingStatus(str, Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     CANCELLED = "cancelled"
+
+
+class TrainingFunction(str, Enum):
+    """Training function enumeration"""
+
+    TRAIN = "train"
+    VALIDATE = "validate"
+    TEST = "test"

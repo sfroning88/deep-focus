@@ -4,7 +4,7 @@ Modified Date: 5.16.2026
 Model training feature engineering
 """
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from focus_python import (
@@ -16,6 +16,7 @@ from focus_python import (
     YEAR_BUILT_COLUMN,
     PREDICTION_TARGETS,
     PredictionType,
+    TrainingFunction,
     Property,
     PropertySnapshot,
     TrainingMSAEncoding,
@@ -33,21 +34,30 @@ class Features:
         properties: List[Property],
         snapshots: List[PropertySnapshot],
         prediction_type: PredictionType,
+        function: TrainingFunction = TrainingFunction.TRAIN,
+        msa_encoding: Optional[Dict[str, float]] = None,
     ) -> TrainingFrame:
         """Join each snapshot with its property features; one sample per snapshot"""
         if not properties or not snapshots:
             raise ValueError("Properties and snapshots are required for training")
 
         target = PREDICTION_TARGETS[prediction_type]
+        filtered = [snap for snap in snapshots if snap.function == function]
 
-        snap_df = Features._build_snapshot_df(snapshots, target)
+        snap_df = Features._build_snapshot_df(filtered, target)
         prop_df = Features._build_property_df(properties)
 
         df = prop_df.merge(snap_df, on="property_id", how="inner")
         if df.empty:
-            raise ValueError("No overlapping properties + snapshots after join")
+            raise ValueError(
+                f"No overlapping properties + snapshots after join for function={function.value}"
+            )
 
-        msa_encoding, msa_records = Features._compute_msa_encoding(df, target)
+        if msa_encoding is None:
+            msa_encoding, msa_records = Features._compute_msa_encoding(df, target)
+        else:
+            _, msa_records = Features._compute_msa_encoding(df, target)
+
         global_mean = float(df[target].mean())
         df[MSA_FEATURE_COLUMN] = df["msa_id"].map(msa_encoding).fillna(global_mean)
 
