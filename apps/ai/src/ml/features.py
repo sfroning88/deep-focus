@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Modified Date: 5.14.2026
+Modified Date: 5.16.2026
 Model training feature engineering
 """
 
@@ -12,6 +12,8 @@ from focus_python import (
     MSA_FEATURE_COLUMN,
     MSA_UNKNOWN,
     SNAPSHOT_DATE_COLUMN,
+    TOTAL_UNITS_COLUMN,
+    YEAR_BUILT_COLUMN,
     PREDICTION_TARGETS,
     PredictionType,
     Property,
@@ -87,6 +89,8 @@ class Features:
                 {
                     "property_id": p.id,
                     "msa_id": p.msa_id or MSA_UNKNOWN,
+                    TOTAL_UNITS_COLUMN: NumberUtils._to_float(p.total_units),
+                    YEAR_BUILT_COLUMN: NumberUtils._to_float(p.year_built),
                     **NICUtils._acuity_mix(p),
                 }
                 for p in properties

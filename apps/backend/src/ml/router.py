@@ -41,7 +41,7 @@ async def reload_registry(_request: ModelRequest) -> ModelResponse:
         raise error("Model registry unavailable", status_code=503)
 
     try:
-        await run_in_threadpool(model_registry.load())
+        await run_in_threadpool(model_registry.load)
 
         return ModelResponse(model_ids=model_registry.loaded_model_types())
     except RuntimeError as e:

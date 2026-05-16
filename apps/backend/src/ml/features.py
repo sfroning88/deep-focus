@@ -13,7 +13,10 @@ from focus_python import (
     MSA_FEATURE_COLUMN,
     MSA_UNKNOWN,
     SNAPSHOT_DATE_COLUMN,
+    TOTAL_UNITS_COLUMN,
+    YEAR_BUILT_COLUMN,
     NICUtils,
+    NumberUtils,
     Property,
 )
 
@@ -35,5 +38,7 @@ class Features:
             **NICUtils._acuity_mix(prop),
             MSA_FEATURE_COLUMN: encoded,
             SNAPSHOT_DATE_COLUMN: ref_date.toordinal(),
+            TOTAL_UNITS_COLUMN: NumberUtils._to_float(prop.total_units),
+            YEAR_BUILT_COLUMN: NumberUtils._to_float(prop.year_built),
         }
         return pd.DataFrame([row], columns=FEATURE_COLUMNS).astype(np.float64)

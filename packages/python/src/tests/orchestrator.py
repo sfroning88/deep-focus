@@ -50,9 +50,9 @@ def _find_root_env() -> str:
 
 load_dotenv(_find_root_env())
 
-from .endpoints import WORKER_PORTS, worker_url  # noqa: E402
-from .helpers import TESTS_DIR, wait_for_health  # noqa: E402
-from .redis_clear import clear_redis_queue  # noqa: E402
+from .endpoints import WORKER_PORTS, worker_url
+from .helpers import TESTS_DIR, wait_for_health
+from .redis_clear import clear_redis_queue
 
 MONOREPO_MARKER = "pnpm-workspace.yaml"
 HEALTH_TIMEOUT_SECONDS = 30
