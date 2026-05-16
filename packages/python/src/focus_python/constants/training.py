@@ -1,11 +1,26 @@
 """
 Author: Sean Froning
-Modified Date: 5.14.2026
+Modified Date: 5.16.2026
 Definitions for training structures
 """
 
+from typing import List
 from ..enums import TrainingType
 
+ACUITY_FEATURE_COLUMNS: List[str] = ["pct_cottage", "pct_il", "pct_al", "pct_mc"]
+MSA_FEATURE_COLUMN: str = "msa_id_encoded"
+MSA_UNKNOWN: str = "unknown"
+SNAPSHOT_DATE_COLUMN: str = "snapshot_date"
+TOTAL_UNITS_COLUMN: str = "total_units"
+YEAR_BUILT_COLUMN: str = "year_built"
+FEATURE_COLUMNS: List[str] = [
+    *ACUITY_FEATURE_COLUMNS,
+    MSA_FEATURE_COLUMN,
+    SNAPSHOT_DATE_COLUMN,
+    TOTAL_UNITS_COLUMN,
+    YEAR_BUILT_COLUMN,
+]
+FUNCTION_WEIGHT_SPLITS: List[float] = [0.70, 0.15, 0.15]
 TRAINING_JOBS = {
     "linear": TrainingType.LINEAR,
     "ridge": TrainingType.RIDGE,
@@ -13,6 +28,7 @@ TRAINING_JOBS = {
     "gbm": TrainingType.GBM,
 }
 TRAINING_FEATURE_SCHEMA_VERSION = 4
+TRAINING_FUNCTION_SPLIT_VERSION = 1
 TRAINING_SPLIT_SEED = 42
 TRAINING_TEST_SPLIT = 0.2
 TRAINING_MIN_SPLIT_SAMPLES = 5
