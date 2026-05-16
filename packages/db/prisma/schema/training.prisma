@@ -23,6 +23,15 @@ enum TrainingStatus {
     @@schema("ai")
 }
 
+enum TrainingFunction {
+    train
+    validate
+    test
+
+    @@map("training_function")
+    @@schema("ai")
+}
+
 model TrainingMSAEncoding {
     meanTarget              Decimal @map("mean_target") @db.Decimal(14,2)
     sampleCount             Int @map("sample_count")
@@ -57,11 +66,30 @@ model TrainingFeature {
     @@schema("ai")
 }
 
+model TrainingSplit {
+    version                 Int @id
+    trainRatio              Decimal @map("train_ratio") @db.Decimal(3,2)
+    validateRatio           Decimal @map("validate_ratio") @db.Decimal(3,2)
+    testRatio               Decimal @map("test_ratio") @db.Decimal(3,2)
+    shuffledAt              DateTime @map("shuffled_at") @db.Timestamptz(6)
+
+    createdAt               DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+    updatedAt               DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+    batches                 TrainingBatch[]
+
+    @@map("training_split")
+    @@schema("ai")
+}
+
 model TrainingBatch {
     id                      String @id @db.Uuid
     status                  TrainingStatus
     samples                 Int
     splitSeed               Int @map("split_seed")
+    
+    splitVersionId          Int? @map("split_version")
+    splitVersion            TrainingSplit? @relation(fields: [splitVersionId], references: [version], onDelete: Restrict, onUpdate: Cascade)
     
     createdAt               DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
     updatedAt               DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)

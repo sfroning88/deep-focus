@@ -55,6 +55,7 @@ model PropertySnapshot {
     totalExpenses           Decimal @map("total_expenses") @default(0) @db.Decimal(14,2)
     operatingMargin         Decimal @map("operating_margin") @default(0) @db.Decimal(5,2)
     controllablePRD         Decimal @map("controllable_prd") @default(0) @db.Decimal(14,2)
+    function                TrainingFunction?
 
     propertyId              String @map("property_id") @db.Uuid
     property                Property @relation(fields: [propertyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
