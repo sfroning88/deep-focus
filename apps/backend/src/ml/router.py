@@ -5,6 +5,7 @@ Core backend API orchestration
 """
 
 from fastapi import APIRouter, Depends
+from fastapi.concurrency import run_in_threadpool
 from focus_python import (
     dependency,
     error,
@@ -40,7 +41,7 @@ async def reload_registry(_request: ModelRequest) -> ModelResponse:
         raise error("Model registry unavailable", status_code=503)
 
     try:
-        model_registry.load()
+        await run_in_threadpool(model_registry.load())
 
         return ModelResponse(model_ids=model_registry.loaded_model_types())
     except RuntimeError as e:

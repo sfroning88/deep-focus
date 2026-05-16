@@ -32,11 +32,12 @@ class ModelRegistry:
             batch_id, rows = self._fetch_latest_batch()
         except Exception as e:
             logger.error("registry_lookup_failed", error=str(e))
-            return
+            raise RuntimeError(f"Model registry lookup failed: {str(e)}")
 
         if batch_id is None:
             logger.info("registry_no_completed_batch")
-            self._models, self._metadata, self._batch_id = {}, {}, None
+            with self._lock:
+                self._models, self._metadata, self._batch_id = {}, {}, None
             return
 
         with self._lock:
