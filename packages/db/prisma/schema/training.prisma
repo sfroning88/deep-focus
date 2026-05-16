@@ -108,6 +108,7 @@ model TrainingModel {
     status                  TrainingStatus
     r2score                 Decimal @map("r2_score") @db.Decimal(6,4)
     trainScore              Decimal? @map("train_score") @db.Decimal(6,4)
+    validateScore           Decimal? @map("validate_score") @db.Decimal(6,4)
     rmse                    Decimal @db.Decimal(14,2)
     winner                  Boolean @default(false)
     storagePath             String @map("storage_path")
