@@ -17,7 +17,10 @@ from sklearn.ensemble import (
 from sklearn.linear_model import (
     LinearRegression,
     Ridge,
+    Lasso,
+    ElasticNet,
 )
+from sklearn.svm import SVR
 from sklearn.metrics import (
     mean_squared_error,
     r2_score,
@@ -25,6 +28,11 @@ from sklearn.metrics import (
 from sklearn.model_selection import (
     GroupKFold,
 )
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import (
+    StandardScaler,
+)
+from xgboost import XGBRegressor
 from focus_python import logging
 from focus_python import (
     FEATURE_COLUMNS,
@@ -36,7 +44,34 @@ from focus_python import (
     TRAINING_SPLIT_SEED,
     TRAINING_MIN_SPLIT_SAMPLES,
     TRAINING_RIDGE_ALPHA,
+    TRAINING_LASSO_ALPHA,
+    TRAINING_ELASTICNET_L1_RATIO,
     TRAINING_N_ESTIMATORS,
+    TRAINING_SVR_KERNEL,
+    TRAINING_SVR_C,
+    TRAINING_SVR_EPSILON,
+    TRAINING_SVR_GAMMA,
+    TRAINING_SVR_DEGREE,
+    TRAINING_SVR_COEF0,
+    TRAINING_SVR_SHRINKING,
+    TRAINING_SVR_TOL,
+    TRAINING_SVR_CACHE_SIZE,
+    TRAINING_SVR_MAX_ITER,
+    TRAINING_SVR_SCALER_WITH_MEAN,
+    TRAINING_SVR_SCALER_WITH_STD,
+    TRAINING_XGB_N_ESTIMATORS,
+    TRAINING_XGB_MAX_DEPTH,
+    TRAINING_XGB_LEARNING_RATE,
+    TRAINING_XGB_MIN_CHILD_WEIGHT,
+    TRAINING_XGB_SUBSAMPLE,
+    TRAINING_XGB_COLSAMPLE_BYTREE,
+    TRAINING_XGB_COLSAMPLE_BYLEVEL,
+    TRAINING_XGB_COLSAMPLE_BYNODE,
+    TRAINING_XGB_REG_ALPHA,
+    TRAINING_XGB_REG_LAMBDA,
+    TRAINING_XGB_GAMMA,
+    TRAINING_XGB_TREE_METHOD,
+    TRAINING_XGB_N_JOBS,
     PredictionType,
     TrainingFunction,
     TrainingBatch,
@@ -266,6 +301,61 @@ class TrainingServices:
             return GradientBoostingRegressor(
                 n_estimators=TRAINING_N_ESTIMATORS,
                 random_state=TRAINING_SPLIT_SEED,
+            )
+        if training_type == TrainingType.LASSO:
+            return Lasso(
+                alpha=TRAINING_LASSO_ALPHA,
+                random_state=TRAINING_SPLIT_SEED,
+            )
+        if training_type == TrainingType.ELASTICNET:
+            return ElasticNet(
+                alpha=TRAINING_LASSO_ALPHA,
+                l1_ratio=TRAINING_ELASTICNET_L1_RATIO,
+                random_state=TRAINING_SPLIT_SEED,
+            )
+        if training_type == TrainingType.SVR:
+            return Pipeline(
+                [
+                    (
+                        "scaler",
+                        StandardScaler(
+                            with_mean=TRAINING_SVR_SCALER_WITH_MEAN,
+                            with_std=TRAINING_SVR_SCALER_WITH_STD,
+                        ),
+                    ),
+                    (
+                        "svr",
+                        SVR(
+                            kernel=TRAINING_SVR_KERNEL,
+                            degree=TRAINING_SVR_DEGREE,
+                            gamma=TRAINING_SVR_GAMMA,
+                            coef0=TRAINING_SVR_COEF0,
+                            tol=TRAINING_SVR_TOL,
+                            C=TRAINING_SVR_C,
+                            epsilon=TRAINING_SVR_EPSILON,
+                            shrinking=TRAINING_SVR_SHRINKING,
+                            cache_size=TRAINING_SVR_CACHE_SIZE,
+                            max_iter=TRAINING_SVR_MAX_ITER,
+                        ),
+                    ),
+                ]
+            )
+        if training_type == TrainingType.XGBOOST:
+            return XGBRegressor(
+                n_estimators=TRAINING_XGB_N_ESTIMATORS,
+                max_depth=TRAINING_XGB_MAX_DEPTH,
+                learning_rate=TRAINING_XGB_LEARNING_RATE,
+                min_child_weight=TRAINING_XGB_MIN_CHILD_WEIGHT,
+                subsample=TRAINING_XGB_SUBSAMPLE,
+                colsample_bytree=TRAINING_XGB_COLSAMPLE_BYTREE,
+                colsample_bylevel=TRAINING_XGB_COLSAMPLE_BYLEVEL,
+                colsample_bynode=TRAINING_XGB_COLSAMPLE_BYNODE,
+                reg_alpha=TRAINING_XGB_REG_ALPHA,
+                reg_lambda=TRAINING_XGB_REG_LAMBDA,
+                gamma=TRAINING_XGB_GAMMA,
+                tree_method=TRAINING_XGB_TREE_METHOD,
+                random_state=TRAINING_SPLIT_SEED,
+                n_jobs=TRAINING_XGB_N_JOBS,
             )
         raise ValueError(f"Unsupported training type: {training_type}")
 

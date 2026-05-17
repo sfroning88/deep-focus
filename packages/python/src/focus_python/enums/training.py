@@ -14,6 +14,10 @@ class TrainingType(str, Enum):
     RIDGE = "ridge"
     FOREST = "forest"
     GBM = "gbm"
+    XGBOOST = "xgboost"
+    LASSO = "lasso"
+    SVR = "svr"
+    ELASTICNET = "elasticnet"
 
 
 class TrainingStatus(str, Enum):

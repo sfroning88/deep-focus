@@ -7,6 +7,10 @@ enum TrainingType {
     ridge
     forest
     gbm
+    xgboost
+    lasso
+    svr
+    elasticnet
 
     @@map("training_type")
     @@schema("ai")
