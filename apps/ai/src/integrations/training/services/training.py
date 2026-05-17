@@ -338,5 +338,10 @@ class TrainingServices:
                 properties, snapshots, prediction_type, function, msa_encoding
             )
             return float(r2_score(frame.y, model.predict(frame.X)))
-        except Exception:
+        except Exception as e:
+            logger.warning(
+                "training_validation_scoring_failed",
+                function=function.value,
+                error=str(e),
+            )
             return None

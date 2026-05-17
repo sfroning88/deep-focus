@@ -79,20 +79,19 @@ class PersistServices:
         return [row["id"] for row in rows]
 
     @staticmethod
-    def bulk_update_snapshot_functions(
+    def seed_split_with_functions(
         assignments: dict[str, TrainingFunction],
+        split: TrainingSplit,
     ) -> None:
-        """Bulk update property_snapshot.function for all snapshots by property_id"""
+        """Atomically bulk-update snapshot functions and upsert the TrainingSplit record"""
         records = [(pid, func.value) for pid, func in assignments.items()]
+        if not records:
+            logger.warning("bulk_update_records_was_empty")
+            return
         with db_pool.get_cursor() as cursor:
             execute_values(
                 cursor, BULK_UPDATE_SNAPSHOT_FUNCTIONS.as_string(cursor), records
             )
-
-    @staticmethod
-    def seed_split(split: TrainingSplit) -> None:
-        """Upsert a TrainingSplit version record"""
-        with db_pool.get_cursor() as cursor:
             cursor.execute(
                 SEED_SPLIT.as_string(cursor),
                 (

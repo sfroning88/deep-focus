@@ -5,7 +5,7 @@ Core AI API orchestration
 """
 
 from fastapi import APIRouter, Depends
-from datetime import datetime
+from uuid import uuid4
 from focus_python import (
     dependency,
     error,
@@ -46,7 +46,7 @@ async def group_shuffle(_request: ShuffleRequest) -> ShuffleResponse:
     if not training_available:
         raise error("Training service unavailable", status_code=503)
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    job_stamp = uuid4().hex
 
     try:
         jobs = queue.enqueue_jobs(
@@ -54,7 +54,7 @@ async def group_shuffle(_request: ShuffleRequest) -> ShuffleResponse:
                 {
                     "func": TrainingBackgroundJobs.background_shuffle_groups,
                     "args": (),
-                    "job_id": f"model_shuffling_{timestamp}",
+                    "job_id": f"model_shuffling_{job_stamp}",
                     "job_timeout": 3000,
                 }
             ]

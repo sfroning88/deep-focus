@@ -26,7 +26,7 @@ export class TrainingService {
   async fetchFunctionCounts(): Promise<TrainingFunctionCounts> {
     const rows = await db.propertySnapshot.groupBy({
       by: ["function"],
-      _count: { function: true },
+      _count: { _all: true },
     });
     const counts: TrainingFunctionCounts = {
       train: 0,
@@ -36,12 +36,12 @@ export class TrainingService {
     };
     for (const row of rows) {
       if (row.function === TrainingFunction.train)
-        counts.train = row._count.function;
+        counts.train = row._count._all;
       else if (row.function === TrainingFunction.validate)
-        counts.validate = row._count.function;
+        counts.validate = row._count._all;
       else if (row.function === TrainingFunction.test)
-        counts.test = row._count.function;
-      else counts.unassigned = row._count.function;
+        counts.test = row._count._all;
+      else counts.unassigned = row._count._all;
     }
     return counts;
   }

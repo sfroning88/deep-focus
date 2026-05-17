@@ -32,10 +32,10 @@ class ShuffleServices:
         rng = np.random.default_rng(resolved_seed)
         rng.shuffle(ids)
 
-        n = len(ids)
+        num = len(ids)
         train_ratio, validate_ratio, test_ratio = FUNCTION_WEIGHT_SPLITS
-        train_cut = int(n * train_ratio)
-        val_cut = int(n * (train_ratio + validate_ratio))
+        train_cut = int(num * train_ratio)
+        val_cut = int(num * (train_ratio + validate_ratio))
 
         assignments: dict[str, TrainingFunction] = {}
         for pid in ids[:train_cut]:
@@ -47,15 +47,15 @@ class ShuffleServices:
 
         shuffled_at = datetime.now(tz=timezone.utc)
 
-        PersistServices.bulk_update_snapshot_functions(assignments)
-        PersistServices.seed_split(
+        PersistServices.seed_split_with_functions(
+            assignments,
             TrainingSplit(
                 version=TRAINING_FUNCTION_SPLIT_VERSION,
                 train_ratio=train_ratio,
                 validate_ratio=validate_ratio,
                 test_ratio=test_ratio,
                 shuffled_at=shuffled_at,
-            )
+            ),
         )
 
         counts = Counter(func.value for func in assignments.values())
