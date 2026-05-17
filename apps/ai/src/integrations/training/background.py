@@ -9,13 +9,31 @@ from focus_python import (
     PredictionType,
     TrainingType,
 )
-from .services import TrainingServices
+from .services import ShuffleServices, TrainingServices
 
 logger = logging.get_logger(__name__)
 
 
 class TrainingBackgroundJobs:
     """Operations for background jobs from Training"""
+
+    @staticmethod
+    def background_shuffle_groups() -> None:
+        """Background: Shuffle property snapshots into function groups"""
+        try:
+            result = ShuffleServices.shuffle_snapshot_functions()
+            logger.info(
+                "model_shuffle_groups_completed",
+                seed=result["seed"],
+                version=result["version"],
+                counts=result["counts"],
+            )
+        except Exception as e:
+            logger.error(
+                "model_shuffle_groups_failed",
+                error=str(e),
+            )
+            raise
 
     @staticmethod
     def background_model_train(

@@ -30,6 +30,10 @@ def worker_url(domain: str) -> str:
 BACKEND_URL = worker_url("backend")
 AI_URL = worker_url("ai")
 
+# -- Shuffle (served by apps/ai) --
+SHUFFLE_PATH = "/api/shuffle"
+SHUFFLE_URL = f"{AI_URL}{SHUFFLE_PATH}"
+
 # -- Train (served by apps/ai) --
 TRAIN_PATH = "/api/train"
 TRAIN_CONTROLLABLE_PRD_PATH = f"{TRAIN_PATH}/controllable_prd"

@@ -3,6 +3,7 @@ export const POSTHOG_EVENTS = {
   privacy_policy_opened: "privacy_policy_opened",
   privacy_policy_closed: "privacy_policy_closed",
   property_snapshot_created: "property_snapshot_created",
+  model_shuffle_training_groups: "model_shuffle_training_groups",
   model_training_started: "model_training_started",
   model_prediction_requested: "model_prediction_requested",
   prediction_feedback_given: "prediction_feedback_given",

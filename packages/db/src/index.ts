@@ -4,6 +4,7 @@ export {
   PredictionType,
   TrainingType,
   TrainingStatus,
+  TrainingFunction,
 } from "../prisma/src/generated/prisma";
 export type {
   Prisma,
@@ -13,6 +14,7 @@ export type {
   Property,
   PropertySnapshot,
   TrainingFeature,
+  TrainingSplit,
   TrainingBatch,
   TrainingModel,
 } from "../prisma/src/generated/prisma";

@@ -8,6 +8,12 @@ from pydantic import BaseModel
 from typing import List
 
 
+class ShuffleResponse(BaseModel):
+    """Response model for shuffling training groups"""
+
+    job_id: str
+
+
 class TrainingResponse(BaseModel):
     """Response model for running training job"""
 

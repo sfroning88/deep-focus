@@ -18,6 +18,7 @@ from .property import (
 from .training import (
     TrainingMSAEncoding,
     TrainingFeature,
+    TrainingSplit,
     TrainingBatch,
     TrainingModel,
 )
@@ -32,6 +33,7 @@ __all__ = [
     "PropertySnapshot",
     "TrainingMSAEncoding",
     "TrainingFeature",
+    "TrainingSplit",
     "TrainingBatch",
     "TrainingModel",
 ]

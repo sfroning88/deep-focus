@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Modified Date: 5.14.2026
+Modified Date: 5.16.2026
 Processing functions for model training
 """
 
@@ -31,11 +31,13 @@ from focus_python import (
     MSA_FEATURE_COLUMN,
     ModelStorageServices,
     TRAINING_FEATURE_SCHEMA_VERSION,
+    TRAINING_FUNCTION_SPLIT_VERSION,
     TRAINING_SPLIT_SEED,
     TRAINING_MIN_SPLIT_SAMPLES,
     TRAINING_RIDGE_ALPHA,
     TRAINING_N_ESTIMATORS,
     PredictionType,
+    TrainingFunction,
     TrainingBatch,
     TrainingFeature,
     TrainingModel,
@@ -65,7 +67,7 @@ class TrainingServices:
 
         batch_id = str(uuid.uuid4())
         frame = Features.build_training_dataframe(
-            properties, snapshots, prediction_type
+            properties, snapshots, prediction_type, TrainingFunction.TRAIN
         )
         if len(frame.X) == 0:
             raise ValueError("No training samples available for batch")
@@ -103,18 +105,28 @@ class TrainingServices:
             properties = PersistServices.fetch_properties()
             snapshots = PersistServices.fetch_snapshots()
             frame = Features.build_training_dataframe(
-                properties, snapshots, prediction_type
+                properties, snapshots, prediction_type, TrainingFunction.TRAIN
             )
 
             estimator = TrainingServices._build_estimator(training_type)
             model, score, train_score, rmse = TrainingServices._train_and_score(
                 estimator, frame.X, frame.y, frame.groups, frame.msa_id
             )
+
+            validate_score = TrainingServices._score_on_function(
+                model,
+                properties,
+                snapshots,
+                prediction_type,
+                TrainingFunction.VALIDATE,
+                frame.msa_encoding,
+            )
             logger.info(
                 "training_scored",
                 type=training_type.value,
                 r2=round(score, 4),
                 train_r2=round(train_score, 4),
+                val_r2=round(validate_score, 4) if validate_score is not None else None,
                 rmse=round(rmse, 2),
                 samples=len(frame.X),
             )
@@ -132,6 +144,7 @@ class TrainingServices:
                     batch_id=batch_id,
                     r2_score=score,
                     train_score=train_score,
+                    validate_score=validate_score,
                     rmse=rmse,
                     storage_path=storage_path,
                     trained_at=datetime.now(tz=timezone.utc),
@@ -163,6 +176,7 @@ class TrainingServices:
             status=TrainingStatus.PENDING,
             samples=len(frame.X),
             split_seed=TRAINING_SPLIT_SEED,
+            split_version_id=TRAINING_FUNCTION_SPLIT_VERSION,
             feature=TrainingFeature(
                 batch_id=batch_id,
                 columns=list(FEATURE_COLUMNS),
@@ -308,3 +322,26 @@ class TrainingServices:
         score = float(r2_score(y, predictions))
         rmse = float(np.sqrt(mean_squared_error(y, predictions)))
         return estimator, score, score, rmse
+
+    @staticmethod
+    def _score_on_function(
+        model: BaseEstimator,
+        properties,
+        snapshots,
+        prediction_type: PredictionType,
+        function: TrainingFunction,
+        msa_encoding,
+    ) -> float | None:
+        """Score a fitted model against a held-out function split; returns None if no data"""
+        try:
+            frame = Features.build_training_dataframe(
+                properties, snapshots, prediction_type, function, msa_encoding
+            )
+            return float(r2_score(frame.y, model.predict(frame.X)))
+        except Exception as e:
+            logger.warning(
+                "training_validation_scoring_failed",
+                function=function.value,
+                error=str(e),
+            )
+            return None

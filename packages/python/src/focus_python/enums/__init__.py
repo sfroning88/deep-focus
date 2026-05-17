@@ -2,7 +2,7 @@ from .nic import NICState
 from .prediction import PredictionType
 from ._prisma import PrismaPredictionType
 from .setting import DomainOption
-from .training import TrainingType, TrainingStatus
+from .training import TrainingType, TrainingStatus, TrainingFunction
 
 __all__ = [
     "NICState",
@@ -11,4 +11,5 @@ __all__ = [
     "DomainOption",
     "TrainingType",
     "TrainingStatus",
+    "TrainingFunction",
 ]

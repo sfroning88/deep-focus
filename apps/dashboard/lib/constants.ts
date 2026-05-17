@@ -21,6 +21,8 @@ export const QUERY_KEYS = {
   predictions: (userId: string, propertyId: string) =>
     ["predictions", userId, propertyId] as const,
   trainingBatches: (userId: string) => ["trainingBatches", userId] as const,
+  trainingFunctionCounts: (userId: string) =>
+    ["trainingFunctionCounts", userId] as const,
 };
 
 export const CACHE_STALE_TIME = 60 * 60 * 60;
