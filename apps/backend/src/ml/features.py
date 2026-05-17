@@ -50,32 +50,39 @@ class Features:
             state_value, state_encoding.get(STATE_UNKNOWN, 0.0)
         )
 
-        total_units = NumberUtils._to_float(prop.total_units) or 0.0
+        total_units_raw = NumberUtils._to_float(prop.total_units)
+        total_units = 0.0 if isnan(total_units_raw) else total_units_raw
         total_beds = NumberUtils._to_float(prop.total_beds)
         beds_per_unit = (
             total_beds / total_units
-            if total_units > 0 and total_beds is not None
+            if total_units > 0 and not isnan(total_beds)
             else 0.0
         )
 
         year_built = NumberUtils._to_float(prop.year_built)
         year_renovated = NumberUtils._to_float(prop.year_renovated)
+        snapshot_year = float(ref_date.year)
         years_since_renovation = (
-            ref_ordinal - year_renovated
+            snapshot_year - year_renovated
             if not isnan(year_renovated)
-            else ref_ordinal - year_built if not isnan(year_built) else 0.0
+            else snapshot_year - year_built if not isnan(year_built) else 0.0
         )
+
+        msa_population_raw = NumberUtils._to_float(prop.msa_population)
+        unit_size_raw = NumberUtils._to_float(prop.unit_size)
 
         row = {
             **NICUtils._acuity_mix(prop),
             BEDS_PER_UNIT_COLUMN: beds_per_unit,
             MSA_FEATURE_COLUMN: msa_encoded,
-            MSA_POPULATION_COLUMN: NumberUtils._to_float(prop.msa_population) or 0.0,
+            MSA_POPULATION_COLUMN: (
+                0.0 if isnan(msa_population_raw) else msa_population_raw
+            ),
             SNAPSHOT_DATE_COLUMN: ref_ordinal,
             STATE_FEATURE_COLUMN: state_encoded,
             TOTAL_UNITS_COLUMN: total_units,
-            UNIT_SIZE_COLUMN: NumberUtils._to_float(prop.unit_size) or 0.0,
-            YEAR_BUILT_COLUMN: year_built or 0.0,
+            UNIT_SIZE_COLUMN: 0.0 if isnan(unit_size_raw) else unit_size_raw,
+            YEAR_BUILT_COLUMN: 0.0 if isnan(year_built) else year_built,
             YEARS_SINCE_RENOVATION_COLUMN: years_since_renovation,
         }
         return pd.DataFrame([row], columns=FEATURE_COLUMNS).astype(np.float64)

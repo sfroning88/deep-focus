@@ -74,17 +74,17 @@ class Features:
             df["state_id"].map(state_encoding).fillna(global_mean)
         )
 
-        df[YEARS_SINCE_RENOVATION_COLUMN] = df.apply(
-            lambda row: (
-                row[SNAPSHOT_DATE_COLUMN] - row["year_renovated_ordinal"]
-                if pd.notna(row["year_renovated_ordinal"])
-                else (
-                    row[SNAPSHOT_DATE_COLUMN] - row[YEAR_BUILT_COLUMN]
-                    if pd.notna(row[YEAR_BUILT_COLUMN])
-                    else np.nan
-                )
+        snapshot_year = pd.to_datetime(
+            df[SNAPSHOT_DATE_COLUMN].apply(lambda o: pd.Timestamp.fromordinal(int(o)))
+        ).dt.year
+        df[YEARS_SINCE_RENOVATION_COLUMN] = np.where(
+            df["year_renovated_ordinal"].notna(),
+            snapshot_year - df["year_renovated_ordinal"],
+            np.where(
+                df[YEAR_BUILT_COLUMN].notna(),
+                snapshot_year - df[YEAR_BUILT_COLUMN],
+                np.nan,
             ),
-            axis=1,
         )
 
         return TrainingFrame(
