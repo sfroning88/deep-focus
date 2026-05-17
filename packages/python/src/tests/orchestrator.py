@@ -144,6 +144,15 @@ def _kill_workers(procs: List[subprocess.Popen]) -> None:
                 pass
 
 
+def _pkill_workers() -> None:
+    """Kill any lingering worker processes by command pattern (catches rq forks and restarts)"""
+    for pattern in ["src.worker_runner", "uvicorn src.main:app"]:
+        try:
+            subprocess.run(["pkill", "-f", pattern], check=False)
+        except Exception:
+            pass
+
+
 def _await_workers_ready(specs: Tuple[WorkerSpec, ...]) -> None:
     """Poll /health on each spawned API until 200 OK"""
     for spec in specs:
@@ -213,6 +222,7 @@ def main() -> None:
         except Exception as cleanup_err:
             print(f"WARNING: Redis cleanup failed: {cleanup_err}")
         _kill_workers(procs)
+        _pkill_workers()
         print("Cleanup complete")
 
 
