@@ -8,12 +8,18 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from focus_python import (
+    BEDS_PER_UNIT_COLUMN,
     FEATURE_COLUMNS,
     MSA_FEATURE_COLUMN,
+    MSA_POPULATION_COLUMN,
     MSA_UNKNOWN,
     SNAPSHOT_DATE_COLUMN,
+    STATE_FEATURE_COLUMN,
+    STATE_UNKNOWN,
     TOTAL_UNITS_COLUMN,
+    UNIT_SIZE_COLUMN,
     YEAR_BUILT_COLUMN,
+    YEARS_SINCE_RENOVATION_COLUMN,
     PREDICTION_TARGETS,
     PredictionType,
     TrainingFunction,
@@ -36,6 +42,7 @@ class Features:
         prediction_type: PredictionType,
         function: TrainingFunction = TrainingFunction.TRAIN,
         msa_encoding: Optional[Dict[str, float]] = None,
+        state_encoding: Optional[Dict[str, float]] = None,
     ) -> TrainingFrame:
         """Join each snapshot with its property features; one sample per snapshot"""
         if not properties or not snapshots:
@@ -58,8 +65,27 @@ class Features:
         else:
             _, msa_records = Features._compute_msa_encoding(df, target)
 
+        if state_encoding is None:
+            state_encoding = Features._compute_state_encoding(df, target)
+
         global_mean = float(df[target].mean())
         df[MSA_FEATURE_COLUMN] = df["msa_id"].map(msa_encoding).fillna(global_mean)
+        df[STATE_FEATURE_COLUMN] = (
+            df["state_id"].map(state_encoding).fillna(global_mean)
+        )
+
+        snapshot_year = pd.to_datetime(
+            df[SNAPSHOT_DATE_COLUMN].apply(lambda o: pd.Timestamp.fromordinal(int(o)))
+        ).dt.year
+        df[YEARS_SINCE_RENOVATION_COLUMN] = np.where(
+            df["year_renovated_ordinal"].notna(),
+            snapshot_year - df["year_renovated_ordinal"],
+            np.where(
+                df[YEAR_BUILT_COLUMN].notna(),
+                snapshot_year - df[YEAR_BUILT_COLUMN],
+                np.nan,
+            ),
+        )
 
         return TrainingFrame(
             X=df[FEATURE_COLUMNS].astype(np.float64),
@@ -68,6 +94,8 @@ class Features:
             msa_id=df["msa_id"].reset_index(drop=True),
             msa_encoding=msa_encoding,
             msa_records=msa_records,
+            state_id=df["state_id"].reset_index(drop=True),
+            state_encoding=state_encoding,
             target=target,
         )
 
@@ -79,13 +107,13 @@ class Features:
         df = pd.DataFrame(
             [
                 {
-                    "property_id": s.property_id,
-                    target: NumberUtils._to_float(getattr(s, target, None)),
+                    "property_id": snap.property_id,
+                    target: NumberUtils._to_float(getattr(snap, target, None)),
                     SNAPSHOT_DATE_COLUMN: (
-                        s.reported_at.toordinal() if s.reported_at else None
+                        snap.reported_at.toordinal() if snap.reported_at else None
                     ),
                 }
-                for s in snapshots
+                for snap in snapshots
             ]
         )
         df = df.dropna(subset=[target, SNAPSHOT_DATE_COLUMN])
@@ -93,19 +121,33 @@ class Features:
 
     @staticmethod
     def _build_property_df(properties: List[Property]) -> pd.DataFrame:
-        """Build the property-side dataframe with MSA and acuity mix columns"""
-        return pd.DataFrame(
-            [
+        """Build the property-side dataframe with MSA, state, acuity mix, and unit columns"""
+        rows = []
+        for prop in properties:
+            total_units = NumberUtils._to_float(prop.total_units)
+            total_beds = NumberUtils._to_float(prop.total_beds)
+            beds_per_unit = (
+                total_beds / total_units
+                if total_units and total_units > 0 and total_beds is not None
+                else np.nan
+            )
+            rows.append(
                 {
-                    "property_id": p.id,
-                    "msa_id": p.msa_id or MSA_UNKNOWN,
-                    TOTAL_UNITS_COLUMN: NumberUtils._to_float(p.total_units),
-                    YEAR_BUILT_COLUMN: NumberUtils._to_float(p.year_built),
-                    **NICUtils._acuity_mix(p),
+                    "property_id": prop.id,
+                    "msa_id": prop.msa_id or MSA_UNKNOWN,
+                    "state_id": prop.state.value if prop.state else STATE_UNKNOWN,
+                    TOTAL_UNITS_COLUMN: total_units,
+                    UNIT_SIZE_COLUMN: NumberUtils._to_float(prop.unit_size),
+                    BEDS_PER_UNIT_COLUMN: beds_per_unit,
+                    YEAR_BUILT_COLUMN: NumberUtils._to_float(prop.year_built),
+                    "year_renovated_ordinal": NumberUtils._to_float(
+                        prop.year_renovated
+                    ),
+                    MSA_POPULATION_COLUMN: NumberUtils._to_float(prop.msa_population),
+                    **NICUtils._acuity_mix(prop),
                 }
-                for p in properties
-            ]
-        )
+            )
+        return pd.DataFrame(rows)
 
     @staticmethod
     def _compute_msa_encoding(
@@ -121,3 +163,8 @@ class Features:
             for msa_id, row in grouped.iterrows()
         ]
         return encoding, records
+
+    @staticmethod
+    def _compute_state_encoding(df: pd.DataFrame, target: str) -> Dict[str, float]:
+        """Compute mean target per state_id"""
+        return df.groupby("state_id")[target].mean().to_dict()

@@ -55,17 +55,19 @@ class InferenceServices:
         if multi_enabled:
             keys = model_registry.loaded_model_types()
             return [
-                InferenceServices._run(prop, key, prediction_type, snapshot_reported_at)
+                InferenceServices._run_inference(
+                    prop, key, prediction_type, snapshot_reported_at
+                )
                 for key in keys
             ]
         return [
-            InferenceServices._run(
+            InferenceServices._run_inference(
                 prop, WINNER_KEY, prediction_type, snapshot_reported_at
             )
         ]
 
     @staticmethod
-    def _run(
+    def _run_inference(
         prop: Property,
         model_key: str,
         prediction_type: PredictionType,
@@ -74,11 +76,24 @@ class InferenceServices:
         """Single-model inference path: load encoding, build vector, predict, package response"""
         model = model_registry.get(model_key)
         meta = model_registry.get_metadata(model_key)
-        encoding = meta.get("msa_encoding")
-        if not isinstance(encoding, dict) or not encoding:
+        msa_encoding = meta.get("msa_encoding")
+        if not isinstance(msa_encoding, dict) or not msa_encoding:
             raise RuntimeError(f"Model '{model_key}' missing msa_encoding metadata")
+        state_encoding = meta.get("state_encoding")
+        if not isinstance(state_encoding, dict) or not state_encoding:
+            raise RuntimeError(f"Model '{model_key}' missing state_encoding metadata")
 
-        X = Features.build_predict_vector(prop, encoding, snapshot_reported_at)
+        X = Features.build_predict_vector(
+            prop, msa_encoding, state_encoding, snapshot_reported_at
+        )
+        nan_cols = X.columns[X.isna().any()].tolist()
+        if nan_cols:
+            logger.warning(
+                "inference_nan_columns",
+                property_id=prop.id,
+                nan_columns=nan_cols,
+                values=X.iloc[0].to_dict(),
+            )
         result = float(model.predict(X)[0])
 
         resolved_type = meta.get("winner_type") or model_key

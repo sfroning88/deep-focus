@@ -118,6 +118,14 @@ class ModelRegistry:
                 key=row["storage_path"],
             )
             return None, None
+        state_encoding = payload.get("state_encoding")
+        if not isinstance(state_encoding, dict) or not state_encoding:
+            logger.error(
+                "registry_payload_missing_state_encoding",
+                type=model_type,
+                key=row["storage_path"],
+            )
+            return None, None
         entry = LoadedModel(
             type=model_type,
             score=float(row["r2_score"]),
@@ -126,6 +134,7 @@ class ModelRegistry:
             winner=bool(row["winner"]),
             batch_id=batch_id,
             msa_encoding=msa_encoding,
+            state_encoding=state_encoding,
             feature_columns=payload.get("feature_columns"),
             target_column=payload.get("target_column"),
             samples=payload.get("samples"),

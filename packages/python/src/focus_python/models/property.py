@@ -30,6 +30,7 @@ class Property(BaseFocus):
     total_units: Optional[int] = None
     total_beds: Optional[int] = None
     msa_id: Optional[str] = None
+    msa_population: Optional[int] = None
 
 
 class PropertySnapshot(BaseFocus):

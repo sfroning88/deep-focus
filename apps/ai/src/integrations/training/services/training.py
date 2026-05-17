@@ -29,6 +29,7 @@ from focus_python import logging
 from focus_python import (
     FEATURE_COLUMNS,
     MSA_FEATURE_COLUMN,
+    STATE_FEATURE_COLUMN,
     ModelStorageServices,
     TRAINING_FEATURE_SCHEMA_VERSION,
     TRAINING_FUNCTION_SPLIT_VERSION,
@@ -110,7 +111,7 @@ class TrainingServices:
 
             estimator = TrainingServices._build_estimator(training_type)
             model, score, train_score, rmse = TrainingServices._train_and_score(
-                estimator, frame.X, frame.y, frame.groups, frame.msa_id
+                estimator, frame.X, frame.y, frame.groups, frame.msa_id, frame.state_id
             )
 
             validate_score = TrainingServices._score_on_function(
@@ -120,6 +121,7 @@ class TrainingServices:
                 prediction_type,
                 TrainingFunction.VALIDATE,
                 frame.msa_encoding,
+                frame.state_encoding,
             )
             logger.info(
                 "training_scored",
@@ -199,6 +201,7 @@ class TrainingServices:
         return ModelPayload(
             model=model,
             msa_encoding=frame.msa_encoding,
+            state_encoding=frame.state_encoding,
             feature_columns=list(FEATURE_COLUMNS),
             target_column=frame.target,
             prediction_type=prediction_type.value,
@@ -268,7 +271,7 @@ class TrainingServices:
 
     @staticmethod
     def _train_and_score(
-        estimator: BaseEstimator, X, y, groups, msa_id
+        estimator: BaseEstimator, X, y, groups, msa_id, state_id
     ) -> Tuple[BaseEstimator, float, float, float]:
         """Group-aware 5-fold CV; returns model + mean test R², mean train R², mean RMSE"""
         n_folds = 5
@@ -281,21 +284,27 @@ class TrainingServices:
             X_train = X.iloc[train_indices].copy()
             X_test = X.iloc[test_indices].copy()
             y_train, y_test = y.iloc[train_indices], y.iloc[test_indices]
-
-            fold_msa_train = msa_id.iloc[train_indices]
-            fold_msa_test = msa_id.iloc[test_indices]
-            fold_encoding = (
-                pd.Series(y_train.values, index=fold_msa_train.values)
-                .groupby(level=0)
-                .mean()
-                .to_dict()
-            )
             fold_mean = float(y_train.mean())
-            X_train[MSA_FEATURE_COLUMN] = (
-                fold_msa_train.map(fold_encoding).fillna(fold_mean).values
+
+            TrainingServices._apply_fold_target_encoding(
+                X_train,
+                X_test,
+                msa_id,
+                train_indices,
+                test_indices,
+                y_train,
+                fold_mean,
+                MSA_FEATURE_COLUMN,
             )
-            X_test[MSA_FEATURE_COLUMN] = (
-                fold_msa_test.map(fold_encoding).fillna(fold_mean).values
+            TrainingServices._apply_fold_target_encoding(
+                X_train,
+                X_test,
+                state_id,
+                train_indices,
+                test_indices,
+                y_train,
+                fold_mean,
+                STATE_FEATURE_COLUMN,
             )
 
             estimator.fit(X_train, y_train)
@@ -311,6 +320,29 @@ class TrainingServices:
             float(np.mean(train_scores)),
             float(np.mean(rmses)),
         )
+
+    @staticmethod
+    def _apply_fold_target_encoding(
+        X_train: pd.DataFrame,
+        X_test: pd.DataFrame,
+        id_series: pd.Series,
+        train_indices,
+        test_indices,
+        y_train: pd.Series,
+        fold_mean: float,
+        column: str,
+    ) -> None:
+        """Compute mean-target encoding from the train split and apply to both halves in-place"""
+        ids_train = id_series.iloc[train_indices]
+        ids_test = id_series.iloc[test_indices]
+        encoding = (
+            pd.Series(y_train.values, index=ids_train.values)
+            .groupby(level=0)
+            .mean()
+            .to_dict()
+        )
+        X_train[column] = ids_train.map(encoding).fillna(fold_mean).values
+        X_test[column] = ids_test.map(encoding).fillna(fold_mean).values
 
     @staticmethod
     def _fit_and_score_full(
@@ -331,11 +363,17 @@ class TrainingServices:
         prediction_type: PredictionType,
         function: TrainingFunction,
         msa_encoding,
+        state_encoding,
     ) -> float | None:
         """Score a fitted model against a held-out function split; returns None if no data"""
         try:
             frame = Features.build_training_dataframe(
-                properties, snapshots, prediction_type, function, msa_encoding
+                properties,
+                snapshots,
+                prediction_type,
+                function,
+                msa_encoding,
+                state_encoding,
             )
             return float(r2_score(frame.y, model.predict(frame.X)))
         except Exception as e:
