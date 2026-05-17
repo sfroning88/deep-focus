@@ -1,10 +1,10 @@
 """
 Author: Sean Froning
-Created Date: 5.9.2026
+Modified Date: 5.16.2026
 Predict from models testing script
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from ..endpoints import ML_RELOAD_URL, PREDICT_CONTROLLABLE_PRD_URL, endpoint_test
 from ..helpers import PREDICT_PRESET_PATH, load_preset_lines
@@ -21,7 +21,7 @@ def _parse_preset(lines: List[str]) -> Dict[str, str]:
     return out
 
 
-def run_reload_test() -> None:
+def run_reload_test() -> List[str]:
     """Simulate CRON: POST /api/ml/reload and assert model_ids are returned"""
     print("Model registry reload (CRON simulation) start")
 
@@ -36,9 +36,10 @@ def run_reload_test() -> None:
 
     print(f"Registry reloaded with {len(model_ids)} model(s): {model_ids}")
     print("Model registry reload complete")
+    return model_ids
 
 
-def run_prediction_tests() -> None:
+def run_prediction_tests(model_ids: Optional[List[str]] = None) -> None:
     """Hit backend/predict/controllable_prd against a preset property_id and assert the response shape"""
     print("Prediction integration endpoint test start")
 
@@ -63,6 +64,16 @@ def run_prediction_tests() -> None:
     predictions: List[Dict[str, Any]] = list(response.get("predictions") or [])
     if not predictions:
         raise RuntimeError("Prediction endpoint returned no predictions")
+
+    if multi_enabled and model_ids:
+        returned_types = {p.get("modelType") for p in predictions}
+        expected_types = set(model_ids)
+        missing = sorted(expected_types - returned_types)
+        if missing:
+            print(
+                "WARNING: multi-model response is missing types listed by registry reload "
+                f"(inference skipped or failed for): {missing}"
+            )
 
     if not multi_enabled and len(predictions) != 1:
         raise RuntimeError(

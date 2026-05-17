@@ -172,8 +172,8 @@ def _run_workflow(workflow: str) -> None:
     elif workflow == "predict":
         from .scripts.predict import run_prediction_tests, run_reload_test
 
-        run_reload_test()
-        run_prediction_tests()
+        model_ids = run_reload_test()
+        run_prediction_tests(model_ids)
     else:
         raise ValueError(f"Unknown workflow: {workflow}")
 

@@ -54,12 +54,24 @@ class InferenceServices:
 
         if multi_enabled:
             keys = model_registry.loaded_model_types()
-            return [
-                InferenceServices._run_inference(
-                    prop, key, prediction_type, snapshot_reported_at
-                )
-                for key in keys
-            ]
+            predictions: List[Prediction] = []
+            for key in keys:
+                try:
+                    predictions.append(
+                        InferenceServices._run_inference(
+                            prop, key, prediction_type, snapshot_reported_at
+                        )
+                    )
+                except Exception as e:
+                    logger.warning(
+                        "inference_model_failed",
+                        property_id=property_id,
+                        model_key=key,
+                        error=str(e),
+                    )
+            if not predictions:
+                raise RuntimeError("No trained model available")
+            return predictions
         return [
             InferenceServices._run_inference(
                 prop, WINNER_KEY, prediction_type, snapshot_reported_at
