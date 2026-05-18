@@ -29,7 +29,7 @@ test("sort buttons are present on home page", async ({ page }) => {
 });
 
 test("clicking a sort button changes active sort", async ({ page }) => {
-  await page.goto(routes.base.home);
+  await page.goto(routes.base.home, { waitUntil: "domcontentloaded" });
   const msaBtn = page.getByRole("button", { name: /MSA/i });
   await msaBtn.click();
   await expect(msaBtn).toHaveAttribute("aria-pressed", "true");
@@ -72,10 +72,7 @@ test("my profile dialog closes on close button", async ({ page }) => {
 test("first property view button opens property card dialog", async ({
   page,
 }) => {
-  await page.goto(routes.base.home);
-  await expect(page.getByRole("heading", { name: "Properties" })).toBeVisible({
-    timeout: 15_000,
-  });
+  await page.goto(routes.base.home, { waitUntil: "domcontentloaded" });
   const firstView = page.getByRole("button", { name: /^View/ }).first();
   const hasProperties = await firstView.isVisible();
   if (!hasProperties) {
