@@ -1,9 +1,12 @@
-import { authRoutes } from "@focus/auth";
+import { authRoutes } from "@focus/auth/routes";
 
 export const routes = {
   ...authRoutes,
+  base: {
+    root: "/" as const,
+    home: "/home" as const,
+  },
   admin: {
     root: "/admin" as const,
-    org: (orgSlug: string) => `/admin/${orgSlug}` as const,
   },
 } as const;

@@ -25,7 +25,7 @@ export default async function AdminPage() {
           </p>
         </div>
         <Link
-          href={routes.home}
+          href={routes.base.home}
           className="w-fit shrink-0 text-sm font-medium text-zinc-900 underline underline-offset-4 dark:text-zinc-100"
         >
           Back to dashboard

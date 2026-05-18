@@ -5,6 +5,7 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./routes": "./src/routes.ts",
     "./server": "./src/server.ts",
     "./middleware": "./src/client/middleware.ts",
     "./client": "./src/client/index.ts"
