@@ -38,11 +38,16 @@ jobs:
             run: pnpm --filter @focus/dashboard build
             env:
                 CI: true
-                DATABASE_URL: ${{ secrets.DATABASE_URL }}
-                DIRECT_URL: ${{ secrets.DIRECT_URL }}
                 NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
                 NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
                 SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+                NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+                NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
+                DATABASE_URL: ${{ secrets.DATABASE_URL }}
+                DIRECT_URL: ${{ secrets.DIRECT_URL }}
+                BACKEND_API_URL: ${{ secrets.BACKEND_API_URL }}
+                AI_API_URL: ${{ secrets.AI_API_URL }}
+                AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
 
         -   name: Install Chromium
             run: pnpm --filter @focus/dashboard exec playwright install chromium --with-deps
@@ -53,11 +58,16 @@ jobs:
             continue-on-error: true
             env:
                 CI: true
-                DATABASE_URL: ${{ secrets.DATABASE_URL }}
-                DIRECT_URL: ${{ secrets.DIRECT_URL }}
                 NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
                 NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
                 SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+                NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+                NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
+                DATABASE_URL: ${{ secrets.DATABASE_URL }}
+                DIRECT_URL: ${{ secrets.DIRECT_URL }}
+                BACKEND_API_URL: ${{ secrets.BACKEND_API_URL }}
+                AI_API_URL: ${{ secrets.AI_API_URL }}
+                AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
                 VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
                 PLAYWRIGHT_BASE_URL: ${{ secrets.PLAYWRIGHT_BASE_URL }}
                 PLAYWRIGHT_EMAIL: ${{ secrets.PLAYWRIGHT_EMAIL }}
