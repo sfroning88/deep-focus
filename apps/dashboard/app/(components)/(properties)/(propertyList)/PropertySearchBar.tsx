@@ -97,7 +97,7 @@ function SortButton({
     <button
       type="button"
       onClick={onClick}
-      aria-pressed={active}
+      aria-pressed={active ? "true" : "false"}
       className={`
         inline-flex items-center gap-1 rounded-md border font-data font-medium
         uppercase tracking-wider transition-colors
