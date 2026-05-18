@@ -17,12 +17,12 @@ export function MyProfileButton({ userId }: MyProfileButtonProps) {
     open && typeof document !== "undefined" ? (
       <>
         <div
-          className="fixed inset-0 z-[100] bg-black/50"
+          className="fixed inset-0 z-100 bg-black/50"
           onClick={() => setOpen(false)}
           aria-hidden
         />
         <div
-          className="fixed left-1/2 top-1/2 z-[110] w-[min(90vw,400px)] -translate-x-1/2 -translate-y-1/2 rounded-sm border border-border bg-card p-5 shadow-lg"
+          className="fixed left-1/2 top-1/2 z-110 w-[min(90vw,400px)] -translate-x-1/2 -translate-y-1/2 rounded-sm border border-border bg-card p-5 shadow-lg"
           role="dialog"
           aria-modal
           aria-labelledby="profile-title"

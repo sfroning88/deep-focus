@@ -29,15 +29,15 @@ export function PrivacyNotice() {
   const modalContent = isOpen ? (
     <>
       <div
-        className="fixed inset-0 bg-black/50 z-[100]"
+        className="fixed inset-0 bg-black/50 z-100"
         onClick={handleClose}
         aria-hidden
       />
       <div
-        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card border border-border shadow-lg z-[110] flex flex-col gap-4 overflow-hidden transition-all duration-300 max-w-2xl max-h-[80vh] w-[90vw] rounded-sm"
+        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card border border-border shadow-lg z-110 flex flex-col gap-4 overflow-hidden transition-all duration-300 max-w-2xl max-h-[80vh] w-[90vw] rounded-sm"
         style={{ padding: isMobile ? "0.75rem" : "1.5rem" }}
       >
-        <div className="flex items-center justify-between flex-shrink-0">
+        <div className="flex items-center justify-between shrink-0">
           <h2
             className={`font-semibold truncate ${isMobile ? "text-base" : "text-xl"}`}
           >
@@ -74,11 +74,7 @@ export function PrivacyNotice() {
         type="button"
         onClick={handleOpen}
         className={`fixed right-4 bg-card border border-border shadow-sm hover:bg-secondary z-50 font-medium text-card-foreground font-data rounded-sm ${
-          !stackAboveBanner
-            ? "bottom-4"
-            : isMobile
-              ? "bottom-[13rem]"
-              : "bottom-[11.5rem]"
+          !stackAboveBanner ? "bottom-4" : isMobile ? "bottom-52" : "bottom-46"
         } ${isMobile ? "px-3 py-2 text-xs rounded-sm" : "px-4 py-2 text-sm rounded-sm"}`}
       >
         Privacy

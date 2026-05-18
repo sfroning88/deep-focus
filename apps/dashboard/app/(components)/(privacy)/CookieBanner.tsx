@@ -37,7 +37,7 @@ export function CookieBanner() {
           ? "max-w-[calc(100vw-2rem)] p-3 text-[10px] leading-snug"
           : "max-w-sm p-4 text-xs leading-snug"
       }`}
-      role="dialog"
+      role="region"
       aria-labelledby="cookie-banner-title"
       aria-describedby="cookie-banner-desc"
     >
