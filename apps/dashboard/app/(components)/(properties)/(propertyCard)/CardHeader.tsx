@@ -17,7 +17,7 @@ export function CardHeader({ card, onClose, actions }: CardHeaderProps) {
           {card.name}
         </h2>
         <div className="mt-1 flex flex-wrap items-center gap-x-1.5 md:gap-x-2 gap-y-1 text-xs md:text-sm text-white/60">
-          <span className="break-words">
+          <span className="wrap-break-word">
             {card.address}, {card.city}, {card.state} {card.zip}
           </span>
           <Dot />

@@ -35,7 +35,7 @@ export function PropertySearchBar({
           onChange={(e) => onQueryChange(e.target.value)}
           aria-label="Search properties"
           className={`
-            w-full rounded-md border border-white/10 bg-white/[0.04]
+            w-full rounded-md border border-white/10 bg-white/4
             text-white placeholder:text-white/30
             focus:outline-none focus:ring-1 focus:ring-fhp-blue-500 focus:border-fhp-blue-500
             font-data transition-colors
@@ -97,6 +97,7 @@ function SortButton({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       className={`
         inline-flex items-center gap-1 rounded-md border font-data font-medium
         uppercase tracking-wider transition-colors
@@ -104,7 +105,7 @@ function SortButton({
         ${
           active
             ? "border-fhp-blue-500 bg-fhp-blue-800/50 text-white"
-            : "border-white/10 bg-white/[0.03] text-white/50 hover:text-white/70 hover:border-white/20"
+            : "border-white/10 bg-white/3 text-white/50 hover:text-white/70 hover:border-white/20"
         }
       `}
     >

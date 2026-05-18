@@ -75,14 +75,14 @@ export function CreateSnapshotModal({
     open && typeof document !== "undefined" ? (
       <>
         <div
-          className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-[2px]"
+          className="fixed inset-0 z-60 bg-black/70 backdrop-blur-[2px]"
           onClick={() => {
             if (!createSnapshot.isPending) setOpen(false);
           }}
           aria-hidden
         />
         <div
-          className="fixed z-[61] left-3 right-3 top-8 bottom-8 md:left-1/2 md:top-1/2 md:right-auto md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 md:w-[min(100vw-2rem,520px)] md:max-h-[min(90vh,720px)] flex flex-col overflow-hidden rounded-md border border-white/10 bg-surface-dark shadow-2xl font-data"
+          className="fixed z-61 left-3 right-3 top-8 bottom-8 md:left-1/2 md:top-1/2 md:right-auto md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 md:w-[min(100vw-2rem,520px)] md:max-h-[min(90vh,720px)] flex flex-col overflow-hidden rounded-md border border-white/10 bg-surface-dark shadow-2xl font-data"
           role="dialog"
           aria-modal
           aria-labelledby={formId}

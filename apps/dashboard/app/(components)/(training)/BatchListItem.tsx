@@ -17,7 +17,7 @@ export function BatchListItem({ batch, isMobile }: BatchListItemProps) {
   ).length;
 
   return (
-    <li className="flex items-center justify-between gap-3 border-b border-white/5 last:border-0 px-3 md:px-5 py-3 md:py-4 transition-colors hover:bg-white/[0.02]">
+    <li className="flex items-center justify-between gap-3 border-b border-white/5 last:border-0 px-3 md:px-5 py-3 md:py-4 transition-colors hover:bg-white/2">
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <p

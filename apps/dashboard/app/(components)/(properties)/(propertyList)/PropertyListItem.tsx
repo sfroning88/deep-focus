@@ -28,7 +28,7 @@ export function PropertyListItem({
   const tier = occValue != null ? getOccupancyTier(occValue) : null;
 
   return (
-    <li className="flex items-center justify-between gap-3 border-b border-white/5 last:border-0 px-3 md:px-5 py-3 md:py-4 transition-colors hover:bg-white/[0.02]">
+    <li className="flex items-center justify-between gap-3 border-b border-white/5 last:border-0 px-3 md:px-5 py-3 md:py-4 transition-colors hover:bg-white/2">
       <div className="min-w-0">
         <p
           className={`font-semibold text-white truncate ${isMobile ? "text-sm" : "text-base"}`}
@@ -82,9 +82,9 @@ export function PropertyListItem({
           onClick={() => onSelect(property.id)}
           aria-label={`View ${property.name}`}
           className={`
-            rounded-md border border-white/15 bg-white/[0.04]
+            rounded-md border border-white/15 bg-white/4
             font-data font-medium text-white/70
-            hover:bg-white/[0.08] hover:text-white transition-colors
+            hover:bg-white/8 hover:text-white transition-colors
             ${isMobile ? "px-2.5 py-1.5 text-xs" : "px-4 py-2 text-sm"}
           `}
         >

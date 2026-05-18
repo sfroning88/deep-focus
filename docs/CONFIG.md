@@ -10,22 +10,6 @@ Use it for config, database pool, structured logging, Redis/RQ queue helpers, sh
 
 App-only wiring stays under **`src/core/`** (for example `health.py`, `lifespan.py`). **`src/main.py`** composes FastAPI with `focus_python` and those modules.
 
-**Local Redis:**
-
-Postgres and storage buckets live on Supabase; only Redis runs locally for the RQ queue.
-
-```sh
-pnpm use:local
-pnpm redis:up
-```
-
-**Testing:**
-
-```sh
-source .venv/bin/activate
-python -m src.tests.orchestrator <train|predict>
-```
-
 ## Deployment
 
 The **`Dockerfile`** expects the **repository root** as build context. **`WORKDIR`** is **`/repo/apps/[fastapi-app]`** so **`../../packages/python`** matches **`/repo/packages/python`**. Render **`buildFilter`** paths include **`packages/python/**`\*\* so shared-package changes trigger rebuilds.

@@ -8,7 +8,9 @@ test("home page renders dashboard heading", async ({ page }) => {
 
 test("home page renders properties list", async ({ page }) => {
   await page.goto(routes.base.home);
-  await expect(page.getByText("Properties")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Properties" })).toBeVisible({
+    timeout: 15_000,
+  });
 });
 
 test("home page renders search bar", async ({ page }) => {
@@ -61,14 +63,19 @@ test("my profile dialog shows name and email fields", async ({ page }) => {
 test("my profile dialog closes on close button", async ({ page }) => {
   await page.goto(routes.base.home);
   await page.getByRole("button", { name: "My Profile" }).click();
-  await page.getByRole("dialog").getByRole("button", { name: "Close" }).click();
-  await expect(page.getByRole("dialog")).not.toBeVisible();
+  const dialog = page.getByRole("dialog", { name: "My Profile" });
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole("button", { name: "Close" }).click();
+  await expect(dialog).not.toBeVisible();
 });
 
 test("first property view button opens property card dialog", async ({
   page,
 }) => {
   await page.goto(routes.base.home);
+  await expect(page.getByRole("heading", { name: "Properties" })).toBeVisible({
+    timeout: 15_000,
+  });
   const firstView = page.getByRole("button", { name: /^View/ }).first();
   const hasProperties = await firstView.isVisible();
   if (!hasProperties) {

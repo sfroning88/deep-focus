@@ -6,7 +6,7 @@ const iconClass = "h-4 w-4 md:h-[18px] md:w-[18px]";
 
 const btnClass = `
   inline-flex items-center justify-center rounded-md border transition-colors p-1.5 md:p-2
-  border-white/15 bg-white/[0.04] text-white/80 hover:bg-white/[0.08]
+  border-white/15 bg-white/4 text-white/80 hover:bg-white/8
   disabled:opacity-40 disabled:pointer-events-none
 `;
 
@@ -76,12 +76,12 @@ export function ValueBox({
       className={`rounded-sm px-2 md:px-4 py-2.5 md:py-3 text-center ${
         highlight
           ? "bg-fhp-blue-800/60 border border-fhp-blue-600/40"
-          : "bg-white/[0.03] border border-white/10"
+          : "bg-white/3 border border-white/10"
       }`}
     >
       {value === null ? (
         <p
-          className="min-h-[1.5rem] md:min-h-8 flex items-center justify-center"
+          className="min-h-6 md:min-h-8 flex items-center justify-center"
           aria-label="Not available"
         >
           <span className="block w-9 md:w-11 max-w-[60%] h-px bg-white/35 rounded-full" />
@@ -120,7 +120,7 @@ export function DeltaBox({
   const sign = isPositive ? "+" : "";
 
   return (
-    <div className="rounded-sm px-2 md:px-4 py-2.5 md:py-3 text-center bg-white/[0.03] border border-white/10">
+    <div className="rounded-sm px-2 md:px-4 py-2.5 md:py-3 text-center bg-white/3 border border-white/10">
       <p
         className={`text-base md:text-xl font-semibold font-data-mono ${color}`}
       >

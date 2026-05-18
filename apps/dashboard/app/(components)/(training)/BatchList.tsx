@@ -47,8 +47,8 @@ export function BatchList({ initialData }: BatchListProps) {
               ${isMobile ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm"}
               ${
                 shuffleMutation.isPending
-                  ? "border-white/10 bg-white/[0.02] text-white/30 cursor-not-allowed"
-                  : "border-white/20 bg-white/[0.04] text-white/70 hover:bg-white/[0.08]"
+                  ? "border-white/10 bg-white/2 text-white/30 cursor-not-allowed"
+                  : "border-white/20 bg-white/4 text-white/70 hover:bg-white/8"
               }
             `}
           >
@@ -63,7 +63,7 @@ export function BatchList({ initialData }: BatchListProps) {
               ${isMobile ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm"}
               ${
                 trainMutation.isPending
-                  ? "border-white/10 bg-white/[0.02] text-white/30 cursor-not-allowed"
+                  ? "border-white/10 bg-white/2 text-white/30 cursor-not-allowed"
                   : "border-fhp-blue-500 bg-fhp-blue-800/50 text-white hover:bg-fhp-blue-700/60"
               }
             `}
@@ -129,7 +129,7 @@ export function BatchList({ initialData }: BatchListProps) {
           ).map(({ label, value, color }) => (
             <div
               key={label}
-              className="flex flex-col items-center rounded-md border border-white/10 bg-white/[0.02] py-2"
+              className="flex flex-col items-center rounded-md border border-white/10 bg-white/2 py-2"
             >
               <span
                 className={`font-data-mono text-base font-semibold ${color}`}
