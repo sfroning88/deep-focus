@@ -30,7 +30,7 @@ test("clicking a sort button changes active sort", async ({ page }) => {
   await page.goto(routes.base.home);
   const msaBtn = page.getByRole("button", { name: /MSA/i });
   await msaBtn.click();
-  await expect(msaBtn).toBeVisible();
+  await expect(msaBtn).toHaveAttribute("aria-pressed", "true");
 });
 
 test("searching filters property list", async ({ page }) => {

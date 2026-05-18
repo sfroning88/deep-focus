@@ -39,8 +39,8 @@ async function globalSetup(_config: FullConfig) {
     await page.goto(new URL("/auth/login", baseURL).toString(), {
       waitUntil: "domcontentloaded",
     });
-    const emailInput = page.locator("#email");
-    const passwordInput = page.locator("#password");
+    const emailInput = page.locator('[name="email"]');
+    const passwordInput = page.locator('[name="password"]');
     await emailInput.waitFor({ state: "visible" });
     await emailInput.fill(email);
     await passwordInput.waitFor({ state: "visible" });
