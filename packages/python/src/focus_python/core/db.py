@@ -111,15 +111,15 @@ class DatabaseConnectionPool:
         return_all_rows: bool = False,
     ) -> Union[Dict, List[Dict], str, None]:
         self._ensure_pool()
-        q = re.sub(r"\$\d+", "%s", query)
+        sql = re.sub(r"\$\d+", "%s", query)
         with self.get_cursor() as cur:
-            cur.execute(q, params)
+            cur.execute(sql, params)
             if fetch_one:
-                r = cur.fetchone()
-                return dict(r) if r else None
+                row = cur.fetchone()
+                return dict(row) if row else None
             if return_all_rows:
                 return [dict(row) for row in cur.fetchall()]
-            if fetch_all and query.strip().upper().startswith("SELECT"):
+            if fetch_all and sql.strip().upper().startswith("SELECT"):
                 return [dict(row) for row in cur.fetchall()]
             return cur.statusmessage
 

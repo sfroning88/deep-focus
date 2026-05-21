@@ -32,12 +32,12 @@ try:
     from .services import TrainingServices
 
     training_available = True
-except ImportError as e:
+except ImportError as err:
     training_available = False
-    logger.error("Failed to import Training", error=str(e))
-except Exception as e:
+    logger.error("Failed to import Training", error=str(err))
+except Exception as err:
     training_available = False
-    logger.error(f"Failed to boot up Training: {str(e)}")
+    logger.error(f"Failed to boot up Training: {str(err)}")
 
 
 @router.post("/shuffle", dependencies=[Depends(dependency.get_token_header)])
@@ -60,8 +60,8 @@ async def group_shuffle(_request: ShuffleRequest) -> ShuffleResponse:
             ]
         )
         return ShuffleResponse(job_id=jobs[0].id)
-    except Exception as e:
-        logger.error("model_shuffle_enqueue_failed", error=str(e))
+    except Exception as err:
+        logger.error("model_shuffle_enqueue_failed", error=str(err))
         raise error("Model shuffling failed", status_code=500)
 
 
@@ -77,8 +77,8 @@ async def model_train(_request: TrainingRequest) -> TrainingResponse:
 
     try:
         batch_id = TrainingServices.create_batch(prediction_type)
-    except Exception as e:
-        logger.error("training_batch_seed_failed", error=str(e))
+    except Exception as err:
+        logger.error("training_batch_seed_failed", error=str(err))
         raise error("Model training failed to start", status_code=500)
 
     try:
@@ -94,6 +94,6 @@ async def model_train(_request: TrainingRequest) -> TrainingResponse:
             )
         jobs = queue.enqueue_jobs(specs)
         return TrainingResponse(job_ids=[job.id for job in jobs])
-    except Exception as e:
-        logger.error("model_training_enqueue_failed", batch=batch_id, error=str(e))
+    except Exception as err:
+        logger.error("model_training_enqueue_failed", batch=batch_id, error=str(err))
         raise error("Model training failed", status_code=500)

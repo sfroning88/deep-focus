@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Modified Date: 5.14.2026
+Modified Date: 5.21.2026
 Inference-side cache of trained models
 """
 
@@ -11,6 +11,7 @@ from focus_python import ModelStorageServices, TrainingStatus
 from .models import LoadedModel
 from .queries.select_latest_completed_batch import QUERY as SELECT_LATEST_BATCH
 from .queries.select_completed_models_by_batch import QUERY as SELECT_MODELS_BY_BATCH
+from .queries.select_winner_model_by_batch import QUERY as SELECT_WINNER_BY_BATCH
 
 logger = logging.get_logger(__name__)
 
@@ -25,51 +26,71 @@ class ModelRegistry:
         self._models: Dict[str, Any] = {}
         self._metadata: Dict[str, LoadedModel] = {}
         self._batch_id: Optional[str] = None
+        self._multi_loaded: bool = False
 
-    def load(self, force: bool = False) -> None:
-        """Idemptotently resolve latest batch and pull each model's pkl into the cache"""
+    def load(self, multi_enabled: bool = False, force: bool = False) -> None:
+        """Idempotently resolve the latest batch and pull model(s) into the cache"""
         try:
             batch_id, rows = self._fetch_latest_batch()
-        except Exception as e:
-            logger.error("registry_lookup_failed", error=str(e))
-            raise RuntimeError(f"Model registry lookup failed: {str(e)}")
+        except Exception as err:
+            logger.error("registry_lookup_failed", error=str(err))
+            raise RuntimeError(f"Model registry lookup failed: {str(err)}")
 
         if batch_id is None:
             logger.info("registry_no_completed_batch")
             with self._lock:
                 self._models, self._metadata, self._batch_id = {}, {}, None
+                self._multi_loaded = False
             return
 
         with self._lock:
-            if not force and batch_id == self._batch_id:
+            already_current = batch_id == self._batch_id
+            already_sufficient = not multi_enabled or self._multi_loaded
+            if not force and already_current and already_sufficient:
                 logger.debug("registry_already_current", batch=batch_id)
                 return
 
-            estimators: Dict[str, Any] = {}
-            metadata: Dict[str, LoadedModel] = {}
-            for row in rows:
-                entry, estimator = self._load_model_entry(row, batch_id)
-                if entry is None or estimator is None:
-                    continue
-                estimators[entry.type] = estimator
-                metadata[entry.type] = entry
+            if not multi_enabled:
+                winner_row = self._fetch_winner_model(batch_id)
+                if winner_row is None:
+                    logger.warning("registry_no_winner", batch=batch_id)
+                    self._models, self._metadata, self._batch_id = {}, {}, None
+                    self._multi_loaded = False
+                    return
+                rows = [winner_row]
 
-            winner_type = self._resolve_winner(metadata)
-            if winner_type:
-                estimators[WINNER_KEY] = estimators[winner_type]
-                metadata[WINNER_KEY] = metadata[winner_type].model_copy(
-                    update={"winner_type": winner_type}
-                )
+            self._commit_loaded_rows(rows, batch_id, multi_enabled)
 
-            self._models = estimators
-            self._metadata = metadata
-            self._batch_id = batch_id
-            logger.info(
-                "registry_loaded",
-                batch=batch_id,
-                count=len(estimators),
-                winner=winner_type,
+    def _commit_loaded_rows(
+        self, rows: List[Dict[str, Any]], batch_id: str, multi_enabled: bool
+    ) -> None:
+        """Build estimator/metadata dicts from rows, wire winner alias, and commit to state"""
+        estimators: Dict[str, Any] = {}
+        metadata: Dict[str, LoadedModel] = {}
+        for row in rows:
+            entry, estimator = self._load_model_entry(row, batch_id)
+            if entry is None or estimator is None:
+                continue
+            estimators[entry.type] = estimator
+            metadata[entry.type] = entry
+
+        winner_type = self._resolve_winner(metadata)
+        if winner_type:
+            estimators[WINNER_KEY] = estimators[winner_type]
+            metadata[WINNER_KEY] = metadata[winner_type].model_copy(
+                update={"winner_type": winner_type}
             )
+
+        self._models = estimators
+        self._metadata = metadata
+        self._batch_id = batch_id
+        self._multi_loaded = multi_enabled
+        logger.info(
+            "registry_loaded",
+            batch=batch_id,
+            count=len(estimators),
+            winner=winner_type,
+        )
 
     def get(self, model_type: str = WINNER_KEY) -> Any:
         """Return cached sklearn estimator or raise if missing"""
@@ -102,12 +123,12 @@ class ModelRegistry:
         model_type = row["type"]
         try:
             payload = ModelStorageServices.load(row["storage_path"])
-        except Exception as e:
+        except Exception as err:
             logger.error(
                 "registry_load_failed",
                 type=model_type,
                 key=row["storage_path"],
-                error=str(e),
+                error=str(err),
             )
             return None, None
         msa_encoding = payload.get("msa_encoding")
@@ -152,7 +173,9 @@ class ModelRegistry:
     @staticmethod
     def _resolve_winner(metadata: Dict[str, LoadedModel]) -> Optional[str]:
         """Return the model_type marked as winner, or None"""
-        return next((t for t, m in metadata.items() if m.winner), None)
+        return next(
+            (model_type for model_type, model in metadata.items() if model.winner), None
+        )
 
     @staticmethod
     def _fetch_latest_batch() -> tuple[Optional[str], List[Dict[str, Any]]]:
@@ -176,6 +199,17 @@ class ModelRegistry:
             or []
         )
         return batch_row["id"], models
+
+    @staticmethod
+    def _fetch_winner_model(batch_id: str) -> Optional[Dict[str, Any]]:
+        """Return the single winner model row for a batch, or None"""
+        with db_pool.get_cursor() as cursor:
+            query = SELECT_WINNER_BY_BATCH.as_string(cursor)
+        return db_pool.execute_query(
+            query,
+            (batch_id, TrainingStatus.COMPLETED.value),
+            fetch_one=True,
+        )
 
 
 registry = ModelRegistry()

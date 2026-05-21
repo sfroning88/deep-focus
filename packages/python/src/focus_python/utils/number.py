@@ -17,3 +17,10 @@ class NumberUtils:
             return float(value)
         except (TypeError, ValueError):
             return float("nan")
+
+    @staticmethod
+    def clamp_decimal(value: float, precision: int, scale: int) -> float:
+        """Clamp a float to the valid range of a Decimal(precision, scale) column"""
+        integer_digits = precision - scale
+        limit = 10**integer_digits - 10**-scale
+        return max(-limit, min(limit, round(value, scale)))

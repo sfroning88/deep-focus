@@ -16,5 +16,5 @@ def clear_redis_queue() -> None:
         redis_connection.delete(f"rq:queue:{qname}")
         redis_connection.delete(f"rq:queue:{qname}:queued")
         print("Redis queue cleared")
-    except Exception as e:
-        print(f"Error clearing Redis queue: {str(e)}")
+    except Exception as err:
+        print(f"Error clearing Redis queue: {str(err)}")

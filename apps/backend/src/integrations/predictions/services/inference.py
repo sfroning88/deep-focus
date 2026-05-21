@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Created Date: 5.9.2026
+Modified Date: 5.21.2026
 Processing functions for model inference
 """
 
@@ -33,8 +33,7 @@ class InferenceServices:
         prediction_type: PredictionType = PredictionType.CONTROLLABLE_PRD,
     ) -> List[Prediction]:
         """Run the latest winning model (or every model in the latest batch) for a property"""
-        if not model_registry.is_ready():
-            model_registry.load()
+        model_registry.load(multi_enabled=multi_enabled)
         if not model_registry.is_ready():
             raise RuntimeError("No trained model available")
 
@@ -62,12 +61,12 @@ class InferenceServices:
                             prop, key, prediction_type, snapshot_reported_at
                         )
                     )
-                except Exception as e:
+                except Exception as err:
                     logger.warning(
                         "inference_model_failed",
                         property_id=property_id,
                         model_key=key,
-                        error=str(e),
+                        error=str(err),
                     )
             if not predictions:
                 raise RuntimeError("No trained model available")

@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from typing import List
 from psycopg2.extras import execute_values
 from focus_python import db_pool, logging, config
+from focus_python import NumberUtils
 from focus_python import (
     TRAINING_JOBS,
     TRAINING_ERROR_MSG_MAX_LENGTH,
@@ -175,10 +176,14 @@ class PersistServices:
             queryString,
             (
                 TrainingStatus.COMPLETED.value,
-                float(model.r2_score),
-                float(model.train_score) if model.train_score is not None else None,
+                NumberUtils.clamp_decimal(float(model.r2_score), 6, 4),
                 (
-                    float(model.validate_score)
+                    NumberUtils.clamp_decimal(float(model.train_score), 6, 4)
+                    if model.train_score is not None
+                    else None
+                ),
+                (
+                    NumberUtils.clamp_decimal(float(model.validate_score), 6, 4)
                     if model.validate_score is not None
                     else None
                 ),
@@ -228,12 +233,12 @@ class PersistServices:
     @staticmethod
     def _resolve_batch_outcome(models: List[TrainingModel]) -> TrainingStatus:
         """Return FAILED if any model failed, COMPLETED if all types completed, EXECUTING otherwise"""
-        statuses = {m.status for m in models}
+        statuses = {model.status for model in models}
         if TrainingStatus.FAILED in statuses:
             return TrainingStatus.FAILED
-        expected_types = {t for t in TrainingType}
+        expected_types = {training_type for training_type in TrainingType}
         completed_types = {
-            m.type for m in models if m.status == TrainingStatus.COMPLETED
+            model.type for model in models if model.status == TrainingStatus.COMPLETED
         }
         if expected_types.issubset(completed_types):
             return TrainingStatus.COMPLETED
@@ -243,14 +248,14 @@ class PersistServices:
     def _pick_winner(models: List[TrainingModel]) -> TrainingModel:
         """Return the completed model with the highest score"""
         return max(
-            (m for m in models if m.status == TrainingStatus.COMPLETED),
-            key=lambda m: float(m.r2_score or 0),
+            (model for model in models if model.status == TrainingStatus.COMPLETED),
+            key=lambda model: float(model.r2_score or 0),
         )
 
     @staticmethod
     def _fail_batch(batch_id: str, models: List[TrainingModel]) -> None:
         """Persist FAILED terminal state for a batch and log"""
-        statuses = [m.status.value for m in models if m.status]
+        statuses = [model.status.value for model in models if model.status]
         with db_pool.get_cursor() as cursor:
             fail_string = SET_BATCH_FAILED.as_string(cursor)
         db_pool.execute_query(
@@ -282,8 +287,10 @@ class PersistServices:
                     batch=batch_id,
                     status=response.status_code,
                 )
-        except Exception as e:
-            logger.warning("notify_backend_reload_failed", batch=batch_id, error=str(e))
+        except Exception as err:
+            logger.warning(
+                "notify_backend_reload_failed", batch=batch_id, error=str(err)
+            )
 
     @staticmethod
     def _complete_batch(batch_id: str, winner: TrainingModel) -> None:

@@ -21,7 +21,7 @@ Setup Steps:
 If Creating or Activating venv:
 1) python3 -m venv .venv
 2) source .venv/bin/activate
-3) pip install -e .
+3) pip install -err .
 
 Teardown: pnpm redis:down
 """
@@ -39,12 +39,12 @@ from dotenv import load_dotenv
 
 def _find_root_env() -> str:
     """Walk up from this file to find monorepo root .env"""
-    d = Path(__file__).resolve().parent
+    directory = Path(__file__).resolve().parent
     for _ in range(10):
-        env_path = d / ".env"
+        env_path = directory / ".env"
         if env_path.is_file():
             return str(env_path)
-        d = d.parent
+        directory = directory.parent
     return ""
 
 
@@ -85,11 +85,11 @@ WORKFLOW_WORKERS: Dict[str, Tuple[WorkerSpec, ...]] = {
 
 def _find_monorepo_root() -> str:
     """Walk up from tests dir to find monorepo root"""
-    d = TESTS_DIR
+    directory = TESTS_DIR
     for _ in range(10):
-        if os.path.isfile(os.path.join(d, MONOREPO_MARKER)):
-            return d
-        d = os.path.dirname(d)
+        if os.path.isfile(os.path.join(directory, MONOREPO_MARKER)):
+            return directory
+        directory = os.path.dirname(directory)
     raise RuntimeError("Could not find monorepo root")
 
 
@@ -133,13 +133,13 @@ def _spawn_workers(root: str, specs: Tuple[WorkerSpec, ...]) -> List[subprocess.
 
 def _kill_workers(procs: List[subprocess.Popen]) -> None:
     """Terminate all spawned worker processes"""
-    for p in procs:
+    for proc in procs:
         try:
-            p.terminate()
-            p.wait(timeout=5)
+            proc.terminate()
+            proc.wait(timeout=5)
         except Exception:
             try:
-                p.kill()
+                proc.kill()
             except Exception:
                 pass
 
@@ -170,9 +170,14 @@ def _run_workflow(workflow: str) -> None:
 
         run_training_tests()
     elif workflow == "predict":
-        from .scripts.predict import run_prediction_tests, run_reload_test
+        from .scripts.predict import (
+            _load_predict_preset,
+            run_prediction_tests,
+            run_reload_test,
+        )
 
-        model_ids = run_reload_test()
+        _property_id, multi_enabled = _load_predict_preset()
+        model_ids = run_reload_test(multi_enabled=multi_enabled)
         run_prediction_tests(model_ids)
     else:
         raise ValueError(f"Unknown workflow: {workflow}")
@@ -193,7 +198,7 @@ def main() -> None:
     specs = WORKFLOW_WORKERS[workflow]
 
     procs = _spawn_workers(root, specs)
-    print(f"Spawned {len(procs)} processes for {[s.domain for s in specs]}")
+    print(f"Spawned {len(procs)} processes for {[spec.domain for spec in specs]}")
 
     try:
         _await_workers_ready(specs)
@@ -209,9 +214,9 @@ def main() -> None:
         print(f"{workflow.upper()} WORKFLOW PASSED")
         print(f"{'=' * 60}")
 
-    except Exception as e:
+    except Exception as err:
         print(f"\n{'=' * 60}")
-        print(f"{workflow.upper()} WORKFLOW FAILED: {e}")
+        print(f"{workflow.upper()} WORKFLOW FAILED: {err}")
         print(f"{'=' * 60}")
         raise
 

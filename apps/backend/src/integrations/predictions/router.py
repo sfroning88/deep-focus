@@ -29,12 +29,12 @@ try:
     from .services import InferenceServices
 
     predictions_available = True
-except ImportError as e:
+except ImportError as err:
     predictions_available = False
-    logger.error("Failed to import Inference", error=str(e))
-except Exception as e:
+    logger.error("Failed to import Inference", error=str(err))
+except Exception as err:
     predictions_available = False
-    logger.error(f"Failed to boot up Predictions: {str(e)}")
+    logger.error(f"Failed to boot up Predictions: {str(err)}")
 
 
 @router.post(
@@ -53,16 +53,18 @@ async def model_predict(request: PredictionRequest) -> PredictionResponse:
             prediction_type=PredictionType.CONTROLLABLE_PRD,
         )
         return PredictionResponse(
-            predictions=[PrismaPrediction.from_prediction(p) for p in predictions],
+            predictions=[
+                PrismaPrediction.from_prediction(pred) for pred in predictions
+            ],
         )
-    except ValueError as e:
-        logger.warning("model_prediction_rejected", error=str(e))
-        raise error(str(e), status_code=404)
-    except RuntimeError as e:
-        logger.error("model_prediction_unavailable", error=str(e))
-        raise error(str(e), status_code=503)
-    except Exception as e:
-        logger.error("model_prediction_failed", error=str(e))
+    except ValueError as err:
+        logger.warning("model_prediction_rejected", error=str(err))
+        raise error(str(err), status_code=404)
+    except RuntimeError as err:
+        logger.error("model_prediction_unavailable", error=str(err))
+        raise error(str(err), status_code=503)
+    except Exception as err:
+        logger.error("model_prediction_failed", error=str(err))
         raise error("Model prediction failed", status_code=500)
     finally:
         logging.unbind_job_context()

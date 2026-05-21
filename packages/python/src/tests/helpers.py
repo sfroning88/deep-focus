@@ -42,22 +42,22 @@ def wait_for_job_completion(job_id: str, timeout: int = 60) -> bool:
             return False
         print(f"Job {job_id} ended with status: {final_status}")
         return False
-    except Exception as e:
-        print(f"Error waiting for job {job_id}: {str(e)}")
+    except Exception as err:
+        print(f"Error waiting for job {job_id}: {str(err)}")
         return False
 
 
 def load_preset_lines(preset_path: str) -> List[str]:
     """Load non-comment non-empty lines from a preset file"""
     try:
-        with open(preset_path, encoding="utf-8") as f:
+        with open(preset_path, encoding="utf-8") as file:
             return [
-                ln.strip()
-                for ln in f.readlines()
-                if ln.strip() and not ln.startswith("#")
+                line.strip()
+                for line in file.readlines()
+                if line.strip() and not line.startswith("#")
             ]
-    except OSError as e:
-        raise RuntimeError(f"Could not read {preset_path}: {e}") from e
+    except OSError as err:
+        raise RuntimeError(f"Could not read {preset_path}: {err}") from err
 
 
 def load_preset_sections(preset_path: str) -> Tuple[List[str], List[str]]:
@@ -71,10 +71,10 @@ def load_preset_sections(preset_path: str) -> Tuple[List[str], List[str]]:
 
 def resolve_local_preset_path(raw: str) -> str:
     """Expand and normalize a preset file path relative to tests dir"""
-    p = os.path.expanduser(os.path.expandvars(raw.strip()))
-    if os.path.isabs(p):
-        return os.path.normpath(p)
-    return os.path.normpath(os.path.join(TESTS_DIR, p))
+    path = os.path.expanduser(os.path.expandvars(raw.strip()))
+    if os.path.isabs(path):
+        return os.path.normpath(path)
+    return os.path.normpath(os.path.join(TESTS_DIR, path))
 
 
 def wait_for_health(base_url: str, timeout: int = 30, interval: float = 0.5) -> bool:
@@ -87,8 +87,8 @@ def wait_for_health(base_url: str, timeout: int = 30, interval: float = 0.5) -> 
             if response.status_code == 200:
                 return True
             last_err = f"status={response.status_code}"
-        except requests.RequestException as e:
-            last_err = str(e)
+        except requests.RequestException as err:
+            last_err = str(err)
         Time.sleep(interval)
     print(f"Health check timed out for {base_url} ({last_err})")
     return False

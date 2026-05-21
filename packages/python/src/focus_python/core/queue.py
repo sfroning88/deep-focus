@@ -73,7 +73,9 @@ class _Queue:
                     "job_id": job_id,
                     "meta": metadata or {},
                 }
-                job_kwargs_clean = {k: v for k, v in job_kwargs.items() if k != "tags"}
+                job_kwargs_clean = {
+                    key: val for key, val in job_kwargs.items() if key != "tags"
+                }
                 if tags:
                     job = rq.enqueue(func, *args, tags=tags, **job_kwargs_clean)
                 else:
@@ -85,10 +87,10 @@ class _Queue:
                 )
                 logger.info(f"Job enqueued: {job.id} | {QUEUE_NAME} | {func_name}")
                 enqueued.append(job)
-            except Exception as e:
-                failures.append({"job_id": job_data.get("job_id"), "error": str(e)})
+            except Exception as err:
+                failures.append({"job_id": job_data.get("job_id"), "error": str(err)})
                 logger.error(
-                    "job_enqueue_failed", job_id=job_data.get("job_id"), error=str(e)
+                    "job_enqueue_failed", job_id=job_data.get("job_id"), error=str(err)
                 )
         if failures:
             raise RuntimeError(f"{len(failures)} jobs failed to enqueue")
@@ -150,9 +152,9 @@ class _Queue:
                 "queued": queued,
                 "failed": failed,
             }
-        except Exception as e:
-            logger.error(f"Health check failed: {e}")
-            return {"status": "unhealthy", "error": str(e)}
+        except Exception as err:
+            logger.error(f"Health check failed: {err}")
+            return {"status": "unhealthy", "error": str(err)}
 
 
 queue = _Queue()
