@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Created Date: 5.3.2026
+Modified Date: 5.21.2026
 Lifespan events for FastAPI app
 """
 
@@ -23,8 +23,8 @@ async def lifespan(app: FastAPI):
     queue.get_connection()
     try:
         model_registry.load()
-    except Exception as e:
-        logger.warning("registry_warm_failed", error=str(e))
+    except Exception as err:
+        logger.warning("registry_warm_failed", error=str(err))
     app.state.db_pool = db_pool
     app.state.queue = queue
     app.state.model_registry = model_registry

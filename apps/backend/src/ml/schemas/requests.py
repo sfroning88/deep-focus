@@ -1,13 +1,13 @@
 """
 Author: Sean Froning
-Created Date: 5.16.2026
+Modified Date: 5.21.2026
 Request models for Models
 """
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
 
 class ModelRequest(BaseModel):
-    """Request model for reloading model registry (empty body)"""
+    """Request model for reloading model registry"""
 
-    model_config = ConfigDict(extra="forbid")
+    multi_enabled: bool = False

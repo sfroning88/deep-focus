@@ -28,10 +28,10 @@ class TrainingBackgroundJobs:
                 version=result["version"],
                 counts=result["counts"],
             )
-        except Exception as e:
+        except Exception as err:
             logger.error(
                 "model_shuffle_groups_failed",
-                error=str(e),
+                error=str(err),
             )
             raise
 
@@ -53,13 +53,13 @@ class TrainingBackgroundJobs:
                 prediction_type=prediction_enum.value,
                 batch=batch_id,
             )
-        except Exception as e:
+        except Exception as err:
             logger.error(
                 "model_train_job_failed",
                 type=type_enum.value,
                 prediction_type=prediction_enum.value,
                 batch=batch_id,
-                error=str(e),
+                error=str(err),
             )
             raise
         finally:

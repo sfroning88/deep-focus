@@ -16,8 +16,8 @@ class NICUtils:
         total = prop.total_units or 0
         if total <= 0:
             total_calc = sum(
-                int(getattr(prop, k, 0) or 0)
-                for k in (
+                int(getattr(prop, acuity, 0) or 0)
+                for acuity in (
                     "cottage_units",
                     "independent_units",
                     "assisted_units",

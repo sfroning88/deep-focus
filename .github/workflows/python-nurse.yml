@@ -17,7 +17,7 @@ jobs:
     outputs:
       workers: ${{ steps.filter.outputs.changes }}
     steps:
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590
         id: filter
         with:
           filters: |
@@ -41,7 +41,7 @@ jobs:
       matrix:
         worker: ${{ fromJSON(needs.changes.outputs.workers) }}
     steps:
-      - uses: sfroning88/python-nurse@v1.0.3
+      - uses: sfroning88/python-nurse@a17d95bdb9b38eb82657e6b59d8f0a1476396a31
         with:
           app-path: ${{ matrix.worker == 'python' && 'packages/python' || format('apps/{0}', matrix.worker) }}
           github-token: ${{ secrets.GITHUB_TOKEN }}

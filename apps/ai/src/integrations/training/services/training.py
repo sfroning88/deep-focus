@@ -187,14 +187,14 @@ class TrainingServices:
                     trained_at=datetime.now(tz=timezone.utc),
                 )
             )
-        except Exception as e:
-            TrainingServices._handle_job_failure(training_type, batch_id, e)
+        except Exception as err:
+            TrainingServices._handle_job_failure(training_type, batch_id, err)
             raise
 
         try:
             PersistServices.finalize_batch(batch_id)
-        except Exception as e:
-            logger.error("training_finalize_failed", batch=batch_id, error=str(e))
+        except Exception as err:
+            logger.error("training_finalize_failed", batch=batch_id, error=str(err))
 
         logger.info(
             "training_completed",
@@ -466,10 +466,10 @@ class TrainingServices:
                 state_encoding,
             )
             return float(r2_score(frame.y, model.predict(frame.X)))
-        except Exception as e:
+        except Exception as err:
             logger.warning(
                 "training_validation_scoring_failed",
                 function=function.value,
-                error=str(e),
+                error=str(err),
             )
             return None

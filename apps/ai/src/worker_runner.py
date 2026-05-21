@@ -56,6 +56,6 @@ if __name__ == "__main__":
             worker.work(with_scheduler=False)
         except KeyboardInterrupt:
             logger.info("Worker received shutdown signal")
-    except Exception as e:
-        logger.exception(f"Error in worker process: {str(e)}")
+    except Exception as err:
+        logger.exception(f"Error in worker process: {str(err)}")
         sys.exit(1)

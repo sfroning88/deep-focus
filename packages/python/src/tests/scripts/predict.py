@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Modified Date: 5.16.2026
+Modified Date: 5.21.2026
 Predict from models testing script
 """
 
@@ -21,13 +21,14 @@ def _parse_preset(lines: List[str]) -> Dict[str, str]:
     return out
 
 
-def run_reload_test() -> List[str]:
+def run_reload_test(multi_enabled: bool = False) -> List[str]:
     """Simulate CRON: POST /api/ml/reload and assert model_ids are returned"""
     print("Model registry reload (CRON simulation) start")
 
     response: Dict[str, Any] = endpoint_test(
         ML_RELOAD_URL,
         name="ml_reload",
+        payload={"multi_enabled": multi_enabled},
     )
 
     model_ids: List[str] = list(response.get("model_ids") or [])
@@ -39,16 +40,21 @@ def run_reload_test() -> List[str]:
     return model_ids
 
 
-def run_prediction_tests(model_ids: Optional[List[str]] = None) -> None:
-    """Hit backend/predict/controllable_prd against a preset property_id and assert the response shape"""
-    print("Prediction integration endpoint test start")
-
+def _load_predict_preset() -> tuple[str, bool]:
+    """Parse preset and return (property_id, multi_enabled)"""
     preset = _parse_preset(load_preset_lines(PREDICT_PRESET_PATH))
     property_id = preset.get("property_id")
     if not property_id:
         raise RuntimeError(f"property_id missing from {PREDICT_PRESET_PATH}")
-
     multi_enabled = preset.get("multi_enabled", "false").lower() == "true"
+    return property_id, multi_enabled
+
+
+def run_prediction_tests(model_ids: Optional[List[str]] = None) -> None:
+    """Hit backend/predict/controllable_prd against a preset property_id and assert the response shape"""
+    print("Prediction integration endpoint test start")
+
+    property_id, multi_enabled = _load_predict_preset()
 
     payload: Dict[str, Any] = {
         "property_id": property_id,
@@ -66,7 +72,7 @@ def run_prediction_tests(model_ids: Optional[List[str]] = None) -> None:
         raise RuntimeError("Prediction endpoint returned no predictions")
 
     if multi_enabled and model_ids:
-        returned_types = {p.get("modelType") for p in predictions}
+        returned_types = {pred.get("modelType") for pred in predictions}
         expected_types = set(model_ids)
         missing = sorted(expected_types - returned_types)
         if missing:

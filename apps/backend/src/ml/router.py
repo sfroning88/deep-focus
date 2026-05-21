@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Created Date: 5.16.2026
+Modified Date: 5.21.2026
 Core backend API orchestration
 """
 
@@ -26,27 +26,27 @@ try:
     from .registry import registry as model_registry
 
     models_available = True
-except ImportError as e:
+except ImportError as err:
     models_available = False
-    logger.error(f"Failed to import Models: {str(e)}")
-except Exception as e:
+    logger.error(f"Failed to import Models: {str(err)}")
+except Exception as err:
     models_available = False
-    logger.error(f"Failed to boot up Models: {str(e)}")
+    logger.error(f"Failed to boot up Models: {str(err)}")
 
 
 @router.post("/ml/reload", dependencies=[Depends(dependency.get_token_header)])
-async def reload_registry(_request: ModelRequest) -> ModelResponse:
+async def reload_registry(request: ModelRequest) -> ModelResponse:
     """Reload model registry with latest batch winner"""
     if not models_available:
         raise error("Model registry unavailable", status_code=503)
 
     try:
-        await run_in_threadpool(model_registry.load)
+        await run_in_threadpool(model_registry.load, request.multi_enabled)
 
         return ModelResponse(model_ids=model_registry.loaded_model_types())
-    except RuntimeError as e:
-        logger.error("model_registry_unavailable", error=str(e))
-        raise error(str(e), status_code=503)
-    except Exception as e:
-        logger.error("model_registry_failed", error=str(e))
+    except RuntimeError as err:
+        logger.error("model_registry_unavailable", error=str(err))
+        raise error(str(err), status_code=503)
+    except Exception as err:
+        logger.error("model_registry_failed", error=str(err))
         raise error("Model registry failed", status_code=500)
