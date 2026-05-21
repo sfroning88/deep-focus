@@ -16,7 +16,7 @@ jobs:
     outputs:
       dashboard: ${{ steps.filter.outputs.dashboard }}
     steps:
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590
         id: filter
         with:
           filters: |
@@ -34,15 +34,15 @@ jobs:
       issues: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: "22"
           cache: pnpm
@@ -61,16 +61,13 @@ jobs:
           [ "${{ needs.changes.outputs.dashboard }}" == "true" ] && list="${list}@focus/dashboard,"
           echo "projects=${list%,}" >> "$GITHUB_OUTPUT"
 
-      # react-doctor embeds jsx-a11y/no-noninteractive-element-interactions; oxlint does not
-      # implement that rule yet. oxlint 1.58+ rejects unknown plugin rules when parsing config
-      # (oxc-project/oxc#20464), so ^1.47.0 resolves to a broken combo. Pin oxlint to 1.57.0.
       - name: Install React Doctor with pinned oxlint
         run: |
           mkdir -p /tmp/react-doctor-runner
           cd /tmp/react-doctor-runner
           npm init -y
           npm pkg set overrides.oxlint=1.57.0
-          npm install react-doctor@0.0.29
+          npm install react-doctor@0.0.29 oxlint@1.57.0
 
       - name: Run React Doctor
         id: doctor
@@ -84,7 +81,7 @@ jobs:
           echo "score=${SCORE:-0}" >> "$GITHUB_OUTPUT"
 
       - name: Post filtered comment
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
         if: always() && github.event_name == 'pull_request'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

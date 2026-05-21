@@ -12,18 +12,19 @@ jobs:
         timeout-minutes: 30
         permissions:
             contents: read
+            deployments: read
             pull-requests: write
             issues: write
         steps:
         -   name: Check out code
-            uses: actions/checkout@v4
+            uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
             with:
                 fetch-depth: 0
         
         -   name: Setup PNPM
-            uses: pnpm/action-setup@v4
+            uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
         
-        -   uses: actions/setup-node@v4
+        -   uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
             with:
                 node-version: "20"
                 cache: "pnpm"
@@ -33,6 +34,14 @@ jobs:
 
         -   name: Generate Prisma Client
             run: pnpm --filter @focus/db run db:generate
+
+        -   name: Wait for Vercel preview deployment
+            id: vercel
+            uses: patrickedqvist/wait-for-vercel-preview@06c79330064b0e6ef7a2574603b62d3c98789125
+            with:
+                token: ${{ secrets.GITHUB_TOKEN }}
+                max_timeout: 600
+                check_interval: 10
 
         -   name: Build portal
             run: pnpm --filter @focus/dashboard build
@@ -69,7 +78,7 @@ jobs:
                 AI_API_URL: ${{ secrets.AI_API_URL }}
                 AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
                 VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
-                PLAYWRIGHT_BASE_URL: ${{ secrets.PLAYWRIGHT_BASE_URL }}
+                PLAYWRIGHT_BASE_URL: ${{ steps.vercel.outputs.url }}
                 PLAYWRIGHT_EMAIL: ${{ secrets.PLAYWRIGHT_EMAIL }}
                 PLAYWRIGHT_PASSWORD: ${{ secrets.PLAYWRIGHT_PASSWORD }}
 
@@ -79,7 +88,7 @@ jobs:
 
         -   name: Post PR comment
             if: always() && github.event_name == 'pull_request'
-            uses: actions/github-script@v7
+            uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
             with:
                 github-token: ${{ secrets.GITHUB_TOKEN }}
                 script: |
@@ -91,7 +100,7 @@ jobs:
 
         -   name: Upload report artifact
             if: always()
-            uses: actions/upload-artifact@v4
+            uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
             with:
                 name: playwright-report
                 path: apps/dashboard/playwright-report/
