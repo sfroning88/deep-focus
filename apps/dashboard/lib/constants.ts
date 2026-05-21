@@ -2,7 +2,7 @@ export const PROVIDER_STALE_TIME = 60 * 1000;
 
 export const COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
 
-export const USER_ID_COOKIE_NAME = "deep-focus-id";
+export const USER_ID_COOKIE_NAME = "deep-focus-user-id";
 
 export const COOKIE_BANNER_DISMISSED_KEY = "deep-focus-cookie-banner-dismissed";
 

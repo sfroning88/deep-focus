@@ -21,7 +21,7 @@ Setup Steps:
 If Creating or Activating venv:
 1) python3 -m venv .venv
 2) source .venv/bin/activate
-3) pip install -err .
+3) pip install -e .
 
 Teardown: pnpm redis:down
 """
