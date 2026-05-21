@@ -21,10 +21,10 @@ jobs:
             with:
                 fetch-depth: 0
                 persist-credentials: false
-        
+
         -   name: Setup PNPM
             uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
-        
+
         -   uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
             with:
                 node-version: "20"
@@ -44,21 +44,6 @@ jobs:
                 max_timeout: 600
                 check_interval: 10
 
-        -   name: Build portal
-            run: pnpm --filter @focus/dashboard build
-            env:
-                CI: true
-                NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-                NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-                SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-                NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
-                NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
-                DATABASE_URL: ${{ secrets.DATABASE_URL }}
-                DIRECT_URL: ${{ secrets.DIRECT_URL }}
-                BACKEND_API_URL: ${{ secrets.BACKEND_API_URL }}
-                AI_API_URL: ${{ secrets.AI_API_URL }}
-                AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
-
         -   name: Install Chromium
             run: pnpm --filter @focus/dashboard exec playwright install chromium --with-deps
 
@@ -68,16 +53,6 @@ jobs:
             continue-on-error: true
             env:
                 CI: true
-                NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-                NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-                SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-                NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
-                NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
-                DATABASE_URL: ${{ secrets.DATABASE_URL }}
-                DIRECT_URL: ${{ secrets.DIRECT_URL }}
-                BACKEND_API_URL: ${{ secrets.BACKEND_API_URL }}
-                AI_API_URL: ${{ secrets.AI_API_URL }}
-                AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
                 VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
                 PLAYWRIGHT_BASE_URL: ${{ steps.vercel.outputs.url }}
                 PLAYWRIGHT_EMAIL: ${{ secrets.PLAYWRIGHT_EMAIL }}
@@ -93,7 +68,7 @@ jobs:
             with:
                 github-token: ${{ secrets.GITHUB_TOKEN }}
                 script: |
-                    await require('./scripts/post-playwright-comment.js')({ github, context });
+                    await require('./scripts/post-playwright-comment.js')({ github, context, core });
 
         -   name: Fail if smoke tests failed
             if: steps.smoke.outcome == 'failure'
