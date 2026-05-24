@@ -1,9 +1,11 @@
 import { env } from "@focus/config";
+import { PredictionType } from "@focus/db";
 import {
   WORKER_API_ROUTES,
-  type ModelPredictControllablePrdRequest,
-  type ModelPredictControllablePrdResponse,
+  type ModelPredictRequest,
+  type ModelPredictResponse,
 } from "@focus/types";
+import { predictionTypeToApiPath } from "@focus/utils";
 import { WorkerService } from "../worker-service";
 
 export class BackendWorkerService extends WorkerService {
@@ -18,11 +20,14 @@ export class BackendWorkerService extends WorkerService {
     return new BackendWorkerService({ baseUrl, authToken, timeout: 300000 });
   }
 
-  async modelPredictControllablePrd(
-    request: ModelPredictControllablePrdRequest,
-  ): Promise<ModelPredictControllablePrdResponse> {
-    const endpoint = `${this.config.baseUrl}${WORKER_API_ROUTES.modelPredictControllablePrd()}`;
-    return this.makeRequest<ModelPredictControllablePrdResponse>(endpoint, {
+  async modelPredict(
+    predictionType: PredictionType,
+    request: ModelPredictRequest,
+  ): Promise<ModelPredictResponse> {
+    const endpoint = `${this.config.baseUrl}${WORKER_API_ROUTES.modelPredict({
+      predictionType: predictionTypeToApiPath(predictionType),
+    })}`;
+    return this.makeRequest<ModelPredictResponse>(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

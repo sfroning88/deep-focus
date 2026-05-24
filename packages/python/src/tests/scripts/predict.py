@@ -51,7 +51,7 @@ def _load_predict_preset() -> tuple[str, bool]:
 
 
 def run_prediction_tests(model_ids: Optional[List[str]] = None) -> None:
-    """Hit backend/predict/controllable_prd against a preset property_id and assert the response shape"""
+    """Hit backend/predict against a preset property_id and assert the response shape"""
     print("Prediction integration endpoint test start")
 
     property_id, multi_enabled = _load_predict_preset()

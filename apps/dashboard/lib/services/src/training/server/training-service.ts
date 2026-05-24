@@ -1,9 +1,9 @@
 import "server-only";
 
-import { db, TrainingFunction } from "@focus/db";
+import { db, PredictionType, TrainingFunction } from "@focus/db";
 import type {
-  ModelShuffleTrainingGroupsResponse,
-  ModelTrainControllablePrdResponse,
+  ModelShuffleResponse,
+  ModelTrainingResponse,
   TrainingBatchListEntry,
   TrainingFunctionCounts,
 } from "@focus/types";
@@ -15,12 +15,12 @@ export class TrainingService {
     this.workerService = AIWorkerService.fromEnvironment();
   }
 
-  async shuffleTrainingGroups(): Promise<ModelShuffleTrainingGroupsResponse> {
-    return this.workerService.modelShuffleTrainingGroups();
+  async shuffleGroups(): Promise<ModelShuffleResponse> {
+    return this.workerService.modelShuffle();
   }
 
-  async trainControllablePrd(): Promise<ModelTrainControllablePrdResponse> {
-    return this.workerService.modelTrainControllablePrd();
+  async train(predictionType: PredictionType): Promise<ModelTrainingResponse> {
+    return this.workerService.modelTrain(predictionType);
   }
 
   async fetchFunctionCounts(): Promise<TrainingFunctionCounts> {

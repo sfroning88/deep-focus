@@ -2,7 +2,7 @@
 
 import { SectionLabel, ValueBox, DeltaBox } from "@focus/ui";
 import { toNum } from "@focus/utils";
-import { usePredictControllablePrd } from "@/app/(hooks)/use-predict-controllable-prd";
+import { usePredictModels } from "@/app/(hooks)/use-predict-models";
 import { PredictFeedback } from "./PredictFeedback";
 
 type PredictPrdCardProps = {
@@ -17,7 +17,7 @@ export function PredictPrdCard({
   currentPrd,
 }: PredictPrdCardProps) {
   const { mutate, data, isPending, isError, error, isSuccess, reset } =
-    usePredictControllablePrd(userId);
+    usePredictModels(userId);
 
   const predicted =
     isSuccess && data.predictions.length > 0

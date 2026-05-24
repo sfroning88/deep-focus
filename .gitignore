@@ -5,7 +5,10 @@
 .cursor/**
 
 # macOS
-**/* 2*
+**/* [0-9].*
+**/* [0-9]
+**/* [0-9][0-9].*
+**/* [0-9][0-9]
 
 # dependencies
 /node_modules
@@ -64,7 +67,7 @@ __pycache__/
 **/.turbo
 
 # Prisma generated client
-packages/db/prisma/src
+packages/db/prisma/src/generated/
 
 # macOs folder icons
 Icon?

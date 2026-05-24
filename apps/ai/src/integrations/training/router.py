@@ -66,14 +66,14 @@ async def group_shuffle(_request: ShuffleRequest) -> ShuffleResponse:
 
 
 @router.post(
-    "/train/controllable_prd", dependencies=[Depends(dependency.get_token_header)]
+    "/train/{prediction_type}", dependencies=[Depends(dependency.get_token_header)]
 )
-async def model_train(_request: TrainingRequest) -> TrainingResponse:
-    """Train batch of sklearn models for controllable prd"""
+async def model_train(
+    prediction_type: PredictionType, _request: TrainingRequest
+) -> TrainingResponse:
+    """Train batch of sklearn models by PredictionType"""
     if not training_available:
         raise error("Training service unavailable", status_code=503)
-
-    prediction_type = PredictionType.CONTROLLABLE_PRD
 
     try:
         batch_id = TrainingServices.create_batch(prediction_type)

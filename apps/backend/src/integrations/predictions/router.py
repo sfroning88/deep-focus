@@ -38,9 +38,11 @@ except Exception as err:
 
 
 @router.post(
-    "/predict/controllable_prd", dependencies=[Depends(dependency.get_token_header)]
+    "/predict/{prediction_type}", dependencies=[Depends(dependency.get_token_header)]
 )
-async def model_predict(request: PredictionRequest) -> PredictionResponse:
+async def model_predict(
+    prediction_type: PredictionType, request: PredictionRequest
+) -> PredictionResponse:
     """Retrieve controllable PRD prediction(s) from the latest training batch"""
     if not predictions_available:
         raise error("Predictions service unavailable", status_code=503)
@@ -50,7 +52,7 @@ async def model_predict(request: PredictionRequest) -> PredictionResponse:
         predictions = InferenceServices.predict(
             property_id=request.property_id,
             multi_enabled=request.multi_enabled,
-            prediction_type=PredictionType.CONTROLLABLE_PRD,
+            prediction_type=prediction_type,
         )
         return PredictionResponse(
             predictions=[

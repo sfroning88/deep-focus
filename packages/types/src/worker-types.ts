@@ -7,20 +7,20 @@ export type WorkerServiceConfig = {
   timeout?: number;
 };
 
-export type ModelShuffleTrainingGroupsResponse = {
+export type ModelShuffleResponse = {
   jobId: string;
 };
 
-export type ModelTrainControllablePrdResponse = {
+export type ModelTrainingResponse = {
   jobIds: string[];
 };
 
-export type ModelPredictControllablePrdRequest = {
+export type ModelPredictRequest = {
   propertyId: string;
   multiEnabled: boolean;
 };
 
-export type ModelPredictControllablePrdResponse = {
+export type ModelPredictResponse = {
   predictions: Prediction[];
 };
 
@@ -28,9 +28,9 @@ export const WORKER_API_ROUTES = {
   // apps/ai: shuffle train/validate/test groups
   modelShuffleGroups: createRoute("/api/shuffle"),
 
-  // apps/ai: train models on controllable prd
-  modelTrainControllablePrd: createRoute("/api/train/controllable_prd"),
+  // apps/ai: train models for a prediction type
+  modelTrain: createRoute("/api/train/:predictionType"),
 
   // apps/backend: predict controllable prd for property
-  modelPredictControllablePrd: createRoute("/api/predict/controllable_prd"),
+  modelPredict: createRoute("/api/predict/:predictionType"),
 };
