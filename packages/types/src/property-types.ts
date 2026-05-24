@@ -1,7 +1,7 @@
-import {
+import type {
   Prisma,
-  type Property as PrismaProperty,
-  type PropertySnapshot as PrismaPropertySnapshot,
+  Property as PrismaProperty,
+  PropertySnapshot as PrismaPropertySnapshot,
 } from "@focus/db";
 
 export type Property = PrismaProperty;

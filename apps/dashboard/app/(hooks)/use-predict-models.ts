@@ -2,8 +2,9 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import posthog from "posthog-js";
+import { PredictionType } from "@focus/db/enums";
 import { POSTHOG_EVENTS } from "@focus/types";
-import { predictControllablePrdAction } from "../(actions)/prediction-action";
+import { predictModelsAction } from "../(actions)/prediction-action";
 import { QUERY_KEYS } from "@/lib/constants";
 
 type PredictArgs = {
@@ -11,11 +12,12 @@ type PredictArgs = {
   multiEnabled?: boolean;
 };
 
-export function usePredictControllablePrd(userId: string) {
+export function usePredictModels(userId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (args: PredictArgs) =>
-      predictControllablePrdAction({
+      predictModelsAction({
+        predictionType: PredictionType.controllablePrd,
         propertyId: args.propertyId,
         multiEnabled: args.multiEnabled ?? false,
       }),

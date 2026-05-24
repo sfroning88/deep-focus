@@ -2,31 +2,34 @@
 
 import { z } from "zod";
 import { platformAdminAction } from "@focus/auth/server";
+import { PredictionType } from "@focus/db";
 import { TrainingService } from "@lib/services";
 import {
   type TrainingBatchListEntry,
   type TrainingFunctionCounts,
-  type ModelTrainControllablePrdResponse,
-  ModelShuffleTrainingGroupsResponse,
+  type ModelTrainingResponse,
+  ModelShuffleResponse,
 } from "@focus/types";
 
 const trainingService = new TrainingService();
 
-const shuffleTrainingGroupsSchema = z.object({});
+const shuffleGroupsSchema = z.object({});
 
-export const shuffleTrainingGroupsAction = platformAdminAction(
-  shuffleTrainingGroupsSchema,
-  async (): Promise<ModelShuffleTrainingGroupsResponse> => {
-    return await trainingService.shuffleTrainingGroups();
+export const shuffleGroupsAction = platformAdminAction(
+  shuffleGroupsSchema,
+  async (): Promise<ModelShuffleResponse> => {
+    return await trainingService.shuffleGroups();
   },
 );
 
-const trainControllablePrdSchema = z.object({});
+const trainModelsSchema = z.object({
+  predictionType: z.nativeEnum(PredictionType),
+});
 
-export const trainControllablePrdAction = platformAdminAction(
-  trainControllablePrdSchema,
-  async (): Promise<ModelTrainControllablePrdResponse> => {
-    return await trainingService.trainControllablePrd();
+export const trainModels = platformAdminAction(
+  trainModelsSchema,
+  async (ctx): Promise<ModelTrainingResponse> => {
+    return await trainingService.train(ctx.predictionType);
   },
 );
 

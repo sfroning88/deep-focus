@@ -3,8 +3,8 @@
 import { useMediaQuery } from "@/app/(hooks)/use-media-query";
 import { useFetchBatches } from "@/app/(hooks)/use-fetch-batches";
 import { useFetchFunctionCounts } from "@/app/(hooks)/use-fetch-function-counts";
-import { useShuffleTrainingGroups } from "@/app/(hooks)/use-shuffle-training-groups";
-import { useTrainControllablePrd } from "@/app/(hooks)/use-train-controllable-prd";
+import { useShuffleGroups } from "@/app/(hooks)/use-shuffle-groups";
+import { useTrainModels } from "@/app/(hooks)/use-train-models";
 import { useUserId } from "@/app/(hooks)/use-user-id";
 import { BatchListItem } from "./BatchListItem";
 import { MOBILE_BREAKPOINT } from "@/lib/constants";
@@ -26,8 +26,8 @@ export function BatchList({ initialData }: BatchListProps) {
   } = useFetchBatches(userId, initialData);
 
   const { data: functionCounts } = useFetchFunctionCounts(userId);
-  const shuffleMutation = useShuffleTrainingGroups(userId);
-  const trainMutation = useTrainControllablePrd(userId);
+  const shuffleMutation = useShuffleGroups(userId);
+  const trainMutation = useTrainModels(userId);
 
   return (
     <div className="space-y-4 font-data">

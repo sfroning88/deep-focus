@@ -4,19 +4,20 @@ import { z } from "zod";
 import { selfUserAction } from "@focus/auth/server";
 import { PredictionType, TrainingType } from "@focus/db";
 import { PredictionService } from "@lib/services";
-import type { ModelPredictControllablePrdResponse } from "@focus/types";
+import type { ModelPredictResponse } from "@focus/types";
 
 const predictionService = new PredictionService();
 
-const predictControllablePrdSchema = z.object({
+const predictModelsSchema = z.object({
+  predictionType: z.nativeEnum(PredictionType),
   propertyId: z.string(),
   multiEnabled: z.boolean().default(false),
 });
 
-export const predictControllablePrdAction = selfUserAction(
-  predictControllablePrdSchema,
-  async (ctx): Promise<ModelPredictControllablePrdResponse> => {
-    return await predictionService.predictControllablePrd({
+export const predictModelsAction = selfUserAction(
+  predictModelsSchema,
+  async (ctx): Promise<ModelPredictResponse> => {
+    return await predictionService.predict(ctx.predictionType, {
       propertyId: ctx.propertyId,
       multiEnabled: ctx.multiEnabled || false,
     });

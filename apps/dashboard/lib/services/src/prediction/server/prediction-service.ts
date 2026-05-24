@@ -5,8 +5,8 @@ import type {
   Prediction,
   PredictionType,
   TrainingType,
-  ModelPredictControllablePrdRequest,
-  ModelPredictControllablePrdResponse,
+  ModelPredictRequest,
+  ModelPredictResponse,
 } from "@focus/types";
 import { BackendWorkerService } from "@focus/services";
 
@@ -16,10 +16,14 @@ export class PredictionService {
     this.workerService = BackendWorkerService.fromEnvironment();
   }
 
-  async predictControllablePrd(
-    args: ModelPredictControllablePrdRequest,
-  ): Promise<ModelPredictControllablePrdResponse> {
-    const response = await this.workerService.modelPredictControllablePrd(args);
+  async predict(
+    predictionType: PredictionType,
+    args: ModelPredictRequest,
+  ): Promise<ModelPredictResponse> {
+    const response = await this.workerService.modelPredict(
+      predictionType,
+      args,
+    );
     await this.persistPredictions(response.predictions);
     return response;
   }

@@ -1,8 +1,6 @@
-import {
-  type NICMSA as PrismaNICMSA,
-  NICState, // Enum
-} from "@focus/db";
+import { NICState } from "@focus/db/enums";
+import type { NICMSA as PrismaNICMSA } from "@focus/db";
 
-export type { NICState };
+export { NICState };
 
 export type NICMSA = PrismaNICMSA;

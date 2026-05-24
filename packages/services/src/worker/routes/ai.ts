@@ -1,9 +1,11 @@
 import { env } from "@focus/config";
+import { PredictionType } from "@focus/db";
 import {
   WORKER_API_ROUTES,
-  type ModelShuffleTrainingGroupsResponse,
-  type ModelTrainControllablePrdResponse,
+  type ModelShuffleResponse,
+  type ModelTrainingResponse,
 } from "@focus/types";
+import { predictionTypeToApiPath } from "@focus/utils";
 import { WorkerService } from "../worker-service";
 
 export class AIWorkerService extends WorkerService {
@@ -16,18 +18,22 @@ export class AIWorkerService extends WorkerService {
     return new AIWorkerService({ baseUrl, authToken, timeout: 300000 });
   }
 
-  async modelShuffleTrainingGroups(): Promise<ModelShuffleTrainingGroupsResponse> {
+  async modelShuffle(): Promise<ModelShuffleResponse> {
     const endpoint = `${this.config.baseUrl}${WORKER_API_ROUTES.modelShuffleGroups()}`;
-    return this.makeRequest<ModelShuffleTrainingGroupsResponse>(endpoint, {
+    return this.makeRequest<ModelShuffleResponse>(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({}),
     });
   }
 
-  async modelTrainControllablePrd(): Promise<ModelTrainControllablePrdResponse> {
-    const endpoint = `${this.config.baseUrl}${WORKER_API_ROUTES.modelTrainControllablePrd()}`;
-    return this.makeRequest<ModelTrainControllablePrdResponse>(endpoint, {
+  async modelTrain(
+    predictionType: PredictionType,
+  ): Promise<ModelTrainingResponse> {
+    const endpoint = `${this.config.baseUrl}${WORKER_API_ROUTES.modelTrain({
+      predictionType: predictionTypeToApiPath(predictionType),
+    })}`;
+    return this.makeRequest<ModelTrainingResponse>(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({}),
