@@ -19,14 +19,11 @@ find . -type f -name "*.tsbuildinfo" \
 echo "  - Prisma generated client (packages/db/prisma/src/generated)"
 rm -rf packages/db/prisma/src/generated
 
-echo "  - macOS Finder duplicates (e.g. 'foo 2.ts', 'foo 3.js')"
+echo "  - macOS Finder duplicates from iCloud sync"
 find . -type f \
   \( \
-    -name "* [0-9].ts"   -o -name "* [0-9].tsx"  -o \
-    -name "* [0-9].js"   -o -name "* [0-9].jsx"  -o \
-    -name "* [0-9].mjs"  -o -name "* [0-9].cjs"  -o \
-    -name "* [0-9].json" -o -name "* [0-9].d.ts" -o \
-    -name "* [0-9].md"   -o -name "* [0-9].py"   \
+    -name "* [0-9].*"   -o -name "* [0-9]"  -o \
+    -name "* [0-9][0-9].*"   -o -name "* [0-9][0-9]" \
   \) \
   -not -path "*/node_modules/*" \
   -not -path "*/.next/*" \
