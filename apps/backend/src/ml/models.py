@@ -20,6 +20,7 @@ class LoadedModel(BaseModel):
     batch_id: str
     msa_encoding: Optional[Dict[str, float]] = None
     state_encoding: Optional[Dict[str, float]] = None
+    global_mean: Optional[float] = None
     feature_columns: Optional[List[str]] = None
     target_column: Optional[str] = None
     samples: Optional[int] = None

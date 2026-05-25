@@ -22,6 +22,7 @@ class TrainingFrame:
     msa_records: List[TrainingMSAEncoding]
     state_id: pd.Series
     state_encoding: Dict[str, float]
+    global_mean: float
     target: str
 
 
@@ -32,6 +33,7 @@ class ModelPayload:
     model: Any
     msa_encoding: Dict[str, float]
     state_encoding: Dict[str, float]
+    global_mean: float
     feature_columns: List[str]
     target_column: str
     prediction_type: str
@@ -47,6 +49,7 @@ class ModelPayload:
             "model": self.model,
             "msa_encoding": self.msa_encoding,
             "state_encoding": self.state_encoding,
+            "global_mean": self.global_mean,
             "feature_columns": self.feature_columns,
             "target_column": self.target_column,
             "prediction_type": self.prediction_type,

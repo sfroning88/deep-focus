@@ -93,9 +93,16 @@ class InferenceServices:
         state_encoding = meta.get("state_encoding")
         if not isinstance(state_encoding, dict) or not state_encoding:
             raise RuntimeError(f"Model '{model_key}' missing state_encoding metadata")
+        global_mean = meta.get("global_mean")
+        if not isinstance(global_mean, (int, float)):
+            raise RuntimeError(f"Model '{model_key}' missing global_mean metadata")
 
         X = Features.build_predict_vector(
-            prop, msa_encoding, state_encoding, snapshot_reported_at
+            prop,
+            msa_encoding,
+            state_encoding,
+            float(global_mean),
+            snapshot_reported_at,
         )
         nan_cols = X.columns[X.isna().any()].tolist()
         if nan_cols:

@@ -36,6 +36,7 @@ class Features:
         prop: Property,
         msa_encoding: Dict[str, float],
         state_encoding: Dict[str, float],
+        global_mean: float,
         snapshot_reported_at: Optional[date] = None,
     ) -> pd.DataFrame:
         """Build a single-row inference DataFrame matching FEATURE_COLUMNS"""
@@ -43,11 +44,13 @@ class Features:
         ref_ordinal = ref_date.toordinal()
 
         msa_value = str(prop.msa_id or MSA_UNKNOWN)
-        msa_encoded = msa_encoding.get(msa_value, msa_encoding.get(MSA_UNKNOWN, 0.0))
+        msa_encoded = msa_encoding.get(
+            msa_value, msa_encoding.get(MSA_UNKNOWN, global_mean)
+        )
 
         state_value = prop.state.value if prop.state else STATE_UNKNOWN
         state_encoded = state_encoding.get(
-            state_value, state_encoding.get(STATE_UNKNOWN, 0.0)
+            state_value, state_encoding.get(STATE_UNKNOWN, global_mean)
         )
 
         total_units_raw = NumberUtils._to_float(prop.total_units)

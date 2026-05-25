@@ -147,6 +147,7 @@ class ModelRegistry:
                 key=row["storage_path"],
             )
             return None, None
+        global_mean = payload.get("global_mean")
         entry = LoadedModel(
             type=model_type,
             score=float(row["r2_score"]),
@@ -156,6 +157,7 @@ class ModelRegistry:
             batch_id=batch_id,
             msa_encoding=msa_encoding,
             state_encoding=state_encoding,
+            global_mean=float(global_mean) if global_mean is not None else None,
             feature_columns=payload.get("feature_columns"),
             target_column=payload.get("target_column"),
             samples=payload.get("samples"),

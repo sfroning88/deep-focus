@@ -237,6 +237,7 @@ class TrainingServices:
             model=model,
             msa_encoding=frame.msa_encoding,
             state_encoding=frame.state_encoding,
+            global_mean=frame.global_mean,
             feature_columns=list(FEATURE_COLUMNS),
             target_column=frame.target,
             prediction_type=prediction_type.value,

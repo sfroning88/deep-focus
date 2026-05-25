@@ -83,12 +83,14 @@ class Features:
             np.where(
                 df[YEAR_BUILT_COLUMN].notna(),
                 snapshot_year - df[YEAR_BUILT_COLUMN],
-                np.nan,
+                0.0,
             ),
         )
 
+        X = df[FEATURE_COLUMNS].astype(np.float64).fillna(0.0)
+
         return TrainingFrame(
-            X=df[FEATURE_COLUMNS].astype(np.float64),
+            X=X,
             y=df[target].astype(np.float64),
             groups=df["property_id"],
             msa_id=df["msa_id"].reset_index(drop=True),
@@ -96,6 +98,7 @@ class Features:
             msa_records=msa_records,
             state_id=df["state_id"].reset_index(drop=True),
             state_encoding=state_encoding,
+            global_mean=global_mean,
             target=target,
         )
 
