@@ -51,8 +51,10 @@ reviews:
       - "master"
     ignore_title_keywords:
       - "documentation"
+      - "antirabbit"
     labels:
       - "!documentation"
+      - "!antirabbit"
   tools:
     languagetool:
       enabled: true
