@@ -1,7 +1,7 @@
 """
 Author: Sean Froning
 Created Date: 5.16.2026
-Processing functions for snaphsot shuffling
+Processing functions for snapshot shuffling
 """
 
 import time

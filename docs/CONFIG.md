@@ -1,4 +1,4 @@
-# Config
+# Python Config
 
 Last updated: **May 2026**
 
