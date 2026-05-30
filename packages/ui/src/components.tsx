@@ -1,5 +1,10 @@
 import type { ReactNode } from "react";
-import { formatCurrency } from "@focus/utils";
+import { formatCurrency, formatPercent } from "@focus/utils";
+import { MetricFormat } from "./types";
+
+function formatMetricValue(value: number, format: MetricFormat): string {
+  return format === "percent" ? formatPercent(value) : formatCurrency(value);
+}
 import { ThumbsDown, ThumbsUp } from "iconoir-react";
 
 const iconClass = "h-4 w-4 md:h-[18px] md:w-[18px]";
@@ -66,10 +71,12 @@ export function ValueBox({
   label,
   value,
   highlight,
+  format = "currency",
 }: {
   label: string;
   value: number | null;
   highlight?: boolean;
+  format?: MetricFormat;
 }) {
   return (
     <div
@@ -88,7 +95,7 @@ export function ValueBox({
         </p>
       ) : (
         <p className="text-base md:text-xl font-semibold font-data-mono text-white">
-          {formatCurrency(value)}
+          {formatMetricValue(value, format)}
         </p>
       )}
       <p className="mt-0.5 text-[9px] md:text-[11px] text-white/40">{label}</p>
@@ -99,9 +106,11 @@ export function ValueBox({
 export function DeltaBox({
   delta,
   baseline,
+  format = "currency",
 }: {
   delta: number;
   baseline: number | null;
+  format?: MetricFormat;
 }) {
   const pct =
     baseline != null && baseline !== 0
@@ -124,8 +133,9 @@ export function DeltaBox({
       <p
         className={`text-base md:text-xl font-semibold font-data-mono ${color}`}
       >
-        {sign}
-        {formatCurrency(delta)}
+        {format === "percent"
+          ? `${isPositive ? "+" : ""}${delta.toFixed(2)}%`
+          : `${sign}${formatCurrency(delta)}`}
       </p>
       {pct != null ? (
         <p className={`mt-0.5 text-[9px] md:text-[11px] ${color}`}>

@@ -37,3 +37,7 @@ export type TrainingBatchListEntry = Prisma.TrainingBatchGetPayload<{
     };
   };
 }>;
+
+export type TrainingJobs = {
+  jobIds: string[];
+};

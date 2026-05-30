@@ -9,3 +9,4 @@ export {
   SectionLabel,
   ValueBox,
 } from "./components";
+export type { MetricFormat } from "./types";

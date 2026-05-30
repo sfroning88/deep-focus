@@ -38,7 +38,7 @@ async def main():
                     response = await client.post(
                         f"{BACKEND_API_URL}{endpoint}",
                         headers=HEADERS,
-                        json={prediction_type},
+                        json={"prediction_type": prediction_type.value},
                         timeout=WORKER_TIMEOUT,
                     )
                 except httpx.RequestError:

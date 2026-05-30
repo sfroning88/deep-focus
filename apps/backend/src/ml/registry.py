@@ -137,7 +137,7 @@ class ModelRegistry:
             estimator = reg.models.get(model_type)
         if estimator is None:
             raise RuntimeError(
-                f"Model '{model_type}' not loaded for '{prediction_type}"
+                f"Model '{model_type}' not loaded for '{prediction_type}'"
             )
         return estimator
 

@@ -9,7 +9,7 @@ import { KpiStrip } from "./(propertyCard)/KpiStrip";
 import { UnitMixCard } from "./(propertyCard)/UnitMixCard";
 import { ExpenseBreakdownCard } from "./(propertyCard)/ExpenseBreakdownCard";
 import { PrdDetailCard } from "./(propertyCard)/PrdDetailCard";
-import { PredictPrdCard } from "./(predictions)/PredictPrdCard";
+import { PredictCard } from "./(predictions)/PredictCard";
 import { SnapshotHistoryTable } from "./(propertyCard)/SnapshotHistoryTable";
 
 type PropertyCardProps = {
@@ -94,10 +94,12 @@ export function PropertyCard({
             </div>
 
             <PrdDetailCard card={card} snapshot={latestSnapshot} />
-            <PredictPrdCard
+            <PredictCard
               userId={userId}
               propertyId={card.id}
               currentPrd={toNum(latestSnapshot.controllablePRD)}
+              currentOccupancy={toNum(latestSnapshot.occupancy)}
+              currentMargin={toNum(latestSnapshot.operatingMargin)}
             />
             <SnapshotHistoryTable snapshots={card.snapshots} />
           </div>
