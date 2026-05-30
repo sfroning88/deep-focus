@@ -9,6 +9,7 @@ import type {
   ModelPredictResponse,
 } from "@focus/types";
 import { BackendWorkerService } from "@focus/services";
+import { normalizePredictionType } from "@focus/utils";
 
 export class PredictionService {
   private workerService: BackendWorkerService;
@@ -24,8 +25,9 @@ export class PredictionService {
       predictionType,
       args,
     );
-    await this.persistPredictions(response.predictions);
-    return response;
+    const predictions = this.normalizePredictions(response.predictions);
+    await this.persistPredictions(predictions);
+    return { predictions };
   }
 
   async givePredictionFeedback(
@@ -46,6 +48,13 @@ export class PredictionService {
         },
       },
     });
+  }
+
+  private normalizePredictions(predictions: Prediction[]): Prediction[] {
+    return predictions.map((p) => ({
+      ...p,
+      type: normalizePredictionType(String(p.type)),
+    }));
   }
 
   private async persistPredictions(predictions: Prediction[]): Promise<void> {

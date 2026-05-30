@@ -12,7 +12,7 @@ from .prediction import PredictionType
 class PrismaPredictionType(str, Enum):
     CONTROLLABLE_PRD = "controllablePrd"
     OCCUPANCY = "occupancy"
-    OPERATING_MARGIN = "operating_margin"
+    OPERATING_MARGIN = "operatingMargin"
 
     @classmethod
     def cast(cls, domain: PredictionType | None) -> PrismaPredictionType:
