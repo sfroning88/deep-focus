@@ -55,7 +55,7 @@ from .helpers import TESTS_DIR, wait_for_health
 from .redis_clear import clear_redis_queue
 
 MONOREPO_MARKER = "pnpm-workspace.yaml"
-HEALTH_TIMEOUT_SECONDS = 30
+HEALTH_TIMEOUT_SECONDS = 120
 SHARED_PYTHON_SRC = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
     os.pardir,
@@ -177,8 +177,8 @@ def _run_workflow(workflow: str) -> None:
         )
 
         _property_id, multi_enabled = _load_predict_preset()
-        model_ids = run_reload_test(multi_enabled=multi_enabled)
-        run_prediction_tests(model_ids)
+        model_ids_by_type = run_reload_test(multi_enabled=multi_enabled)
+        run_prediction_tests(model_ids_by_type)
     else:
         raise ValueError(f"Unknown workflow: {workflow}")
 

@@ -13,3 +13,4 @@ PREDICTION_TARGETS: Dict[PredictionType, str] = {
     PredictionType.OPERATING_MARGIN: "operating_margin",
 }
 PREDICTION_TABLE = ("ai", "prediction")
+PREDICTION_TYPE_ENUM = ("ai", "prediction_type")

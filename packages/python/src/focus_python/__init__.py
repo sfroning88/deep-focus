@@ -1,6 +1,7 @@
 from .constants import (
     PREDICTION_TARGETS,
     PREDICTION_TABLE,
+    PREDICTION_TYPE_ENUM,
     PROPERTY_FETCH_SIZE,
     NIC_MSA_TABLE,
     PROPERTY_TABLE,
@@ -111,6 +112,7 @@ from .utils import (
 __all__ = [
     "PREDICTION_TARGETS",
     "PREDICTION_TABLE",
+    "PREDICTION_TYPE_ENUM",
     "PROPERTY_FETCH_SIZE",
     "NIC_MSA_TABLE",
     "PROPERTY_TABLE",

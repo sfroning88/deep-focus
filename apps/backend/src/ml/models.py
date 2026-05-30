@@ -1,11 +1,12 @@
 """
 Author: Sean Froning
-Created Date: 5.14.2026
+Modified Date: 5.30.2026
 Inference-side in-memory model
 """
 
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 from pydantic import BaseModel
 
 
@@ -25,3 +26,13 @@ class LoadedModel(BaseModel):
     target_column: Optional[str] = None
     samples: Optional[int] = None
     winner_type: Optional[str] = None
+
+
+@dataclass
+class PredictionTypeRegistry:
+    """Structured input to model registry of prediction type"""
+
+    models: Dict[str, Any]
+    metadata: Dict[str, LoadedModel]
+    batch_id: Optional[str]
+    multi_loaded: Optional[bool]

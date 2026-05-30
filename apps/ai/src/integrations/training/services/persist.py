@@ -119,6 +119,7 @@ class PersistServices:
                     TrainingStatus.PENDING.value,
                     batch.samples,
                     batch.split_seed,
+                    batch.prediction_type.value,
                     batch.split_version_id,
                 ),
             )

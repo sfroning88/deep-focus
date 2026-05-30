@@ -91,7 +91,7 @@ model TrainingBatch {
     status                  TrainingStatus
     samples                 Int
     splitSeed               Int @map("split_seed")
-    predictionType          PredictionType @default(controllablePrd) @map("prediction_type")
+    predictionType          PredictionType @map("prediction_type")
     
     splitVersionId          Int? @map("split_version")
     splitVersion            TrainingSplit? @relation(fields: [splitVersionId], references: [version], onDelete: Restrict, onUpdate: Cascade)

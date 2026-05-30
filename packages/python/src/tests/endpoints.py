@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Created Date: 5.9.2026
+Modified Date: 5.30.2026
 Centralized route registry and endpoint test factories
 """
 
@@ -36,13 +36,19 @@ SHUFFLE_URL = f"{AI_URL}{SHUFFLE_PATH}"
 
 # -- Train (served by apps/ai) --
 TRAIN_PATH = "/api/train"
-TRAIN_CONTROLLABLE_PRD_PATH = f"{TRAIN_PATH}/controllable_prd"
-TRAIN_CONTROLLABLE_PRD_URL = f"{AI_URL}{TRAIN_CONTROLLABLE_PRD_PATH}"
 
 # -- Predict (served by apps/backend) --
 PREDICT_PATH = "/api/predict"
-PREDICT_CONTROLLABLE_PRD_PATH = f"{PREDICT_PATH}/controllable_prd"
-PREDICT_CONTROLLABLE_PRD_URL = f"{BACKEND_URL}{PREDICT_CONTROLLABLE_PRD_PATH}"
+
+
+def build_testing_url(
+    prediction_type: str,
+    root_url: str,
+    root_path: str,
+) -> str:
+    """Build {root_path}/{prediction_type} URL for train or predict integration tests"""
+    return f"{root_url}{root_path}/{prediction_type}"
+
 
 # -- Model registry (served by apps/backend) --
 ML_PATH = "/api/ml"

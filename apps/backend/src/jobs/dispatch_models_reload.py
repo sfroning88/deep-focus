@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Created Date: 5.16.2026
+Modified Date: 5.30.2026
 Cron job to model registry endpoint
 """
 
@@ -13,6 +13,7 @@ _root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(_root / "src"))
 sys.path.insert(0, str(_root))
 from focus_python import config, logging
+from focus_python import PREDICTION_TARGETS
 
 logger = logging.get_logger(__name__)
 
@@ -31,34 +32,35 @@ WORKER_TIMEOUT: float = 600
 async def main():
     async with httpx.AsyncClient() as client:
         endpoint = "/api/ml/reload"
-        for attempt in range(WORKER_RETRIES):
-            try:
-                response = await client.post(
-                    f"{BACKEND_API_URL}{endpoint}",
-                    headers=HEADERS,
-                    json={},
-                    timeout=WORKER_TIMEOUT,
-                )
-            except httpx.RequestError:
+        for prediction_type in PREDICTION_TARGETS.keys():
+            for attempt in range(WORKER_RETRIES):
+                try:
+                    response = await client.post(
+                        f"{BACKEND_API_URL}{endpoint}",
+                        headers=HEADERS,
+                        json={prediction_type},
+                        timeout=WORKER_TIMEOUT,
+                    )
+                except httpx.RequestError:
+                    if attempt == WORKER_RETRIES - 1:
+                        raise
+                    await asyncio.sleep(2**attempt)
+                    continue
+                if response.status_code < 500 and response.status_code != 429:
+                    response.raise_for_status()
+                    request_id = response.headers.get(
+                        "x-request-id"
+                    ) or response.headers.get("x-correlation-id")
+                    logger.info(
+                        "dispatch_models_reload_completed",
+                        endpoint=endpoint,
+                        status_code=response.status_code,
+                        request_id=request_id,
+                    )
+                    break
                 if attempt == WORKER_RETRIES - 1:
-                    raise
+                    response.raise_for_status()
                 await asyncio.sleep(2**attempt)
-                continue
-            if response.status_code < 500 and response.status_code != 429:
-                response.raise_for_status()
-                request_id = response.headers.get(
-                    "x-request-id"
-                ) or response.headers.get("x-correlation-id")
-                logger.info(
-                    "dispatch_models_reload_completed",
-                    endpoint=endpoint,
-                    status_code=response.status_code,
-                    request_id=request_id,
-                )
-                break
-            if attempt == WORKER_RETRIES - 1:
-                response.raise_for_status()
-            await asyncio.sleep(2**attempt)
 
 
 if __name__ == "__main__":
