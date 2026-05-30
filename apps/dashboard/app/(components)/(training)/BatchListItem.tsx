@@ -1,7 +1,11 @@
 "use client";
 
 import { Dot, Badge, trainingStatusColors } from "@focus/ui";
-import { formatDateTime, trainingStatusLabel } from "@focus/utils";
+import {
+  formatDateTime,
+  predictionTypeToApiPath,
+  trainingStatusLabel,
+} from "@focus/utils";
 import type { TrainingBatchListEntry } from "@focus/types";
 
 type BatchListItemProps = {
@@ -35,6 +39,8 @@ export function BatchListItem({ batch, isMobile }: BatchListItemProps) {
           className={`mt-0.5 flex flex-wrap items-center gap-x-1.5 text-white/50 ${isMobile ? "text-[11px]" : "text-xs"}`}
         >
           <span>{formatDateTime(batch.createdAt)}</span>
+          <Dot />
+          <span>{predictionTypeToApiPath(batch.predictionType)}</span>
           <Dot />
           <span>{batch.samples} samples</span>
           <Dot />
