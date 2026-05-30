@@ -4,6 +4,8 @@
 
 enum PredictionType {
     controllablePrd         @map("controllable_prd")
+    occupancy               @map("occupancy")
+    operatingMargin         @map("operating_margin")
 
     @@map("prediction_type")
     @@schema("ai")

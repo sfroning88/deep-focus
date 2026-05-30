@@ -1,13 +1,13 @@
 """
 Author: Sean Froning
-Modified Date: 5.16.2026
+Modified Date: 5.30.2026
 Class objects for training runs
 """
 
 from datetime import datetime
 from typing import List, Optional
 from ._base_focus import BaseFocus
-from ..enums import TrainingType, TrainingStatus
+from ..enums import PredictionType, TrainingType, TrainingStatus
 
 
 class TrainingMSAEncoding(BaseFocus):
@@ -44,6 +44,7 @@ class TrainingBatch(BaseFocus):
     status: Optional[TrainingStatus] = None
     samples: Optional[int] = None
     split_seed: Optional[int] = None
+    prediction_type: Optional[PredictionType] = None
     split_version_id: Optional[int] = None
     feature: Optional[TrainingFeature] = None
 

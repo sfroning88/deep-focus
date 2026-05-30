@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Created Date: 5.9.2026
+Modified Date: 5.30.2026
 Class definitions for Prediction enums
 """
 
@@ -11,3 +11,5 @@ class PredictionType(str, Enum):
     """Prediction scope enumeration"""
 
     CONTROLLABLE_PRD = "controllable_prd"
+    OCCUPANCY = "occupancy"
+    OPERATING_MARGIN = "operating_margin"

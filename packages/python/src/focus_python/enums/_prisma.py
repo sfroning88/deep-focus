@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Created Date: 5.11.2026
+Modified Date: 5.30.2026
 Class definitions for Prisma enums
 """
 
@@ -11,6 +11,8 @@ from .prediction import PredictionType
 
 class PrismaPredictionType(str, Enum):
     CONTROLLABLE_PRD = "controllablePrd"
+    OCCUPANCY = "occupancy"
+    OPERATING_MARGIN = "operating_margin"
 
     @classmethod
     def cast(cls, domain: PredictionType | None) -> PrismaPredictionType:
