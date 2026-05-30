@@ -4,23 +4,28 @@ import { z } from "zod";
 import { selfUserAction } from "@focus/auth/server";
 import { PredictionType, TrainingType } from "@focus/db";
 import { PredictionService } from "@lib/services";
-import type { ModelPredictResponse } from "@focus/types";
+import { PREDICTION_TYPES, type PredictionsForProperty } from "@focus/types";
 
 const predictionService = new PredictionService();
 
 const predictModelsSchema = z.object({
-  predictionType: z.nativeEnum(PredictionType),
   propertyId: z.string(),
   multiEnabled: z.boolean().default(false),
 });
 
 export const predictModelsAction = selfUserAction(
   predictModelsSchema,
-  async (ctx): Promise<ModelPredictResponse> => {
-    return await predictionService.predict(ctx.predictionType, {
-      propertyId: ctx.propertyId,
-      multiEnabled: ctx.multiEnabled || false,
-    });
+  async (ctx): Promise<PredictionsForProperty> => {
+    const entries = await Promise.all(
+      PREDICTION_TYPES.map(async (predictionType) => {
+        const response = await predictionService.predict(predictionType, {
+          propertyId: ctx.propertyId,
+          multiEnabled: ctx.multiEnabled || false,
+        });
+        return [predictionType, response] as const;
+      }),
+    );
+    return Object.fromEntries(entries) as PredictionsForProperty;
   },
 );
 

@@ -2,12 +2,12 @@
 
 import { z } from "zod";
 import { platformAdminAction } from "@focus/auth/server";
-import { PredictionType } from "@focus/db";
 import { TrainingService } from "@lib/services";
 import {
+  PREDICTION_TYPES,
   type TrainingBatchListEntry,
   type TrainingFunctionCounts,
-  type ModelTrainingResponse,
+  type TrainingJobs,
   ModelShuffleResponse,
 } from "@focus/types";
 
@@ -22,14 +22,17 @@ export const shuffleGroupsAction = platformAdminAction(
   },
 );
 
-const trainModelsSchema = z.object({
-  predictionType: z.nativeEnum(PredictionType),
-});
+const trainModelsSchema = z.object({});
 
 export const trainModelsAction = platformAdminAction(
   trainModelsSchema,
-  async (ctx): Promise<ModelTrainingResponse> => {
-    return await trainingService.train(ctx.predictionType);
+  async (): Promise<TrainingJobs> => {
+    const responses = await Promise.all(
+      PREDICTION_TYPES.map((predictionType) =>
+        trainingService.train(predictionType),
+      ),
+    );
+    return { jobIds: responses.flatMap((response) => response.jobIds) };
   },
 );
 
