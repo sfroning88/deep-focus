@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Modified Date: 5.21.2026
+Modified Date: 5.30.2026
 Core backend API orchestration
 """
 
@@ -41,12 +41,24 @@ async def reload_registry(request: ModelRequest) -> ModelResponse:
         raise error("Model registry unavailable", status_code=503)
 
     try:
-        await run_in_threadpool(model_registry.load, request.multi_enabled)
+        await run_in_threadpool(
+            model_registry.load, request.prediction_type, request.multi_enabled
+        )
 
-        return ModelResponse(model_ids=model_registry.loaded_model_types())
+        return ModelResponse(
+            model_ids=model_registry.loaded_model_types(request.prediction_type)
+        )
     except RuntimeError as err:
-        logger.error("model_registry_unavailable", error=str(err))
+        logger.error(
+            "model_registry_unavailable",
+            prediction_type=request.prediction_type.value,
+            error=str(err),
+        )
         raise error(str(err), status_code=503)
     except Exception as err:
-        logger.error("model_registry_failed", error=str(err))
+        logger.error(
+            "model_registry_failed",
+            prediction_type=request.prediction_type.value,
+            error=str(err),
+        )
         raise error("Model registry failed", status_code=500)

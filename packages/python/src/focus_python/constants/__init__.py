@@ -1,6 +1,7 @@
 from .prediction import (
     PREDICTION_TARGETS,
     PREDICTION_TABLE,
+    PREDICTION_TYPE_ENUM,
 )
 from .properties import (
     PROPERTY_FETCH_SIZE,
@@ -72,6 +73,7 @@ from .training import (
 __all__ = [
     "PREDICTION_TARGETS",
     "PREDICTION_TABLE",
+    "PREDICTION_TYPE_ENUM",
     "PROPERTY_FETCH_SIZE",
     "NIC_MSA_TABLE",
     "PROPERTY_TABLE",

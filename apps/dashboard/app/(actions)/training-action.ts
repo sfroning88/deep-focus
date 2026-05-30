@@ -26,7 +26,7 @@ const trainModelsSchema = z.object({
   predictionType: z.nativeEnum(PredictionType),
 });
 
-export const trainModels = platformAdminAction(
+export const trainModelsAction = platformAdminAction(
   trainModelsSchema,
   async (ctx): Promise<ModelTrainingResponse> => {
     return await trainingService.train(ctx.predictionType);

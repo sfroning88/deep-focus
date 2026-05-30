@@ -51,8 +51,8 @@ async def model_predict(
     try:
         predictions = InferenceServices.predict(
             property_id=request.property_id,
-            multi_enabled=request.multi_enabled,
             prediction_type=prediction_type,
+            multi_enabled=request.multi_enabled,
         )
         return PredictionResponse(
             predictions=[

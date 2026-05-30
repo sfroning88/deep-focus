@@ -29,12 +29,14 @@ class InferenceServices:
     @staticmethod
     def predict(
         property_id: str,
+        prediction_type: PredictionType,
         multi_enabled: bool = False,
-        prediction_type: PredictionType = PredictionType.CONTROLLABLE_PRD,
     ) -> List[Prediction]:
         """Run the latest winning model (or every model in the latest batch) for a property"""
-        model_registry.load(multi_enabled=multi_enabled)
-        if not model_registry.is_ready():
+        model_registry.load(
+            prediction_type=prediction_type, multi_enabled=multi_enabled
+        )
+        if not model_registry.is_ready(prediction_type):
             raise RuntimeError("No trained model available")
 
         prop = PersistServices.fetch_property(property_id)
@@ -52,7 +54,7 @@ class InferenceServices:
             )
 
         if multi_enabled:
-            keys = model_registry.loaded_model_types()
+            keys = model_registry.loaded_model_types(prediction_type)
             predictions: List[Prediction] = []
             for key in keys:
                 try:
@@ -85,8 +87,8 @@ class InferenceServices:
         snapshot_reported_at: Optional[date],
     ) -> Prediction:
         """Single-model inference path: load encoding, build vector, predict, package response"""
-        model = model_registry.get(model_key)
-        meta = model_registry.get_metadata(model_key)
+        model = model_registry.get(prediction_type, model_key)
+        meta = model_registry.get_metadata(prediction_type, model_key)
         msa_encoding = meta.get("msa_encoding")
         if not isinstance(msa_encoding, dict) or not msa_encoding:
             raise RuntimeError(f"Model '{model_key}' missing msa_encoding metadata")

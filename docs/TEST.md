@@ -11,8 +11,8 @@ packages/python/src/tests/
 ├── helpers.py
 ├── redis_clear.py
 ├── presets/
-│ ├── accounting.txt
-│ └── data.txt
+│ ├── predict.txt
+│ └── train.txt
 └── scripts/
 ├── predict.py
 └── train.py

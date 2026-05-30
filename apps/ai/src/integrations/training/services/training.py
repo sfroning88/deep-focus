@@ -205,7 +205,7 @@ class TrainingServices:
 
     @staticmethod
     def _build_batch(
-        frame: TrainingFrame, batch_id: str, _prediction_type: PredictionType
+        frame: TrainingFrame, batch_id: str, prediction_type: PredictionType
     ) -> TrainingBatch:
         """Construct a seeded TrainingBatch with its feature contract from a TrainingFrame"""
         return TrainingBatch(
@@ -213,6 +213,7 @@ class TrainingServices:
             status=TrainingStatus.PENDING,
             samples=len(frame.X),
             split_seed=TRAINING_SPLIT_SEED,
+            prediction_type=prediction_type,
             split_version_id=TRAINING_FUNCTION_SPLIT_VERSION,
             feature=TrainingFeature(
                 batch_id=batch_id,
