@@ -6,9 +6,9 @@ Last updated: **May 2026**
 
 Cross-worker infrastructure lives in **`packages/python`** as the **`focus_python`** installable package (`pyproject.toml` at `packages/python/`). The app pins it via **`-e ../../packages/python`** in `requirements.in` / `requirements.txt`.
 
-Use it for config, database pool, structured logging, Redis/RQ queue helpers, shared enums, shared utils, and FastAPI helpers (`dependency`, `error`, `exception`, `middleware`).
+Use it for config, database pool, structured logging, Redis/RQ queue helpers, shared enums, shared utils, and FastAPI helpers.
 
-App-only wiring stays under **`src/core/`** (for example `health.py`, `lifespan.py`). **`src/main.py`** composes FastAPI with `focus_python` and those modules.
+App-only wiring stays under **`src/core/`**, **`src/main.py`** composes FastAPI with `focus_python` and those modules.
 
 ## Deployment
 
@@ -27,7 +27,7 @@ Raise HTTP errors with **`error(...)`** from **`focus_python`** (application err
 
 ## Services
 
-Import shared infrastructure from **`focus_python`** (**`config`**, **`db_pool`**, **`logging`**, **`queue`**, **`error`**, **`dependency`**, etc.), not from a local **`core`** package for those concerns.
+Import shared infrastructure from **`focus_python`**, not from a local **`core`** package for those concerns.
 
 Patterns:
 

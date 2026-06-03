@@ -8,6 +8,7 @@ from datetime import date
 from typing import List, Optional
 from focus_python import logging
 from focus_python import (
+    WINNER_KEY,
     Prediction,
     PredictionType,
     Property,
@@ -15,7 +16,6 @@ from focus_python import (
 )
 from ml import (
     Features,
-    WINNER_KEY,
     model_registry,
 )
 from .persist import PersistServices

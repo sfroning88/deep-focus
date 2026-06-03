@@ -4,7 +4,9 @@ Created Date: 5.3.2026
 Middleware protection for FastAPI App
 """
 
-import uuid, time, re
+import uuid
+import time
+import re
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from ..core import logging
@@ -23,7 +25,7 @@ class _Middleware(BaseHTTPMiddleware):
             else str(uuid.uuid4())
         )
         path = request.url.path
-        logging.bind_context(correlation_id=correlation_id, path=path)
+        logging.bind_middleware_context(correlation_id=correlation_id, path=path)
         request.state.correlation_id = correlation_id
         start_time = time.perf_counter()
         logger.info("request_started", method=request.method, path=request.url.path)

@@ -4,7 +4,8 @@ Created Date: 5.3.2026
 Route API protections for auth
 """
 
-import os, secrets
+import os
+import secrets
 from typing import Optional
 from fastapi import Header
 from .error import error

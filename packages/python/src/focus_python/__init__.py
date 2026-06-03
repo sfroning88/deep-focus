@@ -1,4 +1,5 @@
 from .constants import (
+    WINNER_KEY,
     PREDICTION_TARGETS,
     PREDICTION_TABLE,
     PREDICTION_TYPE_ENUM,
@@ -73,6 +74,7 @@ from .core import (
 )
 from .enums import (
     NICState,
+    PoolFetch,
     PredictionType,
     PrismaPredictionType,
     DomainOption,
@@ -100,6 +102,10 @@ from .models import (
     TrainingBatch,
     TrainingModel,
 )
+from .resources import (
+    AsyncLazyResource,
+    SyncLazyResource,
+)
 from .services import (
     ModelStorageServices,
 )
@@ -107,9 +113,11 @@ from .utils import (
     NICUtils,
     NumberUtils,
     SchemaUtils,
+    UuidUtils,
 )
 
 __all__ = [
+    "WINNER_KEY",
     "PREDICTION_TARGETS",
     "PREDICTION_TABLE",
     "PREDICTION_TYPE_ENUM",
@@ -180,6 +188,7 @@ __all__ = [
     "logging",
     "queue",
     "NICState",
+    "PoolFetch",
     "PredictionType",
     "PrismaPredictionType",
     "DomainOption",
@@ -202,8 +211,11 @@ __all__ = [
     "TrainingSplit",
     "TrainingBatch",
     "TrainingModel",
+    "AsyncLazyResource",
+    "SyncLazyResource",
     "ModelStorageServices",
     "NICUtils",
     "NumberUtils",
     "SchemaUtils",
+    "UuidUtils",
 ]

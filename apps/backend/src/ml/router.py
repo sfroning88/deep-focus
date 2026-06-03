@@ -23,7 +23,7 @@ router = APIRouter(
 
 models_available: bool = False
 try:
-    from .registry import registry as model_registry
+    from .registry import model_registry
 
     models_available = True
 except ImportError as err:

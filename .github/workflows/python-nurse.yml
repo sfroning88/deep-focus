@@ -41,7 +41,7 @@ jobs:
       matrix:
         worker: ${{ fromJSON(needs.changes.outputs.workers) }}
     steps:
-      - uses: sfroning88/python-nurse@a17d95bdb9b38eb82657e6b59d8f0a1476396a31
+      - uses: sfroning88/python-nurse@3317a6d4e69d16c2293fa18c6f6a4973a8bce683
         with:
           app-path: ${{ matrix.worker == 'python' && 'packages/python' || format('apps/{0}', matrix.worker) }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
