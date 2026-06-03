@@ -32,6 +32,7 @@
     "postinstall": "pnpm db:generate",
     "check:python-format": "./scripts/check-python-format.sh",
     "check:migration-safety": "./scripts/check-migration-safety.sh",
+    "check:unit-tests": "./scripts/diff-python-tests.sh",
     "git:pre-commit": "sh scripts/husky/pre-commit.sh",
     "git:pre-push": "sh scripts/husky/pre-push.sh",
     "clean": "./scripts/clean.sh",

@@ -6,11 +6,7 @@ Lifespan events for FastAPI app
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from focus_python import (
-    db_pool,
-    logging,
-    queue,
-)
+from focus_python import db_pool, logging, queue
 
 logger = logging.get_logger(__name__)
 
@@ -18,7 +14,6 @@ logger = logging.get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Application startup")
-    db_pool._ensure_pool()
     queue.get_connection()
     app.state.db_pool = db_pool
     app.state.queue = queue

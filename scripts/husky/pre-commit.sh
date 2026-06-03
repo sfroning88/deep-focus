@@ -6,7 +6,4 @@ cd "$ROOT" || exit 1
 pnpm lint-staged
 pnpm type-check
 pnpm check:migration-safety
-
-if [ -f scripts/husky/pre-commit-extra.sh ]; then
-    sh scripts/husky/pre-commit-extra.sh
-fi
+pnpm check:unit-tests

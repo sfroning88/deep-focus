@@ -7,6 +7,7 @@ Definitions for prediction structures
 from typing import Dict
 from ..enums import PredictionType
 
+WINNER_KEY = "winner"
 PREDICTION_TARGETS: Dict[PredictionType, str] = {
     PredictionType.CONTROLLABLE_PRD: "controllable_prd",
     PredictionType.OCCUPANCY: "occupancy",

@@ -1,4 +1,5 @@
 from .prediction import (
+    WINNER_KEY,
     PREDICTION_TARGETS,
     PREDICTION_TABLE,
     PREDICTION_TYPE_ENUM,
@@ -71,6 +72,7 @@ from .training import (
 )
 
 __all__ = [
+    "WINNER_KEY",
     "PREDICTION_TARGETS",
     "PREDICTION_TABLE",
     "PREDICTION_TYPE_ENUM",

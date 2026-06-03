@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from typing import List
 from psycopg2.extras import execute_values
 from focus_python import db_pool, logging, config
+from focus_python.enums import PoolFetch
 from focus_python import NumberUtils
 from focus_python import (
     TRAINING_JOBS,
@@ -60,7 +61,7 @@ class PersistServices:
         """Pull all property rows and hydrate Property pydantic models"""
         with db_pool.get_cursor() as cursor:
             queryString = FETCH_PROPERTIES.as_string(cursor)
-        rows = db_pool.execute_query(queryString)
+        rows = db_pool.run(queryString, fetch=PoolFetch.ALL)
         return [Property(**row) for row in rows]
 
     @staticmethod
@@ -68,7 +69,7 @@ class PersistServices:
         """Pull all property_snapshot rows and hydrate PropertySnapshot pydantic models"""
         with db_pool.get_cursor() as cursor:
             queryString = FETCH_PROPERTY_SNAPSHOTS.as_string(cursor)
-        rows = db_pool.execute_query(queryString)
+        rows = db_pool.run(queryString, fetch=PoolFetch.ALL)
         return [PropertySnapshot(**row) for row in rows]
 
     @staticmethod
@@ -76,7 +77,7 @@ class PersistServices:
         """Pull distinct property IDs"""
         with db_pool.get_cursor() as cursor:
             queryString = FETCH_PROPERTY_IDS.as_string(cursor)
-        rows = db_pool.execute_query(queryString)
+        rows = db_pool.run(queryString, fetch=PoolFetch.ALL)
         return [row["id"] for row in rows]
 
     @staticmethod
@@ -153,7 +154,7 @@ class PersistServices:
         """Move a pending TrainingModel row into executing state"""
         with db_pool.get_cursor() as cursor:
             queryString = SET_MODEL_EXECUTING.as_string(cursor)
-        db_pool.execute_query(
+        db_pool.run(
             queryString,
             (TrainingStatus.EXECUTING.value, training_type.value, batch_id),
         )
@@ -163,7 +164,7 @@ class PersistServices:
         """Move TrainingBatch from pending → executing the first time a worker starts"""
         with db_pool.get_cursor() as cursor:
             queryString = BUMP_BATCH_EXECUTING.as_string(cursor)
-        db_pool.execute_query(
+        db_pool.run(
             queryString,
             (TrainingStatus.EXECUTING.value, batch_id, TrainingStatus.PENDING.value),
         )
@@ -173,7 +174,7 @@ class PersistServices:
         """Persist successful training run metrics + storage location"""
         with db_pool.get_cursor() as cursor:
             queryString = SET_MODEL_COMPLETED.as_string(cursor)
-        db_pool.execute_query(
+        db_pool.run(
             queryString,
             (
                 TrainingStatus.COMPLETED.value,
@@ -202,7 +203,7 @@ class PersistServices:
         truncated = (model.error_message or "")[:TRAINING_ERROR_MSG_MAX_LENGTH]
         with db_pool.get_cursor() as cursor:
             queryString = SET_MODEL_FAILED.as_string(cursor)
-        db_pool.execute_query(
+        db_pool.run(
             queryString,
             (TrainingStatus.FAILED.value, truncated, model.type.value, model.batch_id),
         )
@@ -228,7 +229,7 @@ class PersistServices:
         """Fetch all model rows for a batch and hydrate into TrainingModel objects"""
         with db_pool.get_cursor() as cursor:
             query_string = SELECT_BATCH_BY_ID.as_string(cursor)
-        rows = db_pool.execute_query(query_string, (batch_id,)) or []
+        rows = db_pool.run(query_string, (batch_id,), fetch=PoolFetch.ALL)
         return [TrainingModel(**row) for row in rows]
 
     @staticmethod
@@ -259,7 +260,7 @@ class PersistServices:
         statuses = [model.status.value for model in models if model.status]
         with db_pool.get_cursor() as cursor:
             fail_string = SET_BATCH_FAILED.as_string(cursor)
-        db_pool.execute_query(
+        db_pool.run(
             fail_string,
             (TrainingStatus.FAILED.value, batch_id, TrainingStatus.FAILED.value),
         )

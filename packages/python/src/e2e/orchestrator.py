@@ -16,7 +16,7 @@ Setup Steps:
 1) pnpm use:local
 2) pnpm redis:up
 3) cd packages/python
-4) python -m src.tests.orchestrator <train|predict>
+4) python -m src.e2e.orchestrator <train|predict>
 
 If Creating or Activating venv:
 1) python3 -m venv .venv

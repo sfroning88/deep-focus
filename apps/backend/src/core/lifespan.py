@@ -7,11 +7,7 @@ Lifespan events for FastAPI app
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from focus_python import (
-    db_pool,
-    logging,
-    queue,
-)
+from focus_python import db_pool, logging, queue
 from focus_python import PREDICTION_TARGETS
 from ml import model_registry
 
@@ -21,7 +17,6 @@ logger = logging.get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Application startup")
-    db_pool._ensure_pool()
     queue.get_connection()
     prediction_types = list(PREDICTION_TARGETS.keys())
     with ThreadPoolExecutor(max_workers=len(prediction_types)) as executor:

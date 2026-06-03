@@ -53,6 +53,8 @@ idna==3.11
     #   anyio
     #   httpx
     #   requests
+iniconfig==2.3.0
+    # via pytest
 jmespath==1.1.0
     # via
     #   boto3
@@ -68,8 +70,12 @@ numpy==2.4.4
     #   scikit-learn
     #   scipy
     #   xgboost
+packaging==26.2
+    # via pytest
 pandas==3.0.2
     # via -r requirements.in
+pluggy==1.6.0
+    # via pytest
 psycopg2-binary==2.9.11
     # via focus-python
 pydantic==2.12.4
@@ -79,6 +85,10 @@ pydantic==2.12.4
     #   fastapi
 pydantic-core==2.41.5
     # via pydantic
+pygments==2.20.0
+    # via pytest
+pytest==9.0.3
+    # via focus-python
 python-dateutil==2.9.0.post0
     # via
     #   botocore

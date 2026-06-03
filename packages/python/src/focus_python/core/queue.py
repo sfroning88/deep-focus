@@ -5,87 +5,70 @@ Redis queue manager with connection pooling
 """
 
 import time
-import threading
-from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List
 from redis import Redis, ConnectionPool
 from rq import Queue
 from rq.job import Job
 from .config import config
 from .logging import logging
+from ..resources import SyncLazyResource
 
 logger = logging.get_logger(__name__)
 
-QUEUE_NAME = config.get_required("domain")
 JOB_TIMEOUT = 3600
+REDIS_MAX_CONNECTIONS = 20
 
 
 class _Queue:
-    _init_lock = threading.Lock()
-    _instance: Optional["_Queue"] = None
-    _connection_pool: Optional[ConnectionPool] = None
-    _rq_queue: Optional[Queue] = None
 
-    def __new__(cls) -> "_Queue":
-        if cls._instance is None:
-            with cls._init_lock:
-                if cls._instance is None:
-                    cls._instance = super().__new__(cls)
-        return cls._instance
+    def __init__(self) -> None:
+        self._pool = SyncLazyResource(self._build_pool)
+        self._rq = SyncLazyResource(self._build_rq)
 
-    def _get_connection(self) -> Redis:
-        if self._connection_pool is None:
-            with self._init_lock:
-                if self._connection_pool is None:
-                    self._connection_pool = ConnectionPool.from_url(
-                        config.get_required("redis"),
-                        max_connections=20,
-                        retry_on_timeout=True,
-                        socket_keepalive=True,
-                    )
-                    Redis(connection_pool=self._connection_pool).ping()
-        return Redis(connection_pool=self._connection_pool)
+    def _build_pool(self) -> ConnectionPool:
+        """Build the Redis connection pool once on first access"""
+        pool = ConnectionPool.from_url(
+            config.get_required("redis"),
+            max_connections=REDIS_MAX_CONNECTIONS,
+            retry_on_timeout=True,
+            socket_keepalive=True,
+        )
+        Redis(connection_pool=pool).ping()
+        return pool
+
+    def _build_rq(self) -> Queue:
+        """Build the RQ queue once on first access (queue name = WORKER_DOMAIN)"""
+        return Queue(config.get_required("domain"), connection=self.get_connection())
 
     def get_connection(self) -> Redis:
-        return self._get_connection()
-
-    def _get_rq_queue(self) -> Queue:
-        if self._rq_queue is None:
-            with self._init_lock:
-                if self._rq_queue is None:
-                    self._rq_queue = Queue(
-                        QUEUE_NAME, connection=self._get_connection()
-                    )
-        return self._rq_queue
+        """Return a Redis client backed by the shared connection pool"""
+        return Redis(connection_pool=self._pool.get())
 
     def enqueue_jobs(self, jobs: List[Dict[str, Any]]) -> List[Job]:
         enqueued, failures = [], []
-        rq = self._get_rq_queue()
+        rq = self._rq.get()
         for job_data in jobs:
             try:
                 func = job_data["func"]
                 args = job_data.get("args", [])
-                job_id = job_data.get("job_id")
                 tags = job_data.get("tags")
-                metadata = job_data.get("metadata")
                 job_kwargs = {
                     "job_timeout": job_data.get("job_timeout", JOB_TIMEOUT),
-                    "job_id": job_id,
-                    "meta": metadata or {},
-                }
-                job_kwargs_clean = {
-                    key: val for key, val in job_kwargs.items() if key != "tags"
+                    "job_id": job_data.get("job_id"),
+                    "meta": job_data.get("metadata") or {},
                 }
                 if tags:
-                    job = rq.enqueue(func, *args, tags=tags, **job_kwargs_clean)
+                    job = rq.enqueue(func, *args, tags=tags, **job_kwargs)
                 else:
-                    job = rq.enqueue(func, *args, **job_kwargs_clean)
+                    job = rq.enqueue(func, *args, **job_kwargs)
                 func_name = (
                     getattr(func, "__name__", None)
                     or getattr(func, "__qualname__", None)
                     or str(func)
                 )
-                logger.info(f"Job enqueued: {job.id} | {QUEUE_NAME} | {func_name}")
+                logger.info(
+                    "job_enqueued", job_id=job.id, queue=rq.name, func=func_name
+                )
                 enqueued.append(job)
             except Exception as err:
                 failures.append({"job_id": job_data.get("job_id"), "error": str(err)})
@@ -96,51 +79,39 @@ class _Queue:
             raise RuntimeError(f"{len(failures)} jobs failed to enqueue")
         return enqueued
 
-    def enqueue_chunked_jobs(
-        self,
-        items: List[Any],
-        chunk_size: int,
-        func: Any,
-        job_id_prefix: str,
-        extra_args: Tuple[Any, ...] = (),
-        job_timeout: Optional[int] = None,
-    ) -> List[Job]:
-        """Enqueue one RQ job per chunk of items with a shared timestamp in each job_id"""
-        if not items:
-            return []
-        if chunk_size < 1:
-            raise ValueError("chunk_size must be at least 1")
-        timeout = job_timeout if job_timeout is not None else JOB_TIMEOUT
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        specs: List[Dict[str, Any]] = []
-        chunk_idx = 0
-        for i in range(0, len(items), chunk_size):
-            chunk = items[i : i + chunk_size]
-            specs.append(
-                {
-                    "func": func,
-                    "args": (chunk,) + extra_args,
-                    "job_id": f"{job_id_prefix}_{timestamp}_{chunk_idx}",
-                    "job_timeout": timeout,
-                }
-            )
-            chunk_idx += 1
-        return self.enqueue_jobs(specs)
-
     def close(self) -> None:
-        if self._connection_pool is not None:
-            self._connection_pool.disconnect()
-            self._connection_pool = None
-            self._rq_queue = None
+        """Close shared Redis connection pool during shutdown"""
+        pool = self._pool.pop()
+        self._rq.reset()
+        if pool is not None:
+            pool.disconnect()
             logger.info("Redis connection pool closed")
+
+    def reset(self) -> None:
+        """Drop the cached pool and queue so a forked child rebuilds its own"""
+        self._pool.reset()
+        self._rq.reset()
+
+    def clear(self) -> Dict[str, int]:
+        """Purge all queued and failed jobs for this worker domain"""
+        rq = self._rq.get()
+        queued = rq.empty()
+        failed_registry = rq.failed_job_registry
+        failed_ids = failed_registry.get_job_ids()
+        for job_id in failed_ids:
+            failed_registry.remove(job_id, delete_job=True)
+        logger.info(
+            "queue_cleared", queue=rq.name, queued=queued, failed=len(failed_ids)
+        )
+        return {"queued": queued, "failed": len(failed_ids)}
 
     def health_check(self) -> Dict[str, Any]:
         try:
-            conn = self._get_connection()
+            conn = self.get_connection()
             start = time.time()
             conn.ping()
             ping_ms = (time.time() - start) * 1000
-            rq = self._get_rq_queue()
+            rq = self._rq.get()
             queued = len(rq)
             failed = len(rq.failed_job_registry)
             status = (
@@ -153,7 +124,7 @@ class _Queue:
                 "failed": failed,
             }
         except Exception as err:
-            logger.error(f"Health check failed: {err}")
+            logger.error("queue_health_check_failed", error=str(err))
             return {"status": "unhealthy", "error": str(err)}
 
 

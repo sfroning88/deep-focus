@@ -21,7 +21,7 @@ atexit.register(_executor.shutdown, wait=False)
 
 def _check_db() -> bool:
     try:
-        db_pool.execute_query("SELECT 1")
+        db_pool.run("SELECT 1")
         return True
     except Exception as err:
         logger.warning(f"DB health check failed: {err}")
