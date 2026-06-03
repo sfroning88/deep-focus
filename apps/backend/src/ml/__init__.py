@@ -1,5 +1,5 @@
 from .features import Features
-from .models import LoadedModel
+from .models import LoadedModel, PredictionTypeRegistry
 from .registry import model_registry
 
 __all__ = [
