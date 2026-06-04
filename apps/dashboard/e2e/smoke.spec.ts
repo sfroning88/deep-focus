@@ -1,136 +1,139 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
+import { TEST_IDS } from "@/lib/test-ids";
 import { routes } from "@lib/routes";
 
-test("home page renders dashboard heading", async ({ page }) => {
+async function gotoHome(page: Page) {
   await page.goto(routes.base.home);
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  await expect(page.getByTestId(TEST_IDS.homeScreen)).toBeVisible();
+}
+
+async function gotoAdmin(page: Page) {
+  await page.goto(routes.admin.root);
+  await expect(page.getByTestId(TEST_IDS.adminScreen)).toBeVisible();
+}
+
+async function waitForProperties(page: Page) {
+  await expect(page.getByTestId(TEST_IDS.propertiesHeading)).toBeVisible({
+    timeout: 15_000,
+  });
+}
+
+test("home page renders dashboard heading", async ({ page }) => {
+  await gotoHome(page);
+  await expect(page.getByTestId(TEST_IDS.dashboardHeading)).toBeVisible();
 });
 
 test("home page renders properties list", async ({ page }) => {
-  await page.goto(routes.base.home);
-  await expect(page.getByRole("heading", { name: "Properties" })).toBeVisible({
-    timeout: 15_000,
-  });
+  await gotoHome(page);
+  await waitForProperties(page);
 });
 
 test("home page renders search bar", async ({ page }) => {
-  await page.goto(routes.base.home);
-  await expect(
-    page.getByRole("textbox", { name: "Search properties" }),
-  ).toBeVisible();
+  await gotoHome(page);
+  await expect(page.getByTestId(TEST_IDS.propertySearchInput)).toBeVisible();
 });
 
 test("sort buttons are present on home page", async ({ page }) => {
-  await page.goto(routes.base.home);
-  await expect(page.getByRole("button", { name: /NAME/i })).toBeVisible();
-  await expect(page.getByRole("button", { name: /MSA/i })).toBeVisible();
-  await expect(page.getByRole("button", { name: /OCC/i })).toBeVisible();
-  await expect(page.getByRole("button", { name: /SNAPS/i })).toBeVisible();
+  await gotoHome(page);
+  await expect(page.getByTestId(TEST_IDS.sortButtonName)).toBeVisible();
+  await expect(page.getByTestId(TEST_IDS.sortButtonMsa)).toBeVisible();
+  await expect(page.getByTestId(TEST_IDS.sortButtonOcc)).toBeVisible();
+  await expect(page.getByTestId(TEST_IDS.sortButtonSnaps)).toBeVisible();
 });
 
 test("clicking a sort button changes active sort", async ({ page }) => {
-  await page.goto(routes.base.home);
-  await expect(page.getByRole("heading", { name: "Properties" })).toBeVisible({
-    timeout: 15_000,
-  });
-  const msaBtn = page.getByRole("button", { name: "MSA" });
+  await gotoHome(page);
+  await waitForProperties(page);
+  const msaBtn = page.getByTestId(TEST_IDS.sortButtonMsa);
   await msaBtn.click();
   await expect(msaBtn).toHaveAttribute("aria-pressed", "true");
 });
 
 test("searching filters property list", async ({ page }) => {
-  await page.goto(routes.base.home);
-  const search = page.getByRole("textbox", { name: "Search properties" });
+  await gotoHome(page);
+  const search = page.getByTestId(TEST_IDS.propertySearchInput);
   await search.fill("zzzzzzzznotarealaproperty");
-  await expect(
-    page.getByText("No properties match your search."),
-  ).toBeVisible();
+  await expect(page.getByTestId(TEST_IDS.propertySearchEmpty)).toBeVisible();
 });
 
 test("my profile button opens profile dialog", async ({ page }) => {
-  await page.goto(routes.base.home);
-  await page.getByRole("button", { name: "My Profile" }).click();
-  await expect(
-    page.getByRole("dialog").getByRole("heading", { name: "My Profile" }),
-  ).toBeVisible();
+  await gotoHome(page);
+  await page.getByTestId(TEST_IDS.myProfileButton).click();
+  await expect(page.getByTestId(TEST_IDS.myProfileDialog)).toBeVisible();
 });
 
 test("my profile dialog shows name and email fields", async ({ page }) => {
-  await page.goto(routes.base.home);
-  await page.getByRole("button", { name: "My Profile" }).click();
-  const dialog = page.getByRole("dialog");
-  await expect(dialog.getByText("Name")).toBeVisible();
-  await expect(dialog.getByText("Email")).toBeVisible();
+  await gotoHome(page);
+  await page.getByTestId(TEST_IDS.myProfileButton).click();
+  const dialog = page.getByTestId(TEST_IDS.myProfileDialog);
+  await expect(dialog.getByTestId(TEST_IDS.myProfileNameField)).toBeVisible();
+  await expect(dialog.getByTestId(TEST_IDS.myProfileEmailField)).toBeVisible();
 });
 
 test("my profile dialog closes on close button", async ({ page }) => {
-  await page.goto(routes.base.home);
-  await page.getByRole("button", { name: "My Profile" }).click();
-  const dialog = page.getByRole("dialog", { name: "My Profile" });
+  await gotoHome(page);
+  await page.getByTestId(TEST_IDS.myProfileButton).click();
+  const dialog = page.getByTestId(TEST_IDS.myProfileDialog);
   await expect(dialog).toBeVisible();
-  await dialog.getByRole("button", { name: "Close" }).click();
+  await dialog.getByTestId(TEST_IDS.myProfileCloseButton).click();
   await expect(dialog).not.toBeVisible();
 });
 
 test("first property view button opens property card dialog", async ({
   page,
 }) => {
-  await page.goto(routes.base.home);
-  await expect(page.getByRole("heading", { name: "Properties" })).toBeVisible({
-    timeout: 15_000,
-  });
-  const firstView = page.getByRole("button", { name: /^View / }).first();
+  await gotoHome(page);
+  await waitForProperties(page);
+  const firstView = page.getByTestId(TEST_IDS.propertyViewButton).first();
   const hasProperties = await firstView.isVisible();
   if (!hasProperties) {
     test.skip(true, "No properties visible in this deploy");
   }
   await firstView.click();
-  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByTestId(TEST_IDS.propertyCardDialog)).toBeVisible();
 });
 
 test("property card dialog has add snapshot button", async ({ page }) => {
-  await page.goto(routes.base.home);
-  const firstView = page.getByRole("button", { name: /^View/ }).first();
+  await gotoHome(page);
+  const firstView = page.getByTestId(TEST_IDS.propertyViewButton).first();
   const hasProperties = await firstView.isVisible();
   if (!hasProperties) {
     test.skip(true, "No properties visible in this deploy");
   }
   await firstView.click();
-  const dialog = page.getByRole("dialog");
+  const dialog = page.getByTestId(TEST_IDS.propertyCardDialog);
   await expect(
-    dialog.getByRole("button", { name: /Add snapshot/i }),
+    dialog.getByTestId(TEST_IDS.propertyCardAddSnapshotButton),
   ).toBeVisible();
 });
 
 test("add snapshot button opens snapshot form", async ({ page }) => {
-  await page.goto(routes.base.home);
-  const firstView = page.getByRole("button", { name: /^View/ }).first();
+  await gotoHome(page);
+  const firstView = page.getByTestId(TEST_IDS.propertyViewButton).first();
   const hasProperties = await firstView.isVisible();
   if (!hasProperties) {
     test.skip(true, "No properties visible in this deploy");
   }
   await firstView.click();
   await page
-    .getByRole("dialog")
-    .getByRole("button", { name: /Add snapshot/i })
+    .getByTestId(TEST_IDS.propertyCardDialog)
+    .getByTestId(TEST_IDS.propertyCardAddSnapshotButton)
     .click();
-  await expect(
-    page.getByRole("dialog", { name: /New snapshot/i }),
-  ).toBeVisible();
+  await expect(page.getByTestId(TEST_IDS.snapshotFormDialog)).toBeVisible();
 });
 
 test("property card has predict button when snapshots exist", async ({
   page,
 }) => {
-  await page.goto(routes.base.home);
-  const firstView = page.getByRole("button", { name: /^View/ }).first();
+  await gotoHome(page);
+  const firstView = page.getByTestId(TEST_IDS.propertyViewButton).first();
   const hasProperties = await firstView.isVisible();
   if (!hasProperties) {
     test.skip(true, "No properties visible in this deploy");
   }
   await firstView.click();
-  const dialog = page.getByRole("dialog");
-  const predictBtn = dialog.getByRole("button", { name: /^Predict$/ });
+  const dialog = page.getByTestId(TEST_IDS.propertyCardDialog);
+  const predictBtn = dialog.getByTestId(TEST_IDS.predictButton);
   const hasSnapshot = await predictBtn.isVisible();
   if (!hasSnapshot) {
     test.skip(true, "Property has no snapshots; predict card not rendered");
@@ -148,16 +151,16 @@ test("predict button is interactive and does not navigate away", async ({
       body: JSON.stringify({ predictions: [] }),
     });
   });
-  await page.goto(routes.base.home);
-  const firstView = page.getByRole("button", { name: /^View/ }).first();
+  await gotoHome(page);
+  const firstView = page.getByTestId(TEST_IDS.propertyViewButton).first();
   const hasProperties = await firstView.isVisible();
   if (!hasProperties) {
     test.skip(true, "No properties visible in this deploy");
   }
   await firstView.click();
   const predictBtn = page
-    .getByRole("dialog")
-    .getByRole("button", { name: /^Predict$/ });
+    .getByTestId(TEST_IDS.propertyCardDialog)
+    .getByTestId(TEST_IDS.predictButton);
   const hasBtn = await predictBtn.isVisible();
   if (!hasBtn) {
     test.skip(true, "Property has no snapshots; predict card not rendered");
@@ -167,40 +170,36 @@ test("predict button is interactive and does not navigate away", async ({
 });
 
 test("admin page renders admin heading", async ({ page }) => {
-  await page.goto(routes.admin.root);
-  await expect(page.getByRole("heading", { name: "Admin" })).toBeVisible();
+  await gotoAdmin(page);
+  await expect(page.getByTestId(TEST_IDS.adminHeading)).toBeVisible();
 });
 
 test("admin page renders training batches section", async ({ page }) => {
-  await page.goto(routes.admin.root);
-  await expect(page.getByText("Training Batches")).toBeVisible();
+  await gotoAdmin(page);
+  await expect(page.getByTestId(TEST_IDS.trainingBatchesHeading)).toBeVisible();
 });
 
 test("admin page has shuffle groups button", async ({ page }) => {
-  await page.goto(routes.admin.root);
-  await expect(
-    page.getByRole("button", { name: "Shuffle Groups" }),
-  ).toBeVisible();
+  await gotoAdmin(page);
+  await expect(page.getByTestId(TEST_IDS.shuffleGroupsButton)).toBeVisible();
 });
 
 test("admin page has train models button", async ({ page }) => {
-  await page.goto(routes.admin.root);
-  await expect(
-    page.getByRole("button", { name: "Train Models" }),
-  ).toBeVisible();
+  await gotoAdmin(page);
+  await expect(page.getByTestId(TEST_IDS.trainModelsButton)).toBeVisible();
 });
 
 test("admin page back to dashboard link navigates to home", async ({
   page,
 }) => {
-  await page.goto(routes.admin.root);
-  await page.getByRole("link", { name: "Back to dashboard" }).click();
+  await gotoAdmin(page);
+  await page.getByTestId(TEST_IDS.backToDashboardLink).click();
   await expect(page).toHaveURL((url) => url.pathname === routes.base.home);
 });
 
 test("home page open admin link navigates to admin", async ({ page }) => {
-  await page.goto(routes.base.home);
-  const adminLink = page.getByRole("link", { name: "Open admin" });
+  await gotoHome(page);
+  const adminLink = page.getByTestId(TEST_IDS.openAdminLink);
   const isAdmin = await adminLink.isVisible();
   if (!isAdmin) {
     test.skip(true, "Playwright user is not a platform admin");

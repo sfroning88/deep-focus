@@ -8,6 +8,7 @@ import { PropertyCard } from "@/app/(components)/(properties)/PropertyCard";
 import { PropertySearchBar } from "./(propertyList)/PropertySearchBar";
 import { PropertyListItem } from "./(propertyList)/PropertyListItem";
 import { MOBILE_BREAKPOINT } from "@/lib/constants";
+import { TEST_IDS } from "@lib/test-ids";
 import { getLatestByRecency, SortDir, SortField, toNum } from "@focus/utils";
 import type { PropertyListEntry } from "@focus/types";
 
@@ -84,6 +85,7 @@ export function PropertyList({ initialData }: PropertyListProps) {
   return (
     <div className="space-y-4 font-data">
       <h1
+        data-testid={TEST_IDS.propertiesHeading}
         className={`font-semibold text-fhp-blue-400 ${isMobile ? "text-lg" : "text-2xl"}`}
       >
         Properties
@@ -107,14 +109,20 @@ export function PropertyList({ initialData }: PropertyListProps) {
             : "Could not load properties."}
         </p>
       ) : !filtered.length ? (
-        <p className="text-white/40 text-sm">
+        <p
+          className="text-white/40 text-sm"
+          data-testid={query ? TEST_IDS.propertySearchEmpty : undefined}
+        >
           {query
             ? "No properties match your search."
             : "No properties to show."}
         </p>
       ) : (
         <>
-          <ul className="border border-white/10 rounded-md overflow-hidden bg-surface-dark">
+          <ul
+            data-testid={TEST_IDS.propertiesList}
+            className="border border-white/10 rounded-md overflow-hidden bg-surface-dark"
+          >
             {filtered.map((p) => (
               <PropertyListItem
                 key={p.id}

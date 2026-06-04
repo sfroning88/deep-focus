@@ -8,6 +8,7 @@ import {
 } from "@focus/utils";
 import { Dot, occupancyColors } from "@focus/ui";
 import type { PropertyListEntry } from "@focus/types";
+import { TEST_IDS } from "@lib/test-ids";
 
 type PropertyListItemProps = {
   property: PropertyListEntry;
@@ -79,6 +80,7 @@ export function PropertyListItem({
         )}
         <button
           type="button"
+          data-testid={TEST_IDS.propertyViewButton}
           onClick={() => onSelect(property.id)}
           aria-label={`View ${property.name}`}
           className={`

@@ -8,6 +8,7 @@ import { useTrainModels } from "@/app/(hooks)/use-train-models";
 import { useUserId } from "@/app/(hooks)/use-user-id";
 import { BatchListItem } from "./BatchListItem";
 import { MOBILE_BREAKPOINT } from "@/lib/constants";
+import { TEST_IDS } from "@lib/test-ids";
 import type { TrainingBatchListEntry } from "@focus/types";
 
 type BatchListProps = {
@@ -33,6 +34,7 @@ export function BatchList({ initialData }: BatchListProps) {
     <div className="space-y-4 font-data">
       <div className="flex items-center justify-between">
         <h2
+          data-testid={TEST_IDS.trainingBatchesHeading}
           className={`font-semibold text-fhp-blue-400 ${isMobile ? "text-lg" : "text-2xl"}`}
         >
           Training Batches
@@ -40,6 +42,7 @@ export function BatchList({ initialData }: BatchListProps) {
         <div className="flex items-center gap-2">
           <button
             type="button"
+            data-testid={TEST_IDS.shuffleGroupsButton}
             disabled={shuffleMutation.isPending}
             onClick={() => shuffleMutation.mutate()}
             className={`
@@ -56,6 +59,7 @@ export function BatchList({ initialData }: BatchListProps) {
           </button>
           <button
             type="button"
+            data-testid={TEST_IDS.trainModelsButton}
             disabled={trainMutation.isPending}
             onClick={() => trainMutation.mutate()}
             className={`

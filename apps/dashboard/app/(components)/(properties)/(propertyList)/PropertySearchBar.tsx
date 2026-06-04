@@ -2,6 +2,7 @@
 
 import { Search } from "lucide-react";
 import { SortDir, SortField } from "@focus/utils";
+import { TEST_IDS } from "@lib/test-ids";
 
 type PropertySearchBarProps = {
   query: string;
@@ -34,6 +35,7 @@ export function PropertySearchBar({
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
           aria-label="Search properties"
+          data-testid={TEST_IDS.propertySearchInput}
           className={`
             w-full rounded-md border border-white/10 bg-white/4
             text-white placeholder:text-white/30
@@ -47,6 +49,7 @@ export function PropertySearchBar({
       <div className="flex gap-1.5 shrink-0">
         <SortButton
           label="NAME"
+          testId={TEST_IDS.sortButtonName}
           active={sortField === SortField.name}
           dir={sortField === SortField.name ? sortDir : undefined}
           onClick={() => onToggleSort(SortField.name)}
@@ -54,6 +57,7 @@ export function PropertySearchBar({
         />
         <SortButton
           label="MSA"
+          testId={TEST_IDS.sortButtonMsa}
           active={sortField === SortField.msa}
           dir={sortField === SortField.msa ? sortDir : undefined}
           onClick={() => onToggleSort(SortField.msa)}
@@ -61,6 +65,7 @@ export function PropertySearchBar({
         />
         <SortButton
           label="OCC"
+          testId={TEST_IDS.sortButtonOcc}
           active={sortField === SortField.occupancy}
           dir={sortField === SortField.occupancy ? sortDir : undefined}
           onClick={() => onToggleSort(SortField.occupancy)}
@@ -68,6 +73,7 @@ export function PropertySearchBar({
         />
         <SortButton
           label="SNAPS"
+          testId={TEST_IDS.sortButtonSnaps}
           active={sortField === SortField.snapshots}
           dir={sortField === SortField.snapshots ? sortDir : undefined}
           onClick={() => onToggleSort(SortField.snapshots)}
@@ -80,12 +86,14 @@ export function PropertySearchBar({
 
 function SortButton({
   label,
+  testId,
   active,
   dir,
   onClick,
   isMobile,
 }: {
   label: string;
+  testId: string;
   active: boolean;
   dir?: SortDir;
   onClick: () => void;
@@ -96,6 +104,7 @@ function SortButton({
   return (
     <button
       type="button"
+      data-testid={testId}
       onClick={onClick}
       aria-pressed={active ? "true" : "false"}
       className={`
