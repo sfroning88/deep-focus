@@ -11,6 +11,7 @@ import { ExpenseBreakdownCard } from "./(propertyCard)/ExpenseBreakdownCard";
 import { PrdDetailCard } from "./(propertyCard)/PrdDetailCard";
 import { PredictCard } from "./(predictions)/PredictCard";
 import { SnapshotHistoryTable } from "./(propertyCard)/SnapshotHistoryTable";
+import { TEST_IDS } from "@lib/test-ids";
 
 type PropertyCardProps = {
   userId: string;
@@ -51,6 +52,7 @@ export function PropertyCard({
         role="dialog"
         aria-modal="true"
         aria-labelledby="property-card-title"
+        data-testid={TEST_IDS.propertyCardDialog}
         className="
           fixed inset-3 md:inset-auto
           md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2

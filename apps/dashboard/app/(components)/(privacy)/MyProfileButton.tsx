@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { User, X } from "lucide-react";
 import { useMyProfile } from "@/app/(hooks)/use-my-profile";
+import { TEST_IDS } from "@lib/test-ids";
 
 type MyProfileButtonProps = {
   userId: string;
@@ -26,6 +27,7 @@ export function MyProfileButton({ userId }: MyProfileButtonProps) {
           role="dialog"
           aria-modal
           aria-labelledby="profile-title"
+          data-testid={TEST_IDS.myProfileDialog}
         >
           <div className="flex items-center justify-between gap-3">
             <h2
@@ -36,6 +38,7 @@ export function MyProfileButton({ userId }: MyProfileButtonProps) {
             </h2>
             <button
               type="button"
+              data-testid={TEST_IDS.myProfileCloseButton}
               onClick={() => setOpen(false)}
               className="p-1 -mr-1 text-muted-foreground hover:text-card-foreground transition-colors"
               aria-label="Close"
@@ -48,7 +51,7 @@ export function MyProfileButton({ userId }: MyProfileButtonProps) {
             <p className="mt-4 text-sm text-muted-foreground">Loading…</p>
           ) : profile ? (
             <dl className="mt-4 flex flex-col gap-3 text-sm">
-              <div>
+              <div data-testid={TEST_IDS.myProfileNameField}>
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Name
                 </dt>
@@ -56,7 +59,7 @@ export function MyProfileButton({ userId }: MyProfileButtonProps) {
                   {profile.name ?? "—"}
                 </dd>
               </div>
-              <div>
+              <div data-testid={TEST_IDS.myProfileEmailField}>
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Email
                 </dt>
@@ -86,6 +89,7 @@ export function MyProfileButton({ userId }: MyProfileButtonProps) {
     <>
       <button
         type="button"
+        data-testid={TEST_IDS.myProfileButton}
         onClick={() => setOpen(true)}
         className="inline-flex items-center gap-1.5 rounded-sm border border-border px-2.5 py-1.5 text-sm font-medium text-zinc-600 hover:bg-secondary hover:text-zinc-900 transition-colors dark:text-zinc-400 dark:hover:text-zinc-100"
       >

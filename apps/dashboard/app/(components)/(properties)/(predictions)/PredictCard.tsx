@@ -7,6 +7,7 @@ import { firstPredictionResult } from "@focus/utils";
 import { usePredictModels } from "@/app/(hooks)/use-predict-models";
 import { PredictFeedback } from "./PredictFeedback";
 import { PredictMetric } from "./PredictMetric";
+import { TEST_IDS } from "@lib/test-ids";
 
 type PredictCardProps = {
   userId: string;
@@ -55,6 +56,7 @@ export function PredictCard({
         <SectionLabel>AI Predictions</SectionLabel>
         <button
           type="button"
+          data-testid={TEST_IDS.predictButton}
           disabled={isPending}
           onClick={() => {
             reset();

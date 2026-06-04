@@ -26,6 +26,7 @@ import {
 } from "@focus/utils";
 import { useCreateSnapshot } from "@/app/(hooks)/use-create-snapshot";
 import { SectionLabel } from "@focus/ui";
+import { TEST_IDS } from "@lib/test-ids";
 
 type CreateSnapshotModalProps = {
   userId: string;
@@ -86,6 +87,7 @@ export function CreateSnapshotModal({
           role="dialog"
           aria-modal
           aria-labelledby={formId}
+          data-testid={TEST_IDS.snapshotFormDialog}
         >
           <div className="flex items-center justify-between gap-3 border-b border-white/10 px-3 py-2.5 md:px-4 md:py-3 shrink-0">
             <h2 id={formId} className="text-sm font-semibold text-white">
@@ -224,6 +226,7 @@ export function CreateSnapshotModal({
     <>
       <button
         type="button"
+        data-testid={TEST_IDS.propertyCardAddSnapshotButton}
         onClick={() => {
           setForm(getDefaultSnapshotFormState());
           setOpen(true);
