@@ -4,16 +4,9 @@ Created Date: 5.9.2026
 Core backend API orchestration
 """
 
-from fastapi import APIRouter, Depends
-from focus_python import (
-    dependency,
-    error,
-    logging,
-)
-from focus_python import (
-    PredictionType,
-    PrismaPrediction,
-)
+from fastapi import APIRouter, Depends, Request
+from focus_python import dependency, error, logging
+from focus_python import PredictionType, PrismaPrediction
 from .schemas import PredictionRequest, PredictionResponse
 
 logger = logging.get_logger(__name__)
@@ -41,18 +34,18 @@ except Exception as err:
     "/predict/{prediction_type}", dependencies=[Depends(dependency.get_token_header)]
 )
 async def model_predict(
-    prediction_type: PredictionType, request: PredictionRequest
+    request: Request, prediction_type: PredictionType, payload: PredictionRequest
 ) -> PredictionResponse:
     """Retrieve controllable PRD prediction(s) from the latest training batch"""
     if not predictions_available:
         raise error("Predictions service unavailable", status_code=503)
 
-    logging.bind_job_context(property_id=request.property_id)
+    logging.bind_job_context(property_id=payload.property_id)
     try:
         predictions = InferenceServices.predict(
-            property_id=request.property_id,
+            property_id=payload.property_id,
             prediction_type=prediction_type,
-            multi_enabled=request.multi_enabled,
+            multi_enabled=payload.multi_enabled,
         )
         return PredictionResponse(
             predictions=[
