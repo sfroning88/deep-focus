@@ -6,11 +6,7 @@ Core backend API orchestration
 
 from fastapi import APIRouter, Depends
 from fastapi.concurrency import run_in_threadpool
-from focus_python import (
-    dependency,
-    error,
-    logging,
-)
+from focus_python import dependency, error, logging, limiter
 from .schemas import ModelRequest, ModelResponse
 
 logger = logging.get_logger(__name__)
@@ -35,6 +31,7 @@ except Exception as err:
 
 
 @router.post("/ml/reload", dependencies=[Depends(dependency.get_token_header)])
+@limiter.limit("1/hour")
 async def reload_registry(request: ModelRequest) -> ModelResponse:
     """Reload model registry with latest batch winner"""
     if not models_available:

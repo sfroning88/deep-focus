@@ -10,12 +10,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from fastapi import FastAPI
-from focus_python import (
-    config,
-    exception,
-    logging,
-    middleware,
-)
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from focus_python import config, exception, logging, middleware, limiter
 from core import health, lifespan
 from integrations import TrainingRouter
 
@@ -36,6 +34,11 @@ app.add_middleware(middleware)
 
 # Register exception handlers
 exception.register_exception_handlers(app)
+
+# Rate limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 # Include routers
 app.include_router(health.router)

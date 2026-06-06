@@ -5,15 +5,8 @@ Core backend API orchestration
 """
 
 from fastapi import APIRouter, Depends
-from focus_python import (
-    dependency,
-    error,
-    logging,
-)
-from focus_python import (
-    PredictionType,
-    PrismaPrediction,
-)
+from focus_python import dependency, error, logging
+from focus_python import PredictionType, PrismaPrediction
 from .schemas import PredictionRequest, PredictionResponse
 
 logger = logging.get_logger(__name__)

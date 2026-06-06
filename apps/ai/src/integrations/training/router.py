@@ -6,16 +6,8 @@ Core AI API orchestration
 
 from fastapi import APIRouter, Depends
 from uuid import uuid4
-from focus_python import (
-    dependency,
-    error,
-    logging,
-    queue,
-)
-from focus_python import (
-    PredictionType,
-    TRAINING_JOBS,
-)
+from focus_python import dependency, error, logging, queue, limiter
+from focus_python import PredictionType, TRAINING_JOBS
 from .schemas import ShuffleRequest, TrainingRequest, ShuffleResponse, TrainingResponse
 
 logger = logging.get_logger(__name__)
@@ -41,7 +33,8 @@ except Exception as err:
 
 
 @router.post("/shuffle", dependencies=[Depends(dependency.get_token_header)])
-async def group_shuffle(_request: ShuffleRequest) -> ShuffleResponse:
+@limiter.limit("5/minute")
+async def group_shuffle(request: ShuffleRequest) -> ShuffleResponse:
     """Shuffle snapshots into different TrainingSplit"""
     if not training_available:
         raise error("Training service unavailable", status_code=503)
@@ -68,8 +61,9 @@ async def group_shuffle(_request: ShuffleRequest) -> ShuffleResponse:
 @router.post(
     "/train/{prediction_type}", dependencies=[Depends(dependency.get_token_header)]
 )
+@limiter.limit("3/hour")
 async def model_train(
-    prediction_type: PredictionType, _request: TrainingRequest
+    prediction_type: PredictionType, request: TrainingRequest
 ) -> TrainingResponse:
     """Train batch of sklearn models by PredictionType"""
     if not training_available:

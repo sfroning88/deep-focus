@@ -87,6 +87,7 @@ from .fastapi import (
     error,
     exception,
     middleware,
+    limiter,
 )
 from .models import (
     BaseFocus,
@@ -199,6 +200,7 @@ __all__ = [
     "error",
     "exception",
     "middleware",
+    "limiter",
     "BaseFocus",
     "BasePrisma",
     "NICMSA",
