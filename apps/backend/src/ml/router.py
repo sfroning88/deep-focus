@@ -4,7 +4,7 @@ Modified Date: 5.30.2026
 Core backend API orchestration
 """
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from fastapi.concurrency import run_in_threadpool
 from focus_python import dependency, error, logging, limiter
 from .schemas import ModelRequest, ModelResponse
@@ -31,31 +31,31 @@ except Exception as err:
 
 
 @router.post("/ml/reload", dependencies=[Depends(dependency.get_token_header)])
-@limiter.limit("1/hour")
-async def reload_registry(request: ModelRequest) -> ModelResponse:
+@limiter.limit("6/hour")
+async def reload_registry(request: Request, payload: ModelRequest) -> ModelResponse:
     """Reload model registry with latest batch winner"""
     if not models_available:
         raise error("Model registry unavailable", status_code=503)
 
     try:
         await run_in_threadpool(
-            model_registry.load, request.prediction_type, request.multi_enabled
+            model_registry.load, payload.prediction_type, payload.multi_enabled
         )
 
         return ModelResponse(
-            model_ids=model_registry.loaded_model_types(request.prediction_type)
+            model_ids=model_registry.loaded_model_types(payload.prediction_type)
         )
     except RuntimeError as err:
         logger.error(
             "model_registry_unavailable",
-            prediction_type=request.prediction_type.value,
+            prediction_type=payload.prediction_type.value,
             error=str(err),
         )
         raise error(str(err), status_code=503)
     except Exception as err:
         logger.error(
             "model_registry_failed",
-            prediction_type=request.prediction_type.value,
+            prediction_type=payload.prediction_type.value,
             error=str(err),
         )
         raise error("Model registry failed", status_code=500)
