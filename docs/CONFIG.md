@@ -25,6 +25,8 @@ Conventions:
 
 Raise HTTP errors with **`error(...)`** from **`focus_python`** (application error type). Register handlers once in **`main.py`** with **`exception.register_exception_handlers(app)`**.
 
+Routes are globally **rate limited** using [`slowapi`](https://github.com/laurentS/slowapi).
+
 ## Services
 
 Import shared infrastructure from **`focus_python`**, not from a local **`core`** package for those concerns.
