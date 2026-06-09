@@ -27,7 +27,7 @@ except ImportError as err:
     logger.error("Failed to import Inference", error=str(err))
 except Exception as err:
     predictions_available = False
-    logger.error(f"Failed to boot up Predictions: {str(err)}")
+    logger.error("Failed to boot up Predictions", error=str(err))
 
 
 @router.post(

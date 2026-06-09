@@ -8,7 +8,7 @@ function generateUserId(): string {
   );
 }
 
-export function getCookie(name: string): string | null {
+function getCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);

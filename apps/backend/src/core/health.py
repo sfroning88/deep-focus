@@ -24,7 +24,7 @@ def _check_db() -> bool:
         db_pool.run("SELECT 1")
         return True
     except Exception as err:
-        logger.warning(f"DB health check failed: {err}")
+        logger.warning("DB health check failed", error=str(err))
         return False
 
 
@@ -36,7 +36,7 @@ def _check_redis() -> bool:
         conn.ping()
         return True
     except Exception as err:
-        logger.warning(f"Redis health check failed: {err}")
+        logger.warning("Redis health check failed", error=str(err))
         return False
 
 

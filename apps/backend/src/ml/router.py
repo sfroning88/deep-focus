@@ -24,10 +24,10 @@ try:
     models_available = True
 except ImportError as err:
     models_available = False
-    logger.error(f"Failed to import Models: {str(err)}")
+    logger.error("Failed to import Models", error=str(err))
 except Exception as err:
     models_available = False
-    logger.error(f"Failed to boot up Models: {str(err)}")
+    logger.error("Failed to boot up Models", error=str(err))
 
 
 @router.post("/ml/reload", dependencies=[Depends(dependency.get_token_header)])

@@ -30,7 +30,7 @@ listen = [config.get_required("domain")]
 
 def cleanup_on_shutdown(signum: int, _frame) -> None:
     """Graceful shutdown handler"""
-    logger.info(f"🛑 Received signal {signum}, shutting down gracefully...")
+    logger.info("Received signal, shutting down gracefully...", signal=signum)
     sys.exit(0)
 
 
@@ -46,16 +46,18 @@ if __name__ == "__main__":
         if worker_class == "SimpleWorker":
             worker = SimpleWorker(queues, connection=redis_conn)
             logger.info(
-                f"Worker {worker.name} initialized (SimpleWorker - development mode)"
+                "Worker initialized", worker_name=worker.name, mode="development"
             )
-            logger.warning("⚠️  SimpleWorker does not support parallel job processing")
+            logger.warning("SimpleWorker does not support parallel job processing")
         else:
             worker = Worker(queues, connection=redis_conn)
-            logger.info(f"Worker {worker.name} initialized (Worker - production mode)")
+            logger.info(
+                "Worker initialized", worker_name=worker.name, mode="production"
+            )
         try:
             worker.work(with_scheduler=False)
         except KeyboardInterrupt:
             logger.info("Worker received shutdown signal")
     except Exception as err:
-        logger.exception(f"Error in worker process: {str(err)}")
+        logger.exception("Error in worker process", error=str(err))
         sys.exit(1)
