@@ -62,7 +62,7 @@ class _DatabaseConnectionPool:
             keepalives_interval=10,
             keepalives_count=5,
         )
-        logger.info(f"Database pool initialized {pool_min}:{pool_max}")
+        logger.info("Database pool initialized", pool_min=pool_min, pool_max=pool_max)
         return pool
 
     def get_conn(self):

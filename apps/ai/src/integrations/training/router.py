@@ -29,7 +29,7 @@ except ImportError as err:
     logger.error("Failed to import Training", error=str(err))
 except Exception as err:
     training_available = False
-    logger.error(f"Failed to boot up Training: {str(err)}")
+    logger.error("Failed to boot up Training", error=str(err))
 
 
 @router.post("/shuffle", dependencies=[Depends(dependency.get_token_header)])
