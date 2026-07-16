@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Created Date: 6.3.2026
+Modified Date: 7.16.2026
 Unit tests for training feature engineering
 """
 
@@ -11,6 +11,7 @@ import pytest
 from focus_python import (
     FEATURE_COLUMNS,
     NICState,
+    NumberUtils,
     PredictionType,
     Property,
     PropertySnapshot,
@@ -56,6 +57,11 @@ def test_build_training_dataframe_joins_property_and_snapshot():
     assert list(frame.X.columns) == FEATURE_COLUMNS
     assert frame.target == "controllable_prd"
     assert float(frame.y.iloc[0]) == pytest.approx(12.5)
+    expected_sin, expected_cos = NumberUtils.encode_cyclical(
+        date(2024, 6, 1).toordinal()
+    )
+    assert frame.X["snapshot_month_sin"].iloc[0] == pytest.approx(expected_sin)
+    assert frame.X["snapshot_month_cos"].iloc[0] == pytest.approx(expected_cos)
 
 
 def test_build_training_dataframe_requires_non_empty_inputs():

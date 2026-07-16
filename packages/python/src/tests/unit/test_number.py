@@ -1,10 +1,12 @@
 """
 Author: Sean Froning
-Created Date: 6.3.2026
+Modified Date: 7.16.2026
 Unit tests for NumberUtils decimal clamping
 """
 
 import math
+from datetime import date
+
 import pytest
 from focus_python import NumberUtils
 
@@ -33,3 +35,21 @@ def test_clamp_decimal_negative_infinity_maps_to_lower_limit():
 def test_clamp_decimal_rejects_nan_or_none(value):
     with pytest.raises(ValueError):
         NumberUtils.clamp_decimal(value, precision=6, scale=4)
+
+
+def test_encode_cyclical_uses_snapshot_month():
+    sin_val, cos_val = NumberUtils.encode_cyclical(date(2024, 6, 1).toordinal())
+    assert sin_val == pytest.approx(0.0)
+    assert cos_val == pytest.approx(-1.0)
+
+
+def test_encode_cyclical_january():
+    sin_val, cos_val = NumberUtils.encode_cyclical(date(2024, 1, 15).toordinal())
+    assert sin_val == pytest.approx(0.5)
+    assert cos_val == pytest.approx(math.sqrt(3) / 2)
+
+
+@pytest.mark.parametrize("value", [None, float("nan")])
+def test_encode_cyclical_rejects_nan_or_none(value):
+    with pytest.raises(ValueError):
+        NumberUtils.encode_cyclical(value)

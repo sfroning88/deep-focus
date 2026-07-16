@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Modified Date: 5.16.2026
+Modified Date: 7.16.2026
 Model training feature engineering
 """
 
@@ -14,6 +14,8 @@ from focus_python import (
     MSA_POPULATION_COLUMN,
     MSA_UNKNOWN,
     SNAPSHOT_DATE_COLUMN,
+    SNAPSHOT_MONTH_SIN_COLUMN,
+    SNAPSHOT_MONTH_COS_COLUMN,
     STATE_FEATURE_COLUMN,
     STATE_UNKNOWN,
     TOTAL_UNITS_COLUMN,
@@ -74,9 +76,17 @@ class Features:
             df["state_id"].map(state_encoding).fillna(global_mean)
         )
 
-        snapshot_year = pd.to_datetime(
+        snapshot_dt = pd.to_datetime(
             df[SNAPSHOT_DATE_COLUMN].apply(lambda o: pd.Timestamp.fromordinal(int(o)))
-        ).dt.year
+        )
+        snapshot_year = snapshot_dt.dt.year
+
+        encoded = df[SNAPSHOT_DATE_COLUMN].map(
+            lambda o: NumberUtils.encode_cyclical(int(o))
+        )
+        df[SNAPSHOT_MONTH_SIN_COLUMN] = encoded.map(lambda t: t[0])
+        df[SNAPSHOT_MONTH_COS_COLUMN] = encoded.map(lambda t: t[1])
+
         df[YEARS_SINCE_RENOVATION_COLUMN] = np.where(
             df["year_renovated_ordinal"].notna(),
             snapshot_year - df["year_renovated_ordinal"],

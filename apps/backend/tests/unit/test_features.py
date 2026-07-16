@@ -1,12 +1,13 @@
 """
 Author: Sean Froning
-Created Date: 6.3.2026
+Modified Date: 7.16.2026
 Unit tests for inference feature engineering
 """
 
 from datetime import date
 
-from focus_python import FEATURE_COLUMNS, NICState, Property
+import pytest
+from focus_python import FEATURE_COLUMNS, NICState, NumberUtils, Property
 from ml.features import Features
 
 
@@ -39,7 +40,11 @@ def test_build_predict_vector_matches_feature_columns():
     assert len(frame) == 1
     assert frame["msa_id_encoded"].iloc[0] == 12.0
     assert frame["state_encoded"].iloc[0] == 11.0
-    assert frame["snapshot_date"].iloc[0] == date(2024, 1, 15).toordinal()
+    snapshot_ordinal = date(2024, 1, 15).toordinal()
+    expected_sin, expected_cos = NumberUtils.encode_cyclical(snapshot_ordinal)
+    assert frame["snapshot_date"].iloc[0] == snapshot_ordinal
+    assert frame["snapshot_month_sin"].iloc[0] == pytest.approx(expected_sin)
+    assert frame["snapshot_month_cos"].iloc[0] == pytest.approx(expected_cos)
 
 
 def test_build_predict_vector_falls_back_to_global_mean_for_unknown_keys():

@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Modified Date: 5.16.2026
+Modified Date: 7.16.2026
 Definitions for training structures
 """
 
@@ -14,6 +14,8 @@ MSA_UNKNOWN: str = "unknown"
 STATE_FEATURE_COLUMN: str = "state_encoded"
 STATE_UNKNOWN: str = "unknown"
 SNAPSHOT_DATE_COLUMN: str = "snapshot_date"
+SNAPSHOT_MONTH_SIN_COLUMN: str = "snapshot_month_sin"
+SNAPSHOT_MONTH_COS_COLUMN: str = "snapshot_month_cos"
 TOTAL_UNITS_COLUMN: str = "total_units"
 UNIT_SIZE_COLUMN: str = "unit_size"
 BEDS_PER_UNIT_COLUMN: str = "beds_per_unit"
@@ -25,6 +27,8 @@ FEATURE_COLUMNS: List[str] = [
     MSA_FEATURE_COLUMN,
     MSA_POPULATION_COLUMN,
     SNAPSHOT_DATE_COLUMN,
+    SNAPSHOT_MONTH_SIN_COLUMN,
+    SNAPSHOT_MONTH_COS_COLUMN,
     STATE_FEATURE_COLUMN,
     TOTAL_UNITS_COLUMN,
     UNIT_SIZE_COLUMN,
@@ -42,7 +46,7 @@ TRAINING_JOBS = {
     "svr": TrainingType.SVR,
     "elasticnet": TrainingType.ELASTICNET,
 }
-TRAINING_FEATURE_SCHEMA_VERSION = 7
+TRAINING_FEATURE_SCHEMA_VERSION = 8
 TRAINING_FUNCTION_SPLIT_VERSION = 1
 TRAINING_SPLIT_SEED = 42
 TRAINING_MIN_SPLIT_SAMPLES = 5
