@@ -21,6 +21,8 @@ features = [
     msa_population, # msa information
     state_id_encoded, # mean-target encoded with match presence
     snapshot_date, # temporal field with ordinal casting (days since origin)
+    snapshot_month_sin, # temporal field with cyclical encoding
+    snapshot_month_cos, # temporal field with cyclical encoding
     total_units, # property information
     unit_size, # property information
     year_built, # property information
@@ -63,6 +65,10 @@ Alternative encoding strategies include:
 - **Frequencey Encoding** to capture the relative frequency (`mode`) of a category within the dataset
 - **Leave-One-Out Encoding** to capture mean target but leaving out the target value being encoded
 
+### Cyclical Encoding
+
+Two additionally derived fields, `snapshot_month_sin` and `snapshot_month_cos`, capture seasonal trends based on the `month` of the original `snapshot_dt`. By employing **cyclical encoding**, models capture seasonal trends (summer `occupancy` spikes) and wrap-around context (`Dec` being adjacent to `Jan`).
+
 ### Ratio Heavy
 
 The `feature contract` relies heavily on **derived ratios** (ie `pct_cottage`, `beds_per_unit`, etc). This naturally decouples building size from building mix, capturing the **scale invariant** intent. This is supplemented by an `orthogonal feature contract` that includes `total_units`.
@@ -90,7 +96,6 @@ Each persisted `.pkl` model carries everything needed to reproduce its feature t
 
 Intending to implement the following alterations:
 
-- **cyclical encoding** field with `month_sin`, `month_cos`
 - **missing indicator** columns that survive imputation
 - **region relative** features for `properties` relative to market
 - **interaction terms** for **linear** models performance boosts

@@ -1,10 +1,12 @@
 """
 Author: Sean Froning
-Created Date: 5.9.2026
+Modified Date: 7.16.2026
 Number field validator utils
 """
 
 import math
+import pandas as pd
+from typing import Tuple
 
 
 class NumberUtils:
@@ -30,3 +32,11 @@ class NumberUtils:
         if math.isinf(value):
             return limit if value > 0 else -limit
         return max(-limit, min(limit, round(value, scale)))
+
+    @staticmethod
+    def encode_cyclical(ordinal: int) -> Tuple[float, float]:
+        if ordinal is None or math.isnan(ordinal):
+            raise ValueError("encode_cyclical received NaN/None")
+        month = pd.Timestamp.fromordinal(ordinal).month
+        angle = 2.0 * math.pi * month / 12.0
+        return math.sin(angle), math.cos(angle)

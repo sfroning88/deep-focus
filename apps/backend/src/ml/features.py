@@ -1,6 +1,6 @@
 """
 Author: Sean Froning
-Modified Date: 5.16.2026
+Modified Date: 7.16.2026
 Model inference feature engineering
 """
 
@@ -16,6 +16,8 @@ from focus_python import (
     MSA_POPULATION_COLUMN,
     MSA_UNKNOWN,
     SNAPSHOT_DATE_COLUMN,
+    SNAPSHOT_MONTH_SIN_COLUMN,
+    SNAPSHOT_MONTH_COS_COLUMN,
     STATE_FEATURE_COLUMN,
     STATE_UNKNOWN,
     TOTAL_UNITS_COLUMN,
@@ -65,6 +67,9 @@ class Features:
         year_built = NumberUtils._to_float(prop.year_built)
         year_renovated = NumberUtils._to_float(prop.year_renovated)
         snapshot_year = float(ref_date.year)
+        snapshot_month_sin, snapshot_month_cos = NumberUtils.encode_cyclical(
+            ref_ordinal
+        )
         years_since_renovation = (
             snapshot_year - year_renovated
             if not isnan(year_renovated)
@@ -82,6 +87,8 @@ class Features:
                 0.0 if isnan(msa_population_raw) else msa_population_raw
             ),
             SNAPSHOT_DATE_COLUMN: ref_ordinal,
+            SNAPSHOT_MONTH_SIN_COLUMN: snapshot_month_sin,
+            SNAPSHOT_MONTH_COS_COLUMN: snapshot_month_cos,
             STATE_FEATURE_COLUMN: state_encoded,
             TOTAL_UNITS_COLUMN: total_units,
             UNIT_SIZE_COLUMN: 0.0 if isnan(unit_size_raw) else unit_size_raw,
